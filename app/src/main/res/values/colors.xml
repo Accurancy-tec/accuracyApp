@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!--  Fundo principal  -->
+    <color name="bg_deep">#FF06101E</color>
+    <!--  Fundo do card/phone  -->
+    <color name="bg_surface">#FF0A1628</color>
+    <!--  Azul primário (botões, destaques)  -->
+    <color name="primary_blue">#FF2563EB</color>
+    <!--  Texto principal (branco quase puro)  -->
+    <color name="text_primary">#FFF1F5F9</color>
+    <!--  Texto secundário (cinza médio)  -->
+    <color name="text_secondary">#FF475569</color>
+    <!--  Texto de placeholder  -->
+    <color name="text_placeholder">#FF334155</color>
+    <!--  Borda dos campos  -->
+    <color name="input_border">#1AFFFFFF</color>
+    <!--  Fundo dos campos  -->
+    <color name="input_bg">#0DFFFFFF</color>
+    <!--  Fundo dos botões sociais  -->
+    <color name="social_bg">#0AFFFFFF</color>
+    <!--  Linha divisória  -->
+    <color name="divider">#12FFFFFF</color>
+    <!--  Tab inativa  -->
+    <color name="tab_bg">#0DFFFFFF</color>
+</resources>

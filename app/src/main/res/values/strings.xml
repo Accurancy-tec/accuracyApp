@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">InvestFlow</string>
+    <!--  Espaçamentos  -->
+    <dimen name="screen_padding">24dp</dimen>
+    <dimen name="input_padding_h">14dp</dimen>
+    <dimen name="input_padding_v">13dp</dimen>
+    <dimen name="corner_input">10dp</dimen>
+    <dimen name="corner_btn">10dp</dimen>
+    <dimen name="corner_tab">8dp</dimen>
+    <dimen name="corner_logo">10dp</dimen>
+    <!--  Tamanhos de fonte  -->
+    <dimen name="text_app_name">14sp</dimen>
+    <dimen name="text_headline">22sp</dimen>
+    <dimen name="text_sub">13sp</dimen>
+    <dimen name="text_label">10sp</dimen>
+    <dimen name="text_input">14sp</dimen>
+    <dimen name="text_btn">14sp</dimen>
+    <dimen name="text_tab">13sp</dimen>
+    <dimen name="text_link">12sp</dimen>
+    <dimen name="text_social">11sp</dimen>
+</resources>
