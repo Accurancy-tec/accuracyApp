@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -26,7 +27,8 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText editEmail;
     EditText editSenha;
-    Button   btnEntrar;
+    Button   btnLogin;
+    Button btnRegister;
     TextView btnEsqueciSenha;
     ImageView btnToggleSenha;
     TextView tabEntrar;
@@ -34,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     LinearLayout btnGoogle;
     LinearLayout btnGitHub;
     TextView btnIrCadastro;
+    View layoutLogin;
+    View layoutRegister;
 
     private boolean senhaVisivel = false;
 
@@ -43,16 +47,19 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editEmail       = findViewById(R.id.editEmail);
-        editSenha       = findViewById(R.id.editSenha);
-        btnEntrar       = findViewById(R.id.btnEntrar);
+        editEmail = findViewById(R.id.editEmail);
+        editSenha = findViewById(R.id.editSenha);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnRegister = findViewById(R.id.btnRegister);
         btnEsqueciSenha = findViewById(R.id.btnEsqueciSenha);
-        btnToggleSenha  = findViewById(R.id.btnToggleSenha);
-        tabEntrar       = findViewById(R.id.tabEntrar);
-        tabCadastrar    = findViewById(R.id.tabCadastrar);
-        btnGoogle       = findViewById(R.id.btnGoogle);
-        btnGitHub       = findViewById(R.id.btnGitHub);
-        btnIrCadastro   = findViewById(R.id.btnIrCadastro);
+        btnToggleSenha = findViewById(R.id.btnToggleSenha);
+        tabEntrar = findViewById(R.id.tabEntrar);
+        tabCadastrar = findViewById(R.id.tabCadastrar);
+        btnGoogle = findViewById(R.id.btnGoogle);
+        btnGitHub = findViewById(R.id.btnGitHub);
+        btnIrCadastro = findViewById(R.id.btnIrCadastro);
+        layoutLogin = findViewById(R.id.layoutLogin);
+        layoutRegister = findViewById(R.id.layoutRegister);
 
         configurarListeners();
     }
@@ -60,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void configurarListeners() {
 
-        btnEntrar.setOnClickListener(new View.OnClickListener() {
+        btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = editEmail.getText().toString().trim();
@@ -119,23 +126,27 @@ public class LoginActivity extends AppCompatActivity {
         tabCadastrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Navegar para a tela de cadastro
-                // Intent intent = new Intent(LoginActivity.this, CadastroActivity.class);
-                // startActivity(intent);
+                layoutLogin.setVisibility(View.GONE);
+                layoutRegister.setVisibility(View.VISIBLE);
 
-                tabEntrar.setBackgroundResource(0); // remove background ativo
-                tabEntrar.setTextColor(getColor(R.color.text_secondary));
                 tabCadastrar.setBackgroundResource(R.drawable.bg_tab_active);
+                tabEntrar.setBackgroundResource(0);
+
                 tabCadastrar.setTextColor(getColor(R.color.text_primary));
+                tabEntrar.setTextColor(getColor(R.color.text_secondary));
             }
         });
 
         tabEntrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tabCadastrar.setBackgroundResource(0);
-                tabCadastrar.setTextColor(getColor(R.color.text_secondary));
+                layoutLogin.setVisibility(View.VISIBLE);
+                layoutRegister.setVisibility(View.GONE);
+
                 tabEntrar.setBackgroundResource(R.drawable.bg_tab_active);
+                tabCadastrar.setBackgroundResource(0);
+
+                tabCadastrar.setTextColor(getColor(R.color.text_secondary));
                 tabEntrar.setTextColor(getColor(R.color.text_primary));
             }
         });
