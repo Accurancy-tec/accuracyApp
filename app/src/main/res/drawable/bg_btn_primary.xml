@@ -10,7 +10,7 @@
     <!-- Estado normal -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#2563EB" />
+            <solid android:color="@color/btn_primary" />
             <corners android:radius="10dp" />
         </shape>
     </item>

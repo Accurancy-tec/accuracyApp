@@ -24,7 +24,6 @@
         android:textColor="@color/text_secondary"
         android:textSize="13sp" />
 
-    <!-- EMAIL -->
 
     <TextView
         android:layout_width="wrap_content"
@@ -52,7 +51,6 @@
         android:textColorHint="@color/text_placeholder"
         android:textSize="14sp" />
 
-    <!-- SENHA -->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -120,6 +118,8 @@
         android:layout_height="50dp"
         android:layout_marginBottom="24dp"
         android:background="@drawable/bg_btn_primary"
+        android:backgroundTint="@null"
+        android:radius="10dp"
         android:stateListAnimator="@null"
         android:text="Entrar na conta"
         android:textColor="@color/text_primary"

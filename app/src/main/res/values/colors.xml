@@ -24,4 +24,6 @@
     <color name="divider">#12FFFFFF</color>
     <!--  Tab inativa  -->
     <color name="tab_bg">#0DFFFFFF</color>
+
+    <color name="btn_primary">#2563EB</color>
 </resources>
