@@ -4,10 +4,10 @@ public class User {
     private String nome_usuario;
     private String email_usuario;
     private String senha_usuario;
-    private int cpf_usuario;
-    private int telefone_usuario;
+    private String cpf_usuario;
+    private String telefone_usuario;
 
-    public User(String nome_usuario, int telefone_usuario, int cpf_usuario, String senha_usuario, String email_usuario) {
+    public User(String nome_usuario, String telefone_usuario, String cpf_usuario, String senha_usuario, String email_usuario) {
         this.nome_usuario = nome_usuario;
         this.telefone_usuario = telefone_usuario;
         this.cpf_usuario = cpf_usuario;
@@ -47,19 +47,19 @@ public class User {
         this.senha_usuario = senha_usuario;
     }
 
-    public int getCpf_usuario() {
+    public String getCpf_usuario() {
         return cpf_usuario;
     }
 
-    public void setCpf_usuario(int cpf_usuario) {
+    public void setCpf_usuario(String cpf_usuario) {
         this.cpf_usuario = cpf_usuario;
     }
 
-    public int getTelefone_usuario() {
+    public String getTelefone_usuario() {
         return telefone_usuario;
     }
 
-    public void setTelefone_usuario(int telefone_usuario) {
+    public void setTelefone_usuario(String telefone_usuario) {
         this.telefone_usuario = telefone_usuario;
     }
 }
