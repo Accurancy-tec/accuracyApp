@@ -17,7 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.accturancy.Api.ApiResponse;
-import com.example.accturancy.Api.ApiService;
+import com.example.accturancy.Api.ApiServicePost;
 import com.example.accturancy.Api.RetrofitClient;
 import com.example.accturancy.Classes.clsAportes;
 import com.example.accturancy.R;
@@ -86,9 +86,9 @@ public class Aportes extends AppCompatActivity {
 
         //Puxando a função que contem as outras partes do código
         //Em tese não muda nada mas facilita a manutenção
-        sistema();
+        aportes();
     }
-    private void sistema(){
+    private void aportes(){
 
         //Executa ao clicar no botão de Enviar
         btnEnviar.setOnClickListener(new View.OnClickListener() {
@@ -112,9 +112,9 @@ public class Aportes extends AppCompatActivity {
                 Double Preco = Double.parseDouble(SPreco);
 
                 //Cria o objeto api, responsável por enviar os dados para o banco de dados
-                ApiService api = RetrofitClient
+                ApiServicePost api = RetrofitClient
                         .getClient()
-                        .create(ApiService.class);
+                        .create(ApiServicePost.class);
 
                 //Cria a classe aporte e em seguida passa os seus dados para api
                 clsAportes aporte = new clsAportes(Ativo,Preco,Tipo,Recorrencia);

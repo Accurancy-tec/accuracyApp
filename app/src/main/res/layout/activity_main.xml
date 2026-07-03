@@ -5,7 +5,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity.MainActivity">
+    tools:context=".Activity.MainActivity"
+    tools:layout_editor_absoluteX="-19dp"
+    tools:layout_editor_absoluteY="0dp">
 
     <Button
         android:id="@+id/btnAportes"
@@ -16,4 +18,85 @@
         android:text="Aportes"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtAtivoPreco1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="168dp"
+        android:layout_marginTop="344dp"
+        android:text="Preco Provisório"
+        app:layout_constraintStart_toEndOf="@+id/txtAtivoNome1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtAtivoPreco4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="164dp"
+        android:layout_marginTop="32dp"
+        android:text="Preco Provisório"
+        app:layout_constraintStart_toEndOf="@+id/txtAtivoNome4"
+        app:layout_constraintTop_toBottomOf="@+id/txtAtivoPreco3" />
+
+    <TextView
+        android:id="@+id/txtAtivoPreco2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="172dp"
+        android:layout_marginTop="60dp"
+        android:text="Preco Provisório"
+        app:layout_constraintStart_toEndOf="@+id/txtAtivoNome2"
+        app:layout_constraintTop_toBottomOf="@+id/txtAtivoPreco1" />
+
+    <TextView
+        android:id="@+id/txtAtivoPreco3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="168dp"
+        android:layout_marginTop="64dp"
+        android:text="Preco Provisório"
+        app:layout_constraintStart_toEndOf="@+id/txtAtivoNome3"
+        app:layout_constraintTop_toBottomOf="@+id/txtAtivoPreco2" />
+
+    <TextView
+        android:id="@+id/txtAtivoNome2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:text="Nome Provisório"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtAtivoNome1" />
+
+    <TextView
+        android:id="@+id/txtAtivoNome1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="344dp"
+        android:text="Nome Provisório"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtAtivoNome3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
+        android:text="Nome Provisório"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtAtivoNome2" />
+
+    <TextView
+        android:id="@+id/txtAtivoNome4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="44dp"
+        android:text="Nome Provisório"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtAtivoNome3" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,48 +1,48 @@
 package com.example.accturancy.Classes;
 
 public class clsAportes {
-    private String Ativo;
-    private double Preco;
-    private String Tipo;
-    private String Recorrencia;
+    private String ativo_aporte;
+    private double preco_aporte;
+    private String tipo_aporte;
+    private String recorrencia_aporte;
 
     public clsAportes(String ativo, double preco, String tipo, String recorrencia) {
-        Ativo = ativo;
-        Preco = preco;
-        Tipo = tipo;
-        Recorrencia = recorrencia;
+        ativo_aporte = ativo;
+        preco_aporte = preco;
+        tipo_aporte = tipo;
+        recorrencia_aporte = recorrencia;
     }
 
     public String getAtivo() {
-        return Ativo;
+        return ativo_aporte;
     }
 
     public void setAtivo(String ativo) {
-        Ativo = ativo;
+        ativo_aporte = ativo;
     }
 
     public String getTipo() {
-        return Tipo;
+        return tipo_aporte;
     }
 
     public void setTipo(String tipo) {
-        Tipo = tipo;
+        tipo_aporte = tipo;
     }
 
     public double getPreco() {
-        return Preco;
+        return preco_aporte;
     }
 
     public void setPreco(double preco) {
-        Preco = preco;
+        preco_aporte = preco;
     }
 
     public String getRecorrencia() {
-        return Recorrencia;
+        return recorrencia_aporte;
     }
 
     public void setRecorrencia(String recorrencia) {
-        Recorrencia = recorrencia;
+        recorrencia_aporte = recorrencia;
     }
 
 }

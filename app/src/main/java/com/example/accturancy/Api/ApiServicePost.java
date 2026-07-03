@@ -7,9 +7,11 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 //Classe criada para enviar as informações do Aporte para o php
-public interface ApiService {
+public interface ApiServicePost {
 
     @POST("insert.php")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
+
+
 
 }

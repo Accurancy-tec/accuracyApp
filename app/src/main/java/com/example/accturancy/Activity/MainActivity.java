@@ -1,9 +1,13 @@
 package com.example.accturancy.Activity;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,11 +15,25 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.accturancy.Api.ApiResponse;
+import com.example.accturancy.Api.ApiServiceGet;
+import com.example.accturancy.Api.RetrofitClient;
 import com.example.accturancy.R;
+
+
+import java.util.ArrayList;
+
+import com.example.accturancy.Classes.clsAportes;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
     Button btnAportes;
+    TextView txtAtivoNome1,txtAtivoNome2,txtAtivoNome3,txtAtivoNome4,
+            txtAtivoPreco1, txtAtivoPreco2, txtAtivoPreco3, txtAtivoPreco4;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,12 +44,22 @@ public class MainActivity extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
-
-
         });
 
         btnAportes = (Button) findViewById(R.id.btnAportes);
+        txtAtivoNome1 = (TextView) findViewById(R.id.txtAtivoNome1);
+        txtAtivoNome2 = (TextView) findViewById(R.id.txtAtivoNome2);
+        txtAtivoNome3 = (TextView) findViewById(R.id.txtAtivoNome3);
+        txtAtivoNome4 = (TextView) findViewById(R.id.txtAtivoNome4);
+        txtAtivoPreco1 = (TextView) findViewById(R.id.txtAtivoPreco1);
+        txtAtivoPreco2 = (TextView) findViewById(R.id.txtAtivoPreco2);
+        txtAtivoPreco3 = (TextView) findViewById(R.id.txtAtivoPreco3);
+        txtAtivoPreco4 = (TextView) findViewById(R.id.txtAtivoPreco4);
 
+        dashboard();
+    }
+
+    private void dashboard(){
         btnAportes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,5 +68,41 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(pag);
             }
         });
-    }
+
+
+
+        ApiServiceGet api = RetrofitClient
+                .getClient()
+                .create(ApiServiceGet.class);
+
+        api.getAportes().enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+
+                if(response.isSuccessful() && response.body() != null ){
+
+                    ArrayList<clsAportes> ativo = response.body().getLista();
+                    if(!ativo.isEmpty()) {
+                        txtAtivoNome1.setText(ativo.get(0).getAtivo());
+                        txtAtivoNome2.setText(ativo.get(1).getAtivo());
+                        txtAtivoNome3.setText(ativo.get(2).getAtivo());
+                        txtAtivoNome4.setText(ativo.get(3).getAtivo());
+
+                        txtAtivoPreco1.setText(String.valueOf(ativo.get(0).getPreco()));
+                        txtAtivoPreco2.setText(String.valueOf(ativo.get(1).getPreco()));
+                        txtAtivoPreco3.setText(String.valueOf(ativo.get(2).getPreco()));
+                        txtAtivoPreco4.setText(String.valueOf(ativo.get(3).getPreco()));
+                    return;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this,
+                        "Nenhuma resposta chegou",
+                        LENGTH_LONG).show();
+            }
+        });
+    };
 }
