@@ -2,6 +2,7 @@ package com.example.accturancy.Activity;
 
 import static android.widget.Toast.LENGTH_LONG;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -32,7 +33,7 @@ public class Aportes extends AppCompatActivity {
 
     Spinner spnAtivo, spnTipo,spnRecorrencia;
     EditText txtPreco;
-    Button btnEnviar;
+    Button btnEnviar, btnHome;
 
 
 
@@ -53,6 +54,7 @@ public class Aportes extends AppCompatActivity {
     spnTipo = (Spinner) findViewById(R.id.spnTipo);
     btnEnviar = (Button) findViewById(R.id.btnEnviar);
     txtPreco = (EditText) findViewById(R.id.txtPreco);
+    btnHome = (Button) findViewById(R.id.btnHome);
 
     //Listas para os Spinners
     String[] Ativo = {"Escolha o Ativo","Petobras", "Bitcoin", "Dolar"};
@@ -148,6 +150,15 @@ public class Aportes extends AppCompatActivity {
                         ).show();
                     }
                 });
+            }
+        });
+
+        btnHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent home = new Intent(Aportes.this,
+                        MainActivity.class);
+                startActivity(home);
             }
         });
     }

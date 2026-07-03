@@ -83,15 +83,22 @@ public class MainActivity extends AppCompatActivity {
 
                     ArrayList<clsAportes> ativo = response.body().getLista();
                     if(!ativo.isEmpty()) {
-                        txtAtivoNome1.setText(ativo.get(0).getAtivo());
-                        txtAtivoNome2.setText(ativo.get(1).getAtivo());
-                        txtAtivoNome3.setText(ativo.get(2).getAtivo());
-                        txtAtivoNome4.setText(ativo.get(3).getAtivo());
 
+                        int tamanho = ativo.size();
+
+                        txtAtivoNome1.setText(ativo.get(0).getAtivo());
                         txtAtivoPreco1.setText(String.valueOf(ativo.get(0).getPreco()));
-                        txtAtivoPreco2.setText(String.valueOf(ativo.get(1).getPreco()));
-                        txtAtivoPreco3.setText(String.valueOf(ativo.get(2).getPreco()));
-                        txtAtivoPreco4.setText(String.valueOf(ativo.get(3).getPreco()));
+                        if(tamanho  == 2){
+                            txtAtivoNome2.setText(ativo.get(1).getAtivo());
+                            txtAtivoPreco2.setText(String.valueOf(ativo.get(1).getPreco()));
+                        }if (tamanho == 3) {
+                            txtAtivoNome3.setText(ativo.get(2).getAtivo());
+                            txtAtivoPreco3.setText(String.valueOf(ativo.get(2).getPreco()));
+                        }if(tamanho == 4){
+                            txtAtivoNome4.setText(ativo.get(3).getAtivo());
+                            txtAtivoPreco4.setText(String.valueOf(ativo.get(3).getPreco()));
+                        }
+
                     return;
                     }
                 }
