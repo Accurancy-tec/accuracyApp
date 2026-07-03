@@ -27,6 +27,12 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText editEmail;
     EditText editSenha;
+    EditText txtNome;
+    EditText txtCpf;
+    EditText txtCelular;
+    EditText txtEmailCadastro;
+    EditText txtSenhaCadastro;
+    EditText txtConfirmarSenha;
     Button   btnLogin;
     Button btnRegister;
     TextView btnEsqueciSenha;
@@ -47,8 +53,15 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         editEmail = findViewById(R.id.editEmail);
         editSenha = findViewById(R.id.editSenha);
+        txtNome = findViewById(R.id.txtNome);
+        txtCpf = findViewById(R.id.txtCpf);
+        txtCelular = findViewById(R.id.txtCelular);
+        txtEmailCadastro = findViewById(R.id.txtEmailCadastro);
+        txtSenhaCadastro = findViewById(R.id.txtSenhaCadastro);
+        txtConfirmarSenha = findViewById(R.id.txtConfirmarSenha);
         btnLogin = findViewById(R.id.btnLogin);
         btnRegister = findViewById(R.id.btnRegister);
         btnEsqueciSenha = findViewById(R.id.btnEsqueciSenha);
@@ -85,6 +98,52 @@ public class LoginActivity extends AppCompatActivity {
 
                 // chamar API aqui via Retrofit
                 fazerLogin(email, senha);
+            }
+        });
+
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String nome = txtNome.getText().toString().trim();
+                String cpf = txtCpf.getText().toString().trim();
+                String celular = txtCelular.getText().toString().trim();
+                String email = txtEmailCadastro.getText().toString().trim();
+                String senhaCadastro = txtSenhaCadastro.getText().toString().trim();
+                String confirmarSenhaCadastro = txtConfirmarSenha.getText().toString().trim();
+
+
+                if(nome.isEmpty()){
+                    txtNome.setError("Informe o nome");
+                    return;
+                }
+                if(cpf.isEmpty()){
+                    txtCpf.setError("Informe o CPF");
+                    return;
+                }
+                if(celular.isEmpty()){
+                    txtCelular.setError("Informe o Celular.");
+                    return;
+                }
+                if(email.isEmpty()){
+                    editEmail.setError("Informe o E-mail.");
+                    return;
+                }
+                if(senhaCadastro.isEmpty()){
+                    txtSenhaCadastro.setError("Informe a senha.");
+                    return;
+                }
+                if(confirmarSenhaCadastro.isEmpty()){
+                    txtConfirmarSenha.setError("Confirme a senha.");
+                    return;
+                }
+
+                if(!senhaCadastro.equals(confirmarSenhaCadastro)){
+                    txtConfirmarSenha.setError("As senhas não são iguais.");
+                    return;
+                }
+
+                fazerRegistro(nome, celular, cpf, senhaCadastro, email);
+
             }
         });
 
@@ -126,6 +185,7 @@ public class LoginActivity extends AppCompatActivity {
         tabCadastrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 layoutLogin.setVisibility(View.GONE);
                 layoutRegister.setVisibility(View.VISIBLE);
 
@@ -172,6 +232,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+
+
         btnIrCadastro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -187,14 +249,18 @@ public class LoginActivity extends AppCompatActivity {
 
     // Método de login
     private void fazerLogin(String email, String senha) {
-        User user = new User(email, senha);
+
+
+    }
+    private void fazerRegistro(String nome, String telefone, String cpf, String senha, String email){
+        User user = new User(nome, telefone, cpf, senha, email);
 
         ApiService api = RetrofitClient.getClient().create(ApiService.class);
         api.registerNewUser(user).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful()){
-                    Toast.makeText(LoginActivity.this, "Redirecionando para dashboard: em breve", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Usuario cadastrado", Toast.LENGTH_LONG).show();
 
                 }
                 else{
@@ -204,8 +270,8 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable throwable) {
+                Toast.makeText(LoginActivity.this, "Erro" + throwable.toString(), Toast.LENGTH_LONG).show();
             }
         });
-
     }
 }
