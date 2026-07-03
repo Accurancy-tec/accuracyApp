@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">InvestFlow</string>
+    <string name="app_name">Accuracy</string>
     <!--  Espaçamentos  -->
     <dimen name="screen_padding">24dp</dimen>
     <dimen name="input_padding_h">14dp</dimen>
