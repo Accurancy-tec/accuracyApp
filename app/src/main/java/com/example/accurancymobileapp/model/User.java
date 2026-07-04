@@ -1,6 +1,7 @@
 package com.example.accurancymobileapp.model;
 
 public class User {
+    private int id_usuario;
     private String nome_usuario;
     private String email_usuario;
     private String senha_usuario;
@@ -23,6 +24,9 @@ public class User {
 
     }
 
+    public int getId_usuario(){
+        return id_usuario;
+    }
     public String getNome_usuario() {
         return nome_usuario;
     }
@@ -31,7 +35,7 @@ public class User {
         this.nome_usuario = nome_usuario;
     }
 
-    public String getEmail_usuario() {
+    public String getEmail_usuario(String email_usuario) {
         return email_usuario;
     }
 
@@ -39,7 +43,7 @@ public class User {
         this.email_usuario = email_usuario;
     }
 
-    public String getSenha_usuario() {
+    public String getSenha_usuario(String senha_usuario) {
         return senha_usuario;
     }
 
