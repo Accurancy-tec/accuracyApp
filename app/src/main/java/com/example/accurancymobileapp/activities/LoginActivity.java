@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.api.ApiService;
 import com.example.accurancymobileapp.api.RetrofitClient;
+import com.example.accurancymobileapp.model.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 
 import okhttp3.ResponseBody;
@@ -249,9 +250,38 @@ public class LoginActivity extends AppCompatActivity {
 
     // Método de login
     private void fazerLogin(String email, String senha) {
+        User user = new User();
+        user.setEmail_usuario(email);
+        user.setSenha_usuario(senha);
 
+        ApiService api = RetrofitClient.getClient().create(ApiService.class);
+        api.loginVerification(user).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+
+                if(response.isSuccessful() && response.body() != null){
+                    LoginResponse login = response.body();
+
+                    if(login.isSuccess()){
+
+                        User usuario = login.getUser();
+
+                        Toast.makeText(LoginActivity.this, "Bem vindo " + usuario.getNome_usuario(), Toast.LENGTH_LONG).show();
+                    }
+                    else{
+                        Toast.makeText(LoginActivity.this, login.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable throwable) {
+                Toast.makeText(LoginActivity.this, "Erro: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
+
     private void fazerRegistro(String nome, String telefone, String cpf, String senha, String email){
         User user = new User(nome, telefone, cpf, senha, email);
 
