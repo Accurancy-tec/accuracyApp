@@ -243,6 +243,7 @@ public class LoginActivity extends AppCompatActivity {
                 // startActivity(intent);
                 Toast.makeText(LoginActivity.this,
                         "Indo para o cadastro...", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
