@@ -2,12 +2,15 @@ package com.example.accurancymobileapp.api;
 
 import com.example.accurancymobileapp.model.LoginResponse;
 import com.example.accurancymobileapp.model.User;
+import com.example.accurancymobileapp.model.clsAportes;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
+//Classe criada para enviar e buscar as informações do banco de dados atráves do php
 public interface ApiService {
 
     @POST("registerNewUser.php")
@@ -15,4 +18,10 @@ public interface ApiService {
 
     @POST("login.php")
     Call<LoginResponse> loginVerification(@Body User user);
+
+    @POST("insert.php")
+    Call<ApiResponse> registerAporte(@Body clsAportes aporte);
+
+    @GET("insert.php")
+    Call<ApiResponse> getAportes();
 }
