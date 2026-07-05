@@ -16,7 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.accurancymobileapp.api.ApiResponse;
-import com.example.accurancymobileapp.api.ApiServiceGet;
+import com.example.accurancymobileapp.api.ApiService;
 import com.example.accurancymobileapp.api.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
@@ -69,9 +69,9 @@ public class Dashboard extends AppCompatActivity {
 
 
 
-        ApiServiceGet api = RetrofitClient
+        ApiService api = RetrofitClient
                 .getClient()
-                .create(ApiServiceGet.class);
+                .create(ApiService.class);
 
         api.getAportes().enqueue(new Callback<ApiResponse>() {
             @Override
