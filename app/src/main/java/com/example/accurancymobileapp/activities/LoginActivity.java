@@ -1,6 +1,5 @@
 package com.example.accurancymobileapp.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -16,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.api.ApiService;
 import com.example.accurancymobileapp.api.RetrofitClient;
-import com.example.accurancymobileapp.model.LoginResponse;
+import com.example.accurancymobileapp.api.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 
 import okhttp3.ResponseBody;
@@ -292,6 +291,22 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful()){
                     Toast.makeText(LoginActivity.this, "Usuario cadastrado", Toast.LENGTH_LONG).show();
+
+                    txtNome.setText("");
+                    txtCpf.setText("");
+                    txtCelular.setText("");
+                    txtEmailCadastro.setText("");
+                    txtSenhaCadastro.setText("");
+                    txtConfirmarSenha.setText("");
+
+                    layoutLogin.setVisibility(View.VISIBLE);
+                    layoutRegister.setVisibility(View.GONE);
+
+                    tabEntrar.setBackgroundResource(R.drawable.bg_tab_active);
+                    tabCadastrar.setBackgroundResource(0);
+
+                    tabCadastrar.setTextColor(getColor(R.color.text_secondary));
+                    tabEntrar.setTextColor(getColor(R.color.text_primary));
 
                 }
                 else{
