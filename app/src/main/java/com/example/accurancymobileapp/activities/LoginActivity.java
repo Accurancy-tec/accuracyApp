@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -267,6 +268,9 @@ public class LoginActivity extends AppCompatActivity {
                         User usuario = login.getUser();
 
                         Toast.makeText(LoginActivity.this, "Bem vindo " + usuario.getNome_usuario(), Toast.LENGTH_LONG).show();
+
+                        Intent it = new Intent(LoginActivity.this, Dashboard.class);
+                        startActivity(it);
                     }
                     else{
                         Toast.makeText(LoginActivity.this, login.getMessage(), Toast.LENGTH_LONG).show();
