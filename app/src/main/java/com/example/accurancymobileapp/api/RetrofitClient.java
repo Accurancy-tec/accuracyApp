@@ -9,7 +9,7 @@ public class RetrofitClient {
     public static Retrofit getClient(){
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2/accuracyApi/")
+                    .baseUrl("http://10.0.0.172/accuracyApi/")
                     .addConverterFactory(
                             GsonConverterFactory.create()
                     )
