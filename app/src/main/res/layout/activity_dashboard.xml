@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity.Dashboard">
+    tools:context=".activities.Dashboard">
 
     <TextView
         android:id="@+id/txtAtivoPreco4"
@@ -97,4 +97,4 @@
         android:text="Nome Provisório"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtAtivoNome1" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
