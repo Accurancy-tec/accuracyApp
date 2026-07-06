@@ -1,6 +1,5 @@
 package com.example.accurancymobileapp.api;
 
-import com.example.accurancymobileapp.model.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.model.clsAportes;
 
