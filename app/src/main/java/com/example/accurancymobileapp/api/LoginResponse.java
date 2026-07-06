@@ -1,4 +1,6 @@
-package com.example.accurancymobileapp.model;
+package com.example.accurancymobileapp.api;
+
+import com.example.accurancymobileapp.model.User;
 
 public class LoginResponse {
     private boolean success;
