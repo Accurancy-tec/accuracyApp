@@ -15,9 +15,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.accurancymobileapp.api.ApiResponse;
-import com.example.accurancymobileapp.api.ApiService;
-import com.example.accurancymobileapp.api.RetrofitClient;
+import com.example.accurancymobileapp.response.ApiResponse;
+import com.example.accurancymobileapp.network.service.ApiService;
+import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 
