@@ -29,7 +29,7 @@ import retrofit2.Response;
 
 public class Dashboard extends AppCompatActivity {
 
-    Button btnAportes;
+    Button btnAportes,btnDeslogar;
     TextView txtAtivoNome1,txtAtivoNome2,txtAtivoNome3,txtAtivoNome4,
             txtAtivoPreco1, txtAtivoPreco2, txtAtivoPreco3, txtAtivoPreco4;
 
@@ -45,6 +45,7 @@ public class Dashboard extends AppCompatActivity {
         });
 
         btnAportes = (Button) findViewById(R.id.btnAportes);
+        btnDeslogar = (Button) findViewById(R.id.btnDeslogar);
         txtAtivoNome1 = (TextView) findViewById(R.id.txtAtivoNome1);
         txtAtivoNome2 = (TextView) findViewById(R.id.txtAtivoNome2);
         txtAtivoNome3 = (TextView) findViewById(R.id.txtAtivoNome3);
@@ -58,6 +59,18 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void dashboard(){
+
+        txtAtivoNome1.setVisibility(View.INVISIBLE);
+        txtAtivoNome2.setVisibility(View.INVISIBLE);
+        txtAtivoNome3.setVisibility(View.INVISIBLE);
+        txtAtivoNome4.setVisibility(View.INVISIBLE);
+
+        txtAtivoPreco1.setVisibility(View.INVISIBLE);
+        txtAtivoPreco2.setVisibility(View.INVISIBLE);
+        txtAtivoPreco3.setVisibility(View.INVISIBLE);
+        txtAtivoPreco4.setVisibility(View.INVISIBLE);
+
+        //Vai para os aportes
         btnAportes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,6 +80,15 @@ public class Dashboard extends AppCompatActivity {
             }
         });
 
+        //Volta para a tela de login
+        btnDeslogar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent login = new Intent(Dashboard.this,
+                        LoginActivity.class);
+                startActivity(login);
+            }
+        });
 
 
         ApiService api = RetrofitClient
@@ -84,15 +106,27 @@ public class Dashboard extends AppCompatActivity {
 
                         int tamanho = ativo.size();
 
+                        txtAtivoNome1.setVisibility(View.VISIBLE);
+                        txtAtivoPreco1.setVisibility(View.VISIBLE);
+
                         txtAtivoNome1.setText(ativo.get(0).getAtivo());
                         txtAtivoPreco1.setText(String.valueOf(ativo.get(0).getPreco()));
                         if(tamanho  == 2){
+                            txtAtivoNome2.setVisibility(View.VISIBLE);
+                            txtAtivoPreco2.setVisibility(View.VISIBLE);
+
                             txtAtivoNome2.setText(ativo.get(1).getAtivo());
                             txtAtivoPreco2.setText(String.valueOf(ativo.get(1).getPreco()));
                         }if (tamanho == 3) {
+                            txtAtivoNome3.setVisibility(View.VISIBLE);
+                            txtAtivoPreco3.setVisibility(View.VISIBLE);
+
                             txtAtivoNome3.setText(ativo.get(2).getAtivo());
                             txtAtivoPreco3.setText(String.valueOf(ativo.get(2).getPreco()));
                         }if(tamanho == 4){
+                            txtAtivoNome4.setVisibility(View.VISIBLE);
+                            txtAtivoPreco4.setVisibility(View.VISIBLE);
+
                             txtAtivoNome4.setText(ativo.get(3).getAtivo());
                             txtAtivoPreco4.setText(String.valueOf(ativo.get(3).getPreco()));
                         }
