@@ -26,4 +26,6 @@
     <color name="tab_bg">#0DFFFFFF</color>
 
     <color name="btn_primary">#2563EB</color>
+
+    <color name="gree_positive">#22C55E</color>
 </resources>
