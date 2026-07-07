@@ -1,100 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity.Dashboard">
+    android:fillViewport="true"
+    tools:context=".activities.Dashboard"
+    android:background="@color/bg_deep">
 
-    <TextView
-        android:id="@+id/txtAtivoPreco4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="158dp"
-        android:layout_marginTop="50dp"
-        android:text="Preco Provisório"
-        app:layout_constraintStart_toEndOf="@+id/txtAtivoNome4"
-        app:layout_constraintTop_toBottomOf="@+id/txtAtivoPreco3" />
 
-    <TextView
-        android:id="@+id/txtAtivoNome3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="55dp"
-        android:text="Nome Provisório"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtAtivoNome2" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="48dp"
+        android:paddingHorizontal="27dp"
+        android:paddingBottom="32dp">
 
-    <TextView
-        android:id="@+id/txtAtivoNome1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="27dp"
-        android:layout_marginTop="266dp"
-        android:text="Nome Provisório"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end">
 
-    <TextView
-        android:id="@+id/txtAtivoPreco2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="157dp"
-        android:layout_marginTop="45dp"
-        android:text="Preco Provisório"
-        app:layout_constraintStart_toEndOf="@+id/txtAtivoNome2"
-        app:layout_constraintTop_toBottomOf="@+id/txtAtivoPreco1" />
+            <Button
+                android:id="@+id/btnDeslogar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Deslogar"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="8dp"/>
 
-    <TextView
-        android:id="@+id/txtAtivoPreco1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="159dp"
-        android:layout_marginTop="266dp"
-        android:text="Preco Provisório"
-        app:layout_constraintStart_toEndOf="@+id/txtAtivoNome1"
-        app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/txtAtivoPreco3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="157dp"
-        android:layout_marginTop="55dp"
-        android:text="Preco Provisório"
-        app:layout_constraintStart_toEndOf="@+id/txtAtivoNome3"
-        app:layout_constraintTop_toBottomOf="@+id/txtAtivoPreco2" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
-    <TextView
-        android:id="@+id/txtAtivoNome4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="27dp"
-        android:layout_marginTop="50dp"
-        android:text="Nome Provisório"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtAtivoNome3" />
+        <!-- Linha 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/btnAportes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="160dp"
-        android:layout_marginTop="677dp"
-        android:text="Aportes"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/txtAtivoNome1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nome Provisório"
+                android:textColor="@color/text_primary"/>
 
-    <TextView
-        android:id="@+id/txtAtivoNome2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="45dp"
-        android:text="Nome Provisório"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtAtivoNome1" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/txtAtivoPreco1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Preco Provisório"
+                android:textColor="@color/text_primary"/>
+
+        </LinearLayout>
+
+        <!-- Linha 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtAtivoNome2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nome Provisório"
+                android:textColor="@color/text_primary"/>
+
+            <TextView
+                android:id="@+id/txtAtivoPreco2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Preco Provisório"
+                android:textColor="@color/text_primary"/>
+
+        </LinearLayout>
+
+        <!-- Linha 3 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtAtivoNome3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nome Provisório"
+                android:textColor="@color/text_primary"/>
+
+            <TextView
+                android:id="@+id/txtAtivoPreco3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Preco Provisório"
+                android:textColor="@color/text_primary"/>
+
+        </LinearLayout>
+
+        <!-- Linha 4 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtAtivoNome4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nome Provisório"
+                android:textColor="@color/text_primary"/>
+
+            <TextView
+                android:id="@+id/txtAtivoPreco4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Preco Provisório"
+                android:textColor="@color/text_primary"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnAportes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Aportes"/>
+
+    </LinearLayout>
+
+</ScrollView>
