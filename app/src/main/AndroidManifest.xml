@@ -12,9 +12,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.AccurancyMobileApp">
-
+        android:theme="@style/Theme.AccurancyMobileApp"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true"
@@ -28,15 +27,17 @@
         <activity
             android:name=".activities.Aportes"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name=".activities.Dashboard"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity
             android:name=".activities.RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.WalletActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

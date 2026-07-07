@@ -1,4 +1,4 @@
-package com.example.accurancymobileapp.api;
+package com.example.accurancymobileapp.response;
 
 import com.example.accurancymobileapp.model.clsAportes;
 

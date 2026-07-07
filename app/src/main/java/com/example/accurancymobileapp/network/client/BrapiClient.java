@@ -1,19 +1,23 @@
-package com.example.accurancymobileapp.api;
+package com.example.accurancymobileapp.network.client;
+
+import com.example.accurancymobileapp.network.service.BrapiService;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitClient {
+public class BrapiClient {
     private static Retrofit retrofit;
 
-    public static Retrofit getClient(){
+    public static Retrofit getBrapiClient(){
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://192.168.0.18/accuracyApi/")
+                    .baseUrl("https://brapi.dev/api/")
                     .addConverterFactory(
                             GsonConverterFactory.create()
                     )
                     .build();
+
+            BrapiService service = retrofit.create(BrapiService.class);
         }
         return retrofit;
     }
