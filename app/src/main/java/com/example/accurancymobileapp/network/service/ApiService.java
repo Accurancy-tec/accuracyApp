@@ -1,5 +1,7 @@
-package com.example.accurancymobileapp.api;
+package com.example.accurancymobileapp.network.service;
 
+import com.example.accurancymobileapp.response.ApiResponse;
+import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.model.clsAportes;
 

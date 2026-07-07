@@ -14,9 +14,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.api.ApiService;
-import com.example.accurancymobileapp.api.RetrofitClient;
-import com.example.accurancymobileapp.api.LoginResponse;
+import com.example.accurancymobileapp.network.service.ApiService;
+import com.example.accurancymobileapp.network.client.RetrofitClient;
+import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 
 import okhttp3.ResponseBody;
