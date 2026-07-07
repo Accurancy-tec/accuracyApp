@@ -5,6 +5,19 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg_deep"
     tools:context=".activities.WalletActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerInvestimentos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
+        android:paddingHorizontal="15dp"
+        tools:itemCount="8"
+        tools:listitem="@layout/item_investiment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
