@@ -39,16 +39,15 @@ public class WalletActivity extends AppCompatActivity {
 
         recyclerInvestimentos = findViewById(R.id.recyclerInvestimentos);
 
-        RecyclerView recyclerInvestimentos = findViewById(R.id.recyclerInvestimentos);
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(this));
 
         BrapiService api = BrapiClient.getBrapiClient().create(BrapiService.class);
-        api.getQuote("PETRA4,VALE3").enqueue(new Callback<QuoteResponse>() {
+        api.getQuote("PETR4,VALE3").enqueue(new Callback<QuoteResponse>() {
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
 
                 if(response.isSuccessful() && response.body() != null){
-                    List<Quote> result = response.body().getQuote();
+                    List<Quote> result = response.body().getResults();
 
                     QuoteAdapter adapter = new QuoteAdapter(result);
 
