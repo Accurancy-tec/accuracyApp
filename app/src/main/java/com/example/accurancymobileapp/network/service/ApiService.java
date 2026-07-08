@@ -4,25 +4,30 @@ import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.model.clsAportes;
+import com.example.accurancymobileapp.response.QuoteResponse;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 //Classe criada para enviar e buscar as informações do banco de dados atráves do php
 public interface ApiService {
 
-    @POST("registerNewUser.php")
+    @POST("user/registerNewUser.php")
     Call<ResponseBody> registerNewUser(@Body User user);
 
-    @POST("login.php")
+    @POST("user/login.php")
     Call<LoginResponse> loginVerification(@Body User user);
 
-    @POST("insert.php")
+    @POST("user/insert.php")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
 
-    @GET("insert.php")
+    @GET("user/insert.php")
     Call<ApiResponse> getAportes();
+
+    @GET("quotes/getQuote.php")
+    Call<QuoteResponse> getQuote(@Query("ticker") String tickers);
 }
