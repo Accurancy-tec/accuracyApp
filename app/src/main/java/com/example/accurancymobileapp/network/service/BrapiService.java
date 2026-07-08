@@ -11,4 +11,7 @@ public interface BrapiService {
     Call<QuoteResponse> getQuote(
             @Path("ticker") String ticker
     );
+
+    @GET("v2/tickers")
+    Call<QuoteResponse> getService();
 }

@@ -17,7 +17,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.accurancymobileapp.model.Quote;
 import com.example.accurancymobileapp.network.client.BrapiClient;
 import com.example.accurancymobileapp.network.service.BrapiService;
 import com.example.accurancymobileapp.response.ApiResponse;
@@ -28,7 +27,6 @@ import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.QuoteResponse;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -161,7 +159,7 @@ public class Aportes extends AppCompatActivity {
     private void carregarAtivos(){
         BrapiService service = BrapiClient.getBrapiClient().create(BrapiService.class);
 
-        service.getQuote("symbol").enqueue(new Callback<QuoteResponse>() {
+        service.getService().enqueue(new Callback<QuoteResponse>() {
 
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
@@ -169,19 +167,20 @@ public class Aportes extends AppCompatActivity {
 
                     List<String> Simbolos = new ArrayList<>();
                     Simbolos.add("Escolha o ativo");
-                    List <Quote> simbolos = response.body().getQuote();
-                    for (Quote s : simbolos) {
 
-                        Simbolos.add(s.getSymbol());
-                    }
 
                     ArrayAdapter <String> adapterAtivo = new ArrayAdapter<String>(Aportes.this,
-                            android.R.layout.simple_spinner_dropdown_item,
+                            android.R.layout.simple_spinner_item,
                             Simbolos
                     );
 
                     spnAtivo.setAdapter(adapterAtivo);
+                return;
                 }
+                Toast.makeText(Aportes.this,
+                        "N achamos nd",
+                        LENGTH_LONG).show();
+
             }
 
             @Override

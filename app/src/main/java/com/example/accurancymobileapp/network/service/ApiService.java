@@ -28,6 +28,5 @@ public interface ApiService {
     @GET("user/insert.php")
     Call<ApiResponse> getAportes();
 
-    @GET("quotes/getQuote.php")
-    Call<QuoteResponse> getQuote(@Query("ticker") String tickers);
+
 }
