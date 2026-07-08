@@ -14,15 +14,15 @@ import retrofit2.http.POST;
 //Classe criada para enviar e buscar as informações do banco de dados atráves do php
 public interface ApiService {
 
-    @POST("registerNewUser.php")
+    @POST("user/registerNewUser.php")
     Call<ResponseBody> registerNewUser(@Body User user);
 
-    @POST("login.php")
+    @POST("user/login.php")
     Call<LoginResponse> loginVerification(@Body User user);
 
-    @POST("insert.php")
+    @POST("user/insert.php")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
 
-    @GET("insert.php")
+    @GET("user/insert.php")
     Call<ApiResponse> getAportes();
 }
