@@ -1,20 +1,25 @@
 package com.example.accurancymobileapp.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Quote;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
     private List<Quote> quotes;
+    NumberFormat formato = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
     public QuoteAdapter(List<Quote> quotes){
         this.quotes = quotes;
@@ -40,15 +45,26 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
 
         holder.txtIconAtivo.setText(quote.getSymbol());
         holder.txtNomeAtivo.setText(quote.getShortName());
-        holder.txtVariacaoAtivo.setText(
-                String.valueOf(quote.getRegularMarketChangePercent()));
-        holder.txtValorAtivo.setText(
-                String.valueOf(quote.getRegularMarketPrice()));
+        holder.txtSubtituloAtivo.setText(
+                String.valueOf(quote.getRegularMarketVolume())
+        );
+        holder.txtVariacaoAtivo.setText(quote.getRegularMarketChangePercent() + "%");
+
+        if(quote.getRegularMarketChangePercent() > 0){
+            holder.txtVariacaoAtivo.setTextColor(
+                    ContextCompat.getColor(holder.itemView.getContext(),R.color.green_positive));
+        }
+        else{
+            holder.txtVariacaoAtivo.setTextColor(
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.red_negative)
+            );
+        }
+        holder.txtValorAtivo.setText(formato.format(quote.getRegularMarketPrice()));
     }
 
     @Override
     public int getItemCount(){
-        return quotes.size();
+        return quotes == null ? 0 : quotes.size();
     }
     class ViewHolder extends RecyclerView.ViewHolder{
 

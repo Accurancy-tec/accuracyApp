@@ -27,5 +27,7 @@
 
     <color name="btn_primary">#2563EB</color>
 
-    <color name="gree_positive">#22C55E</color>
+    <color name="green_positive">#22C55E</color>
+
+    <color name="red_negative">#F44336</color>
 </resources>
