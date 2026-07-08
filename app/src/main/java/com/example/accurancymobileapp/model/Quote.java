@@ -9,6 +9,9 @@ public class Quote {
     @SerializedName("shortName")
     private String shortName;
 
+    @SerializedName("regularMarketVolume")
+    private int regularMarketVolume;
+
     @SerializedName("regularMarketPrice")
     private double regularMarketPrice;
 
@@ -21,6 +24,10 @@ public class Quote {
 
     public String getShortName() {
         return shortName;
+    }
+
+    public int getRegularMarketVolume(){
+        return regularMarketVolume;
     }
 
     public double getRegularMarketPrice() {
