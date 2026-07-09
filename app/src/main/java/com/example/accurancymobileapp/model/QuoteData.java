@@ -2,7 +2,7 @@ package com.example.accurancymobileapp.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Quote {
+public class QuoteData {
     @SerializedName("symbol")
     private String symbol;
 
