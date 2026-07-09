@@ -17,6 +17,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.accurancymobileapp.model.Quote;
 import com.example.accurancymobileapp.network.client.BrapiClient;
 import com.example.accurancymobileapp.network.service.BrapiService;
 import com.example.accurancymobileapp.response.ApiResponse;
@@ -163,11 +164,15 @@ public class Aportes extends AppCompatActivity {
 
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
-                if(response.isSuccessful() || response.body() != null){
+                if(response.isSuccessful() && response.body() != null){
 
                     List<String> Simbolos = new ArrayList<>();
                     Simbolos.add("Escolha o ativo");
+                    List<Quote> ativo = response.body().getQuote();
 
+                    for(Quote a : ativo){
+                        Simbolos.add(a.getSymbol());
+                    }
 
                     ArrayAdapter <String> adapterAtivo = new ArrayAdapter<String>(Aportes.this,
                             android.R.layout.simple_spinner_item,
