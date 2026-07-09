@@ -7,7 +7,7 @@ import java.util.List;
 
 public class QuoteResponse {
 
-    @SerializedName("result")
+    @SerializedName("results")
     private List<Quote> results;
 
     public List<Quote> getQuote(){
