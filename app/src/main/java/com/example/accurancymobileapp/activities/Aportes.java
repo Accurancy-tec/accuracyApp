@@ -4,6 +4,7 @@ import static android.widget.Toast.LENGTH_LONG;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,7 +18,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.accurancymobileapp.model.Quote;
+import com.example.accurancymobileapp.model.QuoteData;
+import com.example.accurancymobileapp.model.QuoteResult;
+import com.example.accurancymobileapp.model.TickerResult;
 import com.example.accurancymobileapp.network.client.BrapiClient;
 import com.example.accurancymobileapp.network.service.BrapiService;
 import com.example.accurancymobileapp.response.ApiResponse;
@@ -26,6 +29,7 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.example.accurancymobileapp.response.TickerResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,23 +164,23 @@ public class Aportes extends AppCompatActivity {
     private void carregarAtivos(){
         BrapiService service = BrapiClient.getBrapiClient().create(BrapiService.class);
 
-        service.getService().enqueue(new Callback<QuoteResponse>() {
+        service.getService().enqueue(new Callback<TickerResponse>() {
 
             @Override
-            public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
+            public void onResponse(Call<TickerResponse> call, Response<TickerResponse> response) {
                 if(response.isSuccessful() && response.body() != null){
 
-                    List<String> Simbolos = new ArrayList<>();
-                    Simbolos.add("Escolha o ativo");
-                    List<Quote> ativo = response.body().getQuote();
+                    List<String> simbolos = new ArrayList<>();
+                    simbolos.add("Escolha o ativo");
 
-                    for(Quote a : ativo){
-                        Simbolos.add(a.getSymbol());
+
+                    for(TickerResult result : response.body().getResults()){
+                        simbolos.add(result.getSymbol());
                     }
 
                     ArrayAdapter <String> adapterAtivo = new ArrayAdapter<String>(Aportes.this,
                             android.R.layout.simple_spinner_item,
-                            Simbolos
+                            simbolos
                     );
 
                     spnAtivo.setAdapter(adapterAtivo);
@@ -189,7 +193,7 @@ public class Aportes extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<QuoteResponse> call, Throwable t) {
+            public void onFailure(Call<TickerResponse> call, Throwable t) {
             Toast.makeText(Aportes.this,
                     "Erro " +t .getMessage(),
                     LENGTH_LONG).show();
