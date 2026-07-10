@@ -12,4 +12,7 @@ public interface BrapiService {
     Call<QuoteResponse> getQuote(
             @Query("symbols") String symbols
     );
+
+    @GET("v2/tickers")
+    Call<QuoteResponse> getService();
 }

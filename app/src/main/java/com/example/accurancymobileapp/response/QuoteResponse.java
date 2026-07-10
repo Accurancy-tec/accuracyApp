@@ -11,6 +11,8 @@ public class QuoteResponse {
     @SerializedName("results")
     private List<QuoteResult> results;
 
+    private List<Quote> results;
+
     public List<QuoteResult> getResults(){
         return results;
     }
