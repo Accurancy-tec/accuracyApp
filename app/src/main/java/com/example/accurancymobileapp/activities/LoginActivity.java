@@ -269,7 +269,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         Toast.makeText(LoginActivity.this, "Bem vindo " + usuario.getNome_usuario(), Toast.LENGTH_LONG).show();
 
-                        Intent it = new Intent(LoginActivity.this, Dashboard.class);
+                        Intent it = new Intent(LoginActivity.this, WalletActivity.class);
                         startActivity(it);
                     }
                     else{
