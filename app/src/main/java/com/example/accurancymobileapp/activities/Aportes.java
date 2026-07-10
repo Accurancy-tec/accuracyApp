@@ -4,7 +4,6 @@ import static android.widget.Toast.LENGTH_LONG;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,17 +17,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.accurancymobileapp.model.QuoteData;
-import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.model.TickerResult;
-import com.example.accurancymobileapp.network.client.BrapiClient;
-import com.example.accurancymobileapp.network.service.BrapiService;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.TickerResponse;
 
 import java.util.ArrayList;
@@ -162,7 +156,7 @@ public class Aportes extends AppCompatActivity {
     }
 
     private void carregarAtivos(){
-        BrapiService service = BrapiClient.getBrapiClient().create(BrapiService.class);
+        ApiService service = RetrofitClient.getClient().create(ApiService.class);
 
         service.getService().enqueue(new Callback<TickerResponse>() {
 
