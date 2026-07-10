@@ -1,6 +1,7 @@
 package com.example.accurancymobileapp.network.service;
 
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.example.accurancymobileapp.response.TickerResponse;
 
 import retrofit2.http.GET;
 import retrofit2.Call;
@@ -14,5 +15,5 @@ public interface BrapiService {
     );
 
     @GET("v2/tickers")
-    Call<QuoteResponse> getService();
+    Call<TickerResponse> getService();
 }
