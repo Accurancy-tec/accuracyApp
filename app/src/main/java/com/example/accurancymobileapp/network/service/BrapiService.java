@@ -5,11 +5,12 @@ import com.example.accurancymobileapp.response.QuoteResponse;
 import retrofit2.http.GET;
 import retrofit2.Call;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface BrapiService {
-    @GET("quote/{ticker}")
+    @GET("v2/stocks/quote")
     Call<QuoteResponse> getQuote(
-            @Path("ticker") String ticker
+            @Query("symbols") String symbols
     );
 
     @GET("v2/tickers")
