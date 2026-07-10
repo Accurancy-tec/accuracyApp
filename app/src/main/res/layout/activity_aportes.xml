@@ -25,13 +25,12 @@
             android:id="@+id/spnAtivo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:textColor="@color/text_primary"/>
+            android:layout_marginBottom="24dp" />
 
         <EditText
             android:id="@+id/txtPreco"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginBottom="24dp"
             android:ems="10"
             android:hint="Preço"
@@ -42,14 +41,12 @@
             android:id="@+id/spnTipo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:textColor="@color/text_primary"/>
+            android:layout_marginBottom="24dp" />
 
         <Spinner
             android:id="@+id/spnRecorrencia"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_primary"/>
+            android:layout_height="wrap_content" />
 
         <View
             android:layout_width="match_parent"

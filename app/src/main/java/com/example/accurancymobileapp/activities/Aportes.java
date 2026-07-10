@@ -17,11 +17,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.accurancymobileapp.model.Quote;
+import com.example.accurancymobileapp.network.client.BrapiClient;
+import com.example.accurancymobileapp.network.service.BrapiService;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.response.QuoteResponse;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,38 +63,25 @@ public class Aportes extends AppCompatActivity {
     txtPreco = (EditText) findViewById(R.id.txtPreco);
     btnHome = (Button) findViewById(R.id.btnHome);
 
-    //Listas para os Spinners
-    String[] Ativo = {"Escolha o Ativo","Petobras", "Bitcoin", "Dolar"};
-    String[] Tipo = {"Escolha o Tipo","Compra"};
-    String[] Recorrencia = {"Escolha a Recorrência","Diário","Semanal","Mensal","Anual"};
+        //Listas fixas
+        String[] Tipo = {"Escolha o Tipo","Compra"};
+        String[] Recorrencia = {"Escolha a Recorrência","Diário","Semanal","Mensal","Anual"};
 
-    //Inserindo escolhas
-        ArrayAdapter<String> adapterAtivo = new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_spinner_item,
-                Ativo
-        );
-        ArrayAdapter<String> adapterTipo = new ArrayAdapter<String>(
-                this,
+        ArrayAdapter<String> adapterTipo = new ArrayAdapter<String>(Aportes.this,
                 android.R.layout.simple_spinner_item,
                 Tipo
         );
-        ArrayAdapter<String> adapterRecorrencia = new ArrayAdapter<String>(
-                this,
+        ArrayAdapter<String> adapterRecorrencia = new ArrayAdapter<String>(Aportes.this,
                 android.R.layout.simple_spinner_item,
                 Recorrencia
         );
 
-        adapterAtivo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapterTipo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapterRecorrencia.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spnAtivo.setAdapter(adapterAtivo);
         spnTipo.setAdapter(adapterTipo);
         spnRecorrencia.setAdapter(adapterRecorrencia);
 
         //Puxando a função que contem as outras partes do código
         //Em tese não muda nada mas facilita a manutenção
+        carregarAtivos();
         aportes();
     }
     private void aportes(){
@@ -131,7 +125,7 @@ public class Aportes extends AppCompatActivity {
                             Toast.makeText(
                                     Aportes.this,
                                     response.body().getMensagem(),
-                                    Toast.LENGTH_LONG
+                                    LENGTH_LONG
                             ).show();
                             return;
                         }
@@ -146,7 +140,7 @@ public class Aportes extends AppCompatActivity {
                         Toast.makeText(
                                 Aportes.this,
                                 "Erro: " + t.getMessage(),
-                                Toast.LENGTH_LONG
+                                LENGTH_LONG
                         ).show();
                     }
                 });
@@ -159,6 +153,46 @@ public class Aportes extends AppCompatActivity {
                 Intent home = new Intent(Aportes.this,
                         Dashboard.class);
                 startActivity(home);
+            }
+        });
+    }
+
+    private void carregarAtivos(){
+        BrapiService service = BrapiClient.getBrapiClient().create(BrapiService.class);
+
+        service.getService().enqueue(new Callback<QuoteResponse>() {
+
+            @Override
+            public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
+                if(response.isSuccessful() && response.body() != null){
+
+                    List<String> Simbolos = new ArrayList<>();
+                    Simbolos.add("Escolha o ativo");
+                    List<Quote> ativo = response.body().getQuote();
+
+                    for(Quote a : ativo){
+                        Simbolos.add(a.getSymbol());
+                    }
+
+                    ArrayAdapter <String> adapterAtivo = new ArrayAdapter<String>(Aportes.this,
+                            android.R.layout.simple_spinner_item,
+                            Simbolos
+                    );
+
+                    spnAtivo.setAdapter(adapterAtivo);
+                return;
+                }
+                Toast.makeText(Aportes.this,
+                        "N achamos nd",
+                        LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onFailure(Call<QuoteResponse> call, Throwable t) {
+            Toast.makeText(Aportes.this,
+                    "Erro " +t .getMessage(),
+                    LENGTH_LONG).show();
             }
         });
     }
