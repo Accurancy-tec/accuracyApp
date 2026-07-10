@@ -13,8 +13,8 @@ import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.QuoteAdapter;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.QuoteResult;
-import com.example.accurancymobileapp.network.client.BrapiClient;
-import com.example.accurancymobileapp.network.service.BrapiService;
+import com.example.accurancymobileapp.network.client.RetrofitClient;
+import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.QuoteResponse;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class WalletActivity extends AppCompatActivity {
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(this));
 
-        BrapiService api = BrapiClient.getBrapiClient().create(BrapiService.class);
+        ApiService api = RetrofitClient.getClient().create(ApiService.class);
         api.getQuote("ITUB4,VALE3,PETR4").enqueue(new Callback<QuoteResponse>() {
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
