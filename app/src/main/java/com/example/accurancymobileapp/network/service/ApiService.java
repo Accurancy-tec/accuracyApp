@@ -5,6 +5,7 @@ import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.example.accurancymobileapp.response.TickerResponse;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -28,5 +29,11 @@ public interface ApiService {
     @GET("user/insert.php")
     Call<ApiResponse> getAportes();
 
+    @GET("quotes/getQuote.php")
+    Call<QuoteResponse> getQuote(
+            @Query("symbol") String symbol
+    );
 
+    @GET("v2/tickers")
+    Call<TickerResponse> getService();
 }
