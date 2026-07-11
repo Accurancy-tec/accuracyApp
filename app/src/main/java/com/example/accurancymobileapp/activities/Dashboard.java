@@ -11,24 +11,34 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.compose.ui.platform.ComposeView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.accurancymobileapp.model.clsGrafic;
+import com.example.accurancymobileapp.ui.ChartHelper;
+
+import com.example.accurancymobileapp.network.service.VicoService;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.response.VicoResponse;
+
+
 
 import java.util.ArrayList;
+import java.util.List;
+
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Dashboard extends AppCompatActivity {
-
+    private ComposeView ctvEvoCarteira;
     Button btnAportes,btnDeslogar;
     TextView txtAtivoNome1,txtAtivoNome2,txtAtivoNome3,txtAtivoNome4,
             txtAtivoPreco1, txtAtivoPreco2, txtAtivoPreco3, txtAtivoPreco4;
@@ -44,6 +54,7 @@ public class Dashboard extends AppCompatActivity {
             return insets;
         });
 
+        ctvEvoCarteira = findViewById(R.id.ctvEvoCarteira);
         btnAportes = (Button) findViewById(R.id.btnAportes);
         btnDeslogar = (Button) findViewById(R.id.btnDeslogar);
         txtAtivoNome1 = (TextView) findViewById(R.id.txtAtivoNome1);
@@ -55,6 +66,7 @@ public class Dashboard extends AppCompatActivity {
         txtAtivoPreco3 = (TextView) findViewById(R.id.txtAtivoPreco3);
         txtAtivoPreco4 = (TextView) findViewById(R.id.txtAtivoPreco4);
 
+        carregarGrafico();
         dashboard();
     }
 
@@ -130,8 +142,6 @@ public class Dashboard extends AppCompatActivity {
                             txtAtivoNome4.setText(ativo.get(3).getAtivo());
                             txtAtivoPreco4.setText(String.valueOf(ativo.get(3).getPreco()));
                         }
-
-                        return;
                     }
                 }
             }
@@ -144,4 +154,37 @@ public class Dashboard extends AppCompatActivity {
             }
         });
     };
+    private void carregarGrafico(){
+
+        VicoService vico = RetrofitClient.getClient().create(VicoService.class);
+        vico.getGrafic().enqueue(new Callback<VicoResponse>() {
+            @Override
+            public void onResponse(Call<VicoResponse> call, Response<VicoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    ArrayList<Number> valores = new ArrayList<>();
+
+                    for(clsGrafic item : response.body().getResults()){
+                        valores.add(item.getPreco());
+                    }
+
+                    if(!valores.isEmpty()){
+                        ChartHelper.configurarGrafico(ctvEvoCarteira, valores);
+                    }
+
+                    Toast.makeText(Dashboard.this,
+                            "Quantidade: " + valores.size(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VicoResponse> call, Throwable t) {
+                Toast.makeText(Dashboard.this,
+                        "Erro " + t.getMessage(),
+                        LENGTH_LONG).show();
+            }
+        });
+    }
 }
