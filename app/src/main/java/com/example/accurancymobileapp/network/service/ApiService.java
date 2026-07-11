@@ -23,10 +23,10 @@ public interface ApiService {
     @POST("user/login.php")
     Call<LoginResponse> loginVerification(@Body User user);
 
-    @POST("user/insert.php")
+    @POST("user/aportes.php")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
 
-    @GET("user/insert.php")
+    @GET("user/dashboard.php")
     Call<ApiResponse> getAportes();
 
     @GET("quotes/getQuote.php")
