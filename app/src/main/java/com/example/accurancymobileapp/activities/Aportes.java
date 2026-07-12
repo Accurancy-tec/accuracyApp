@@ -24,6 +24,7 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.TickerResponse;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class Aportes extends AppCompatActivity {
     Spinner spnAtivo, spnTipo,spnRecorrencia;
     EditText txtPreco;
     Button btnEnviar, btnHome;
+    BottomNavigationView bottomNavigation;
 
 
 
@@ -53,6 +55,7 @@ public class Aportes extends AppCompatActivity {
             return insets;
         });
 
+
         //Linkando com os componentes respectivos
     spnAtivo = (Spinner) findViewById(R.id.spnAtivo);
     spnRecorrencia = (Spinner) findViewById(R.id.spnRecorrencia);
@@ -60,6 +63,29 @@ public class Aportes extends AppCompatActivity {
     btnEnviar = (Button) findViewById(R.id.btnEnviar);
     txtPreco = (EditText) findViewById(R.id.txtPreco);
     btnHome = (Button) findViewById(R.id.btnHome);
+
+    // Trecho do menu
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+        bottomNavigation.setSelectedItemId(R.id.nav_aporte);
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            if(item.getItemId() == R.id.nav_home){
+                Intent it = new Intent(Aportes.this, Dashboard.class);
+                startActivity(it);
+                return true;
+            }
+            if(item.getItemId() == R.id.nav_wallet){
+                Intent it = new Intent(Aportes.this, WalletActivity.class);
+                startActivity(it);
+                return true;
+            }
+            if(item.getItemId() == R.id.nav_aporte){
+                Intent it = new Intent(Aportes.this, Aportes.class);
+                startActivity(it);
+                return true;
+            }
+            return false;
+        });
 
         //Listas fixas
         String[] Tipo = {"Escolha o Tipo","Compra"};

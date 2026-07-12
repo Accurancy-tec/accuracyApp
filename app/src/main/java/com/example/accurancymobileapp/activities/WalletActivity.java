@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -16,6 +17,7 @@ import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ import retrofit2.Response;
 public class WalletActivity extends AppCompatActivity {
 
     RecyclerView recyclerInvestimentos;
+    BottomNavigationView bottomNavigation;
 
 
     @Override
@@ -36,6 +39,29 @@ public class WalletActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wallet);
 
         recyclerInvestimentos = findViewById(R.id.recyclerInvestimentos);
+
+        //Trecho do menu
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+        bottomNavigation.setSelectedItemId(R.id.nav_wallet);
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            if(item.getItemId() == R.id.nav_home){
+                Intent it = new Intent(WalletActivity.this, Dashboard.class);
+                startActivity(it);
+                return true;
+            }
+            if(item.getItemId() == R.id.nav_wallet){
+                Intent it = new Intent(WalletActivity.this, WalletActivity.class);
+                startActivity(it);
+                return true;
+            }
+            if(item.getItemId() == R.id.nav_aporte){
+                Intent it = new Intent(WalletActivity.this, Aportes.class);
+                startActivity(it);
+                return true;
+            }
+            return false;
+        });
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(this));
 

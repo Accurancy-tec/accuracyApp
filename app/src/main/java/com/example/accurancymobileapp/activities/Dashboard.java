@@ -26,7 +26,7 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.VicoResponse;
-
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ import retrofit2.Response;
 public class Dashboard extends AppCompatActivity {
     private ComposeView ctvEvoCarteira;
     Button btnAportes,btnDeslogar;
+    BottomNavigationView bottomNavigation;
     TextView txtAtivoNome1,txtAtivoNome2,txtAtivoNome3,txtAtivoNome4,
             txtAtivoPreco1, txtAtivoPreco2, txtAtivoPreco3, txtAtivoPreco4;
 
@@ -68,6 +69,29 @@ public class Dashboard extends AppCompatActivity {
 
         carregarGrafico();
         dashboard();
+
+        //Trecho do menu
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            if(item.getItemId() == R.id.nav_home){
+                Intent it = new Intent(Dashboard.this, Dashboard.class);
+                startActivity(it);
+                return true;
+            }
+            if(item.getItemId() == R.id.nav_wallet){
+                Intent it = new Intent(Dashboard.this, WalletActivity.class);
+                startActivity(it);
+                return true;
+            }
+            if(item.getItemId() == R.id.nav_aporte){
+                Intent it = new Intent(Dashboard.this, Aportes.class);
+                startActivity(it);
+                return true;
+            }
+            return false;
+        });
     }
 
     private void dashboard(){
