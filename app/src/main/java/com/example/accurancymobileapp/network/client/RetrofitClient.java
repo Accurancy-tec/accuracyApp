@@ -18,7 +18,7 @@ public class RetrofitClient {
 
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://192.168.0.6/accuracyApi/")
+                    .baseUrl("http://10.0.2.2/accuracyApi/")
                     .addConverterFactory(
                             GsonConverterFactory.create()
                     )
