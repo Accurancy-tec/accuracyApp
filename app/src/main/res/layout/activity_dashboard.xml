@@ -150,6 +150,18 @@
             android:layout_gravity="center_horizontal"
             android:text="Aportes"/>
 
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigation"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/bg_deep"
+            app:menu="@menu/bottom_menu"
+
+            app:itemActiveIndicatorStyle="@null"
+            app:labelVisibilityMode="unlabeled"
+            app:itemIconTint="@color/buttom_nav_colors"
+            android:layout_gravity="bottom"/>
     </LinearLayout>
 
 </ScrollView>
