@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
     tools:context=".activities.Aportes"
     android:background="@color/bg_deep">
@@ -76,6 +76,17 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigation"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/bg_deep"
+            app:menu="@menu/bottom_menu"
 
+            app:itemActiveIndicatorStyle="@null"
+            app:labelVisibilityMode="unlabeled"
+            app:itemIconTint="@color/buttom_nav_colors"
+            android:layout_gravity="bottom"/>
+    </LinearLayout>
 </ScrollView>
