@@ -26,7 +26,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -36,6 +38,10 @@ import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import kotlinx.coroutines.delay
+import com.patrykandpatrick.vico.compose.pie.PieChartHost
+import com.patrykandpatrick.vico.compose.pie.rememberPieChart
+import com.patrykandpatrick.vico.compose.pie.data.PieChartModelProducer
+import com.patrykandpatrick.vico.compose.pie.data.pieSeries
 
 
 @Composable
@@ -233,4 +239,31 @@ fun LineChart(valores: List<Number>) {
             modifier = Modifier.fillMaxWidth()
         )
     }
+}
+
+//Gráfico em Pizza
+@Composable
+fun pizzaChart(
+    valores: List<Number>,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .height(240.dp)
+) {
+    val modelProducer = remember {
+        PieChartModelProducer()
+    }
+
+    LaunchedEffect(Unit) {
+        modelProducer.runTransaction {
+            pieSeries {
+                series(40, 30, 20, 10)
+            }
+        }
+    }
+
+    PieChartHost(
+        chart = rememberPieChart(),
+        modelProducer = modelProducer,
+        modifier = modifier
+    )
 }
