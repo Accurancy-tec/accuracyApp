@@ -18,6 +18,7 @@ import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
+import com.example.accurancymobileapp.utils.SessionManager;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -47,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     View layoutRegister;
 
     private boolean senhaVisivel = false;
+    private SessionManager sessionManager;
 
 
     @Override
@@ -54,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        isLoggedVerify();
 
         editEmail = findViewById(R.id.editEmail);
         editSenha = findViewById(R.id.editSenha);
@@ -74,6 +77,8 @@ public class LoginActivity extends AppCompatActivity {
         btnIrCadastro = findViewById(R.id.btnIrCadastro);
         layoutLogin = findViewById(R.id.layoutLogin);
         layoutRegister = findViewById(R.id.layoutRegister);
+
+        sessionManager = new SessionManager(this);
 
         configurarListeners();
     }
@@ -267,6 +272,13 @@ public class LoginActivity extends AppCompatActivity {
 
                         User usuario = login.getUser();
 
+                        sessionManager.saveUserSession(
+                                user.getId_usuario(),
+                                user.getNome_usuario(),
+                                user.getEmail_usuario(),
+                                user.getSenha_usuario()
+                        );
+
                         Toast.makeText(LoginActivity.this, "Bem vindo " + usuario.getNome_usuario(), Toast.LENGTH_LONG).show();
 
                         Intent it = new Intent(LoginActivity.this, WalletActivity.class);
@@ -323,5 +335,16 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Erro" + throwable.toString(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public void isLoggedVerify(){
+        sessionManager = new SessionManager(this);
+
+        if(sessionManager.isLoggedIn()){
+            Intent it = new Intent(LoginActivity.this, Dashboard.class);
+            startActivity(it);
+            finish();
+        }
+        return;
     }
 }

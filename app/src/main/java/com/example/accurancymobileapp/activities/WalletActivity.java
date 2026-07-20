@@ -97,10 +97,10 @@ public class WalletActivity extends AppCompatActivity {
             }
         });
 
-        carregarGrafico();
+        carregarGraficoPizza();
     }
 
-    public void carregarGrafico(){
+    public void carregarGraficoPizza(){
         ArrayList<Number> valores = new ArrayList<>();
 
         valores.add(933.0);
@@ -109,7 +109,7 @@ public class WalletActivity extends AppCompatActivity {
         valores.add(600.0);
         valores.add(1450.0);
 
-        ChartHelper.configurarGraficoWallet(
+        ChartHelper.configurarGraficoPizza(
                 carteiraChart,
                 valores
         );
