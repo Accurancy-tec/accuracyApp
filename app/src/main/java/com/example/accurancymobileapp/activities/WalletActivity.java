@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.compose.ui.platform.ComposeView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +18,7 @@ import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.example.accurancymobileapp.ui.ChartHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public class WalletActivity extends AppCompatActivity {
 
     RecyclerView recyclerInvestimentos;
     BottomNavigationView bottomNavigation;
+    ComposeView ctvEvoCarteira;
 
 
     @Override
@@ -39,6 +42,7 @@ public class WalletActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wallet);
 
         recyclerInvestimentos = findViewById(R.id.recyclerInvestimentos);
+        ctvEvoCarteira = findViewById(R.id.ctvEvoCarteira);
 
         //Trecho do menu
         bottomNavigation = findViewById(R.id.bottomNavigation);
@@ -66,7 +70,7 @@ public class WalletActivity extends AppCompatActivity {
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(this));
 
         ApiService api = RetrofitClient.getClient().create(ApiService.class);
-        api.getQuote("ITUB4,VALE3,PETR4").enqueue(new Callback<QuoteResponse>() {
+        api.getQuote("ITUB4,VALE3,PETR4,PETR4,PETR4").enqueue(new Callback<QuoteResponse>() {
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
 
@@ -92,5 +96,22 @@ public class WalletActivity extends AppCompatActivity {
                 Toast.makeText(WalletActivity.this, "Erro: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+
+        carregarGrafico();
+    }
+
+    public void carregarGrafico(){
+        ArrayList<Number> valores = new ArrayList<>();
+
+        valores.add(1000.0);
+        valores.add(1150.0);
+        valores.add(1080.0);
+        valores.add(1300.0);
+        valores.add(1450.0);
+
+        ChartHelper.configurarGraficoWallet(
+                ctvEvoCarteira,
+                valores
+        );
     }
 }
