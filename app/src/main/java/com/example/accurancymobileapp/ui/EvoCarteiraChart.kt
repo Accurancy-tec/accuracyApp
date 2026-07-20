@@ -87,3 +87,45 @@ fun EvoCarteiraChart(valores: List<Number>) {
             modifier = Modifier.fillMaxWidth()
         )
 }
+
+@Composable
+fun walletEvoCarteiraChart(valores: List<Number>) {
+
+    val meses = listOf(
+        "Jan",
+        "Fev",
+        "Mar",
+        "Abr",
+        "Mai"
+    )
+
+    val modelProducer = remember {
+        CartesianChartModelProducer()
+    }
+
+    LaunchedEffect(valores) {
+        modelProducer.runTransaction {
+            lineSeries {
+                series(valores)
+            }
+        }
+    }
+
+    CartesianChartHost(
+        chart = rememberCartesianChart(
+            rememberLineCartesianLayer(),
+            startAxis = VerticalAxis.rememberStart(
+                /*valueFormatter = { value, _ ->
+                    "R$ ${value.toInt()}"
+                }*/
+            ),
+            bottomAxis = HorizontalAxis.rememberBottom(
+                /*valueFormatter = { value, _ ->
+                    meses.getOrElse(value.toInt()) { "" }
+                }*/
+            )
+        ),
+        modelProducer = modelProducer,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
