@@ -18,7 +18,7 @@ object ChartHelper {
     ) {
         composeView.setContent {
             MaterialTheme {
-                EvoCarteiraChart(valores)
+                LineChart(valores)
             }
         }
     }
