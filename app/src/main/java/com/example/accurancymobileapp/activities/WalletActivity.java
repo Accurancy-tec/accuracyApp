@@ -32,7 +32,7 @@ public class WalletActivity extends AppCompatActivity {
 
     RecyclerView recyclerInvestimentos;
     BottomNavigationView bottomNavigation;
-    ComposeView ctvEvoCarteira;
+    ComposeView carteiraChart;
 
 
     @Override
@@ -42,7 +42,7 @@ public class WalletActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wallet);
 
         recyclerInvestimentos = findViewById(R.id.recyclerInvestimentos);
-        ctvEvoCarteira = findViewById(R.id.ctvEvoCarteira);
+        carteiraChart = findViewById(R.id.carteiraChart);
 
         //Trecho do menu
         bottomNavigation = findViewById(R.id.bottomNavigation);
@@ -103,14 +103,14 @@ public class WalletActivity extends AppCompatActivity {
     public void carregarGrafico(){
         ArrayList<Number> valores = new ArrayList<>();
 
-        valores.add(1000.0);
-        valores.add(1150.0);
-        valores.add(1080.0);
-        valores.add(1300.0);
+        valores.add(933.0);
+        valores.add(422.0);
+        valores.add(1380.0);
+        valores.add(600.0);
         valores.add(1450.0);
 
         ChartHelper.configurarGraficoWallet(
-                ctvEvoCarteira,
+                carteiraChart,
                 valores
         );
     }
