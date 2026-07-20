@@ -12,13 +12,25 @@ object ChartHelper {
     }
 
     @JvmStatic
-    fun configurarGraficoWallet(
+    fun configurarGraficoLine(
         composeView: ComposeView,
         valores: List<Number>
     ) {
         composeView.setContent {
             MaterialTheme {
                 LineChart(valores)
+            }
+        }
+    }
+
+    @JvmStatic
+    fun configurarGraficoPizza(
+        composeView: ComposeView,
+        valores: List<Number>
+    ) {
+        composeView.setContent {
+            MaterialTheme {
+                pizzaChart(valores = valores)
             }
         }
     }
