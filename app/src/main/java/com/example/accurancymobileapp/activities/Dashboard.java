@@ -26,6 +26,7 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.VicoResponse;
+import com.example.accurancymobileapp.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
@@ -120,9 +121,7 @@ public class Dashboard extends AppCompatActivity {
         btnDeslogar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent login = new Intent(Dashboard.this,
-                        LoginActivity.class);
-                startActivity(login);
+               logoutSession();
             }
         });
 
@@ -210,5 +209,20 @@ public class Dashboard extends AppCompatActivity {
                         LENGTH_LONG).show();
             }
         });
+    }
+
+    public void logoutSession(){
+        SessionManager sessionManager = new SessionManager(this);
+
+        sessionManager.logout();
+
+        Intent it = new Intent(Dashboard.this, LoginActivity.class);
+        it.setFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
+        );
+
+        startActivity(it);
+        finish();
+
     }
 }
