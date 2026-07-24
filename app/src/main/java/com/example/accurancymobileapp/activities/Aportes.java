@@ -4,6 +4,7 @@ import static android.widget.Toast.LENGTH_LONG;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,12 +18,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.model.TickerResult;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.TickerResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -184,17 +187,17 @@ public class Aportes extends AppCompatActivity {
     private void carregarAtivos(){
         ApiService service = RetrofitClient.getClient().create(ApiService.class);
 
-        service.getService().enqueue(new Callback<TickerResponse>() {
+        service.getService().enqueue(new Callback<QuoteResponse>() {
 
             @Override
-            public void onResponse(Call<TickerResponse> call, Response<TickerResponse> response) {
+            public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
                 if(response.isSuccessful() && response.body() != null){
 
                     List<String> simbolos = new ArrayList<>();
                     simbolos.add("Escolha o ativo");
 
 
-                    for(TickerResult result : response.body().getResults()){
+                    for(QuoteResult result : response.body().getResults()){
                         simbolos.add(result.getSymbol());
                     }
 
@@ -213,7 +216,7 @@ public class Aportes extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<TickerResponse> call, Throwable t) {
+            public void onFailure(Call<QuoteResponse> call, Throwable t) {
             Toast.makeText(Aportes.this,
                     "Erro " +t .getMessage(),
                     LENGTH_LONG).show();
