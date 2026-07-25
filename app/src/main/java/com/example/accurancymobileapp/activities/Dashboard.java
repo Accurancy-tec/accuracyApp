@@ -26,12 +26,12 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.VicoResponse;
+import com.example.accurancymobileapp.ui.EvoCarteiraChartKt;
 import com.example.accurancymobileapp.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 import retrofit2.Call;
@@ -192,7 +192,7 @@ public class Dashboard extends AppCompatActivity {
                     }
 
                     if(!valores.isEmpty()){
-                        ChartHelper.configurarGrafico(ctvEvoCarteira, valores);
+                        ChartHelper.GraphicConfig(ctvEvoCarteira, valores);
                     }
 
                     Toast.makeText(Dashboard.this,
