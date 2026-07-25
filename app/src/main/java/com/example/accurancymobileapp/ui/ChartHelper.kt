@@ -3,15 +3,16 @@ package com.example.accurancymobileapp.ui
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.material3.MaterialTheme
 
+
 object ChartHelper {
     @JvmStatic
-    fun GraphicLine(composeView: ComposeView, valores: List<Number>) {
+    fun GraphicConfig(composeView: ComposeView, valores: List<Number>) {
         composeView.setContent {
-            GraphicLine(valores)
+            EvoCarteiraChart(valores)
         }
     }
 
-    /*@JvmStatic
+    @JvmStatic
     fun configurarGraficoLine(
         composeView: ComposeView,
         valores: List<Number>
@@ -21,7 +22,7 @@ object ChartHelper {
                 LineChart(valores)
             }
         }
-    }*/
+    }
 
     @JvmStatic
     fun configurarGraficoPizza(
@@ -30,7 +31,7 @@ object ChartHelper {
     ) {
         composeView.setContent {
             MaterialTheme {
-                EvoCarteiraChart(valores = valores)
+                pizzaChart(valores = valores)
             }
         }
     }

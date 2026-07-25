@@ -26,7 +26,7 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.VicoResponse;
-import com.example.accurancymobileapp.ui.GraphicLineKt;
+import com.example.accurancymobileapp.ui.EvoCarteiraChartKt;
 import com.example.accurancymobileapp.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -40,7 +40,6 @@ import retrofit2.Response;
 
 public class Dashboard extends AppCompatActivity {
     private ComposeView ctvEvoCarteira;
-    private ComposeView GraphicLine;
     Button btnAportes,btnDeslogar;
     BottomNavigationView bottomNavigation;
     TextView txtAtivoNome1,txtAtivoNome2,txtAtivoNome3,txtAtivoNome4,
@@ -193,7 +192,7 @@ public class Dashboard extends AppCompatActivity {
                     }
 
                     if(!valores.isEmpty()){
-                        ChartHelper.GraphicLine(GraphicLine, valores);
+                        ChartHelper.GraphicConfig(ctvEvoCarteira, valores);
                     }
 
                     Toast.makeText(Dashboard.this,
