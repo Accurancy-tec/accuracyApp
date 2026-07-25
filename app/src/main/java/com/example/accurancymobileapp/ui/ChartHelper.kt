@@ -5,13 +5,13 @@ import androidx.compose.material3.MaterialTheme
 
 object ChartHelper {
     @JvmStatic
-    fun configurarGrafico(composeView: ComposeView, valores: List<Number>) {
+    fun GraphicLine(composeView: ComposeView, valores: List<Number>) {
         composeView.setContent {
-            EvoCarteiraChart(valores)
+            GraphicLine(valores)
         }
     }
 
-    @JvmStatic
+    /*@JvmStatic
     fun configurarGraficoLine(
         composeView: ComposeView,
         valores: List<Number>
@@ -21,7 +21,7 @@ object ChartHelper {
                 LineChart(valores)
             }
         }
-    }
+    }*/
 
     @JvmStatic
     fun configurarGraficoPizza(
@@ -30,7 +30,7 @@ object ChartHelper {
     ) {
         composeView.setContent {
             MaterialTheme {
-                pizzaChart(valores = valores)
+                EvoCarteiraChart(valores = valores)
             }
         }
     }

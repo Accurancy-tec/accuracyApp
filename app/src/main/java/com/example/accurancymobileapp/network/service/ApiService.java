@@ -33,7 +33,6 @@ public interface ApiService {
     Call<QuoteResponse> getQuote(
             @Query("symbol") String symbol
     );
-
     @GET("quotes/getSymbols.php")
     Call<QuoteResponse> getService();
 }
