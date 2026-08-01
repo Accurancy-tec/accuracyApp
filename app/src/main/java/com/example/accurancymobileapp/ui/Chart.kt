@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
@@ -41,22 +43,23 @@ import com.patrykandpatrick.vico.compose.pie.rememberPieChart
 import kotlinx.coroutines.delay
 
 
+//Gráfico de linhas na Dashboard
 @Composable
-fun EvoCarteiraChart(valores: List<Number>) {
+fun ChartLineDashboard(valores: List<Number>) {
+
     val meses = listOf(
         "Jan",
         "Fev",
         "Mar",
         "Abr",
         "Mai",
-        "Jun"
-    )
+        "Jun")
 
-    val modelProducer = remember {
-        CartesianChartModelProducer()
-    }
+
+    val modelProducer = remember { CartesianChartModelProducer() }
 
     LaunchedEffect(valores) {
+        if (valores.isEmpty()) return@LaunchedEffect
         modelProducer.runTransaction {
             lineSeries {
                 series(valores)
@@ -64,33 +67,71 @@ fun EvoCarteiraChart(valores: List<Number>) {
         }
     }
 
-    CartesianChartHost(
 
-        chart = rememberCartesianChart(
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
 
-            rememberLineCartesianLayer(),
+    val alphaGrafico by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(700),
+        label = "alphaGrafico"
+    )
 
-            bottomAxis = HorizontalAxis.rememberBottom(
-                valueFormatter = { _, value, _ ->
-                    if (value.toInt() < meses.size)
-                        meses[value.toInt()]
-                    else
-                        ""
-                }
-            ),
+    val corLinha = Color(0xFF246BFD)
+    val corFundo = Color(0xFF06101E)
+    val corTexto = Color(0xFF6F829D)
+    val corGrade = Color.White.copy(alpha = 0.08f)
 
-            startAxis = null
+    val linhaCustomizada = LineCartesianLayer.rememberLine(
+        fill = LineCartesianLayer.LineFill.single(Fill(corLinha)),
+        stroke = LineCartesianLayer.LineStroke.Continuous(3.dp),
+        areaFill = LineCartesianLayer.AreaFill.single(
+            Fill(
+                Brush.verticalGradient(
+                    listOf(corLinha.copy(alpha = 0.35f), Color.Transparent)
+                )
+            )
         ),
+        interpolator = LineCartesianLayer.Interpolator.catmullRom(),
+    )
 
-        modelProducer = modelProducer,
 
+    val linhaDeGrade = rememberLineComponent(
+        fill = Fill(corGrade)
+    )
+    val estiloTextoEixo = rememberTextComponent(TextStyle(color = corTexto))
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(220.dp)
-            .background(
-                Color(0xFF0F172A)
-            )
-    )
+            .alpha(alphaGrafico)
+            .background(corFundo)
+            .padding(12.dp)
+    ) {
+
+        CartesianChartHost(
+            chart = rememberCartesianChart(
+                rememberLineCartesianLayer(
+                    lineProvider = LineCartesianLayer.LineProvider.series(linhaCustomizada)
+                ),
+                startAxis = VerticalAxis.rememberStart(
+                    label = estiloTextoEixo,
+                    guideline = linhaDeGrade,
+                    valueFormatter = CartesianValueFormatter.decimal(suffix = "R$"),
+                ),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    label = estiloTextoEixo,
+                    guideline = null,
+                    valueFormatter = { _, value, _ ->
+                        meses.getOrElse(value.toInt()) { "" }
+                    },
+                ),
+            ),
+            modelProducer = modelProducer,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
 }
     //Gráfico de linhas
     @Composable
