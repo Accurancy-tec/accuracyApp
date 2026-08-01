@@ -26,7 +26,6 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.VicoResponse;
-import com.example.accurancymobileapp.ui.EvoCarteiraChartKt;
 import com.example.accurancymobileapp.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -191,6 +190,7 @@ public class Dashboard extends AppCompatActivity {
                         valores.add(item.getPreco());
                     }
 
+                    //Se a lista não estiver fazia chama a func do arquivo ctvEvoCarteira
                     if(!valores.isEmpty()){
                         ChartHelper.GraphicConfig(ctvEvoCarteira, valores);
                     }

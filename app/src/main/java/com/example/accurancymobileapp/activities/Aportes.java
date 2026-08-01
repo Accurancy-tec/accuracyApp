@@ -106,8 +106,7 @@ public class Aportes extends AppCompatActivity {
         spnTipo.setAdapter(adapterTipo);
         spnRecorrencia.setAdapter(adapterRecorrencia);
 
-        //Puxando a função que contem as outras partes do código
-        //Em tese não muda nada mas facilita a manutenção
+
         carregarAtivos();
         aportes();
     }
