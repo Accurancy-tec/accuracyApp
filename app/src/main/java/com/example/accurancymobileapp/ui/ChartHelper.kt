@@ -8,7 +8,7 @@ object ChartHelper {
     @JvmStatic
     fun GraphicConfig(composeView: ComposeView, valores: List<Number>) {
         composeView.setContent {
-            EvoCarteiraChart(valores)
+            ChartLineDashboard(valores)
         }
     }
 
