@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    tools:context=".activities.Dashboard"
     android:background="@color/bg_deep">
 
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,105 +45,19 @@
 
 
         <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/ctvEvoCarteira"
+            android:id="@+id/ctvChart"
             android:layout_width="match_parent"
             android:layout_height="300dp" />
 
-        <!-- Linha 1 -->
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerInvestimentos"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal">
+            android:layout_height="287dp"
+            android:nestedScrollingEnabled="true"
+            android:paddingHorizontal="16dp"
+            tools:itemCount="8"
+            tools:listitem="@layout/item_investiment" />
 
-            <TextView
-                android:id="@+id/txtAtivoNome1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Nome Provisório"
-                android:textColor="@color/text_primary"/>
-
-            <TextView
-                android:id="@+id/txtAtivoPreco1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Preco Provisório"
-                android:textColor="@color/text_primary"/>
-
-        </LinearLayout>
-
-        <!-- Linha 2 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/txtAtivoNome2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Nome Provisório"
-                android:textColor="@color/text_primary"/>
-
-            <TextView
-                android:id="@+id/txtAtivoPreco2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Preco Provisório"
-                android:textColor="@color/text_primary"/>
-
-        </LinearLayout>
-
-        <!-- Linha 3 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/txtAtivoNome3"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Nome Provisório"
-                android:textColor="@color/text_primary"/>
-
-            <TextView
-                android:id="@+id/txtAtivoPreco3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Preco Provisório"
-                android:textColor="@color/text_primary"/>
-
-        </LinearLayout>
-
-        <!-- Linha 4 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/txtAtivoNome4"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Nome Provisório"
-                android:textColor="@color/text_primary"/>
-
-            <TextView
-                android:id="@+id/txtAtivoPreco4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Preco Provisório"
-                android:textColor="@color/text_primary"/>
-
-        </LinearLayout>
 
         <Button
             android:id="@+id/btnAportes"
@@ -164,4 +80,5 @@
             android:layout_gravity="bottom"/>
     </LinearLayout>
 
-</ScrollView>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
