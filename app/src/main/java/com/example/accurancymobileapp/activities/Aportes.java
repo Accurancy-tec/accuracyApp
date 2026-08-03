@@ -95,13 +95,16 @@ public class Aportes extends AppCompatActivity {
         String[] Recorrencia = {"Escolha a Recorrência","Diário","Semanal","Mensal","Anual"};
 
         ArrayAdapter<String> adapterTipo = new ArrayAdapter<String>(Aportes.this,
-                android.R.layout.simple_spinner_item,
+                R.layout.my_select_item,
                 Tipo
         );
         ArrayAdapter<String> adapterRecorrencia = new ArrayAdapter<String>(Aportes.this,
-                android.R.layout.simple_spinner_item,
+                R.layout.my_select_item,
                 Recorrencia
         );
+
+        adapterTipo.setDropDownViewResource(R.layout.my_dropdown_item);
+        adapterRecorrencia.setDropDownViewResource(R.layout.my_dropdown_item);
 
         spnTipo.setAdapter(adapterTipo);
         spnRecorrencia.setAdapter(adapterRecorrencia);
@@ -201,9 +204,11 @@ public class Aportes extends AppCompatActivity {
                     }
 
                     ArrayAdapter <String> adapterAtivo = new ArrayAdapter<String>(Aportes.this,
-                            android.R.layout.simple_spinner_item,
+                            R.layout.my_select_item,
                             simbolos
                     );
+
+                    adapterAtivo.setDropDownViewResource(R.layout.my_dropdown_item);
 
                     spnAtivo.setAdapter(adapterAtivo);
                 return;
