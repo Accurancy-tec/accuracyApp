@@ -64,7 +64,6 @@ public class Dashboard extends AppCompatActivity {
         });
 
         ctvChart = findViewById(R.id.ctvChart);
-        btnAportes = (Button) findViewById(R.id.btnAportes);
         btnDeslogar = (Button) findViewById(R.id.btnDeslogar);
         recyclerInvestimentos = findViewById(R.id.recyclerInvestimentos);
 
@@ -99,16 +98,6 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void dashboard(){
-
-        //Vai para os aportes
-        btnAportes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent pag = new Intent(Dashboard.this,
-                        Aportes.class);
-                startActivity(pag);
-            }
-        });
 
         //Volta para a tela de login
         btnDeslogar.setOnClickListener(new View.OnClickListener() {
