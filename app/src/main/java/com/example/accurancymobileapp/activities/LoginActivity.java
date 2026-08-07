@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isLoggedVerify();
+        //isLoggedVerify();
 
         editEmail = findViewById(R.id.editEmail);
         editSenha = findViewById(R.id.editSenha);
@@ -180,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
         btnEsqueciSenha.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: navegar para tela de recuperação de senha
+
                 Toast.makeText(LoginActivity.this,
                         "Tela de recuperação de senha (em breve)",
                         Toast.LENGTH_SHORT).show();
@@ -221,7 +221,7 @@ public class LoginActivity extends AppCompatActivity {
         btnGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: implementar Google Sign-In
+
                 Toast.makeText(LoginActivity.this,
                         "Login com Google (em breve)", Toast.LENGTH_SHORT).show();
             }
@@ -231,7 +231,7 @@ public class LoginActivity extends AppCompatActivity {
         btnGitHub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: implementar GitHub OAuth
+
                 Toast.makeText(LoginActivity.this,
                         "Login com GitHub (em breve)", Toast.LENGTH_SHORT).show();
             }
@@ -281,7 +281,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         Toast.makeText(LoginActivity.this, "Bem vindo " + usuario.getNome_usuario(), Toast.LENGTH_LONG).show();
 
-                        Intent it = new Intent(LoginActivity.this, Dashboard.class);
+                        Intent it = new Intent(LoginActivity.this, MainPageActivity.class);
                         startActivity(it);
                     }
                     else{
