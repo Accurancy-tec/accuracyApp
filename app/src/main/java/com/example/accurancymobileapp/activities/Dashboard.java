@@ -15,11 +15,14 @@ import androidx.compose.ui.platform.ComposeView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.adapter.EmphasisAdapter;
 
+import com.example.accurancymobileapp.fragments.DashboardFragment;
+import com.example.accurancymobileapp.fragments.WalletFragment;
 import com.example.accurancymobileapp.model.clsGrafic;
 import com.example.accurancymobileapp.ui.ChartHelper;
 
@@ -43,12 +46,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Dashboard extends AppCompatActivity {
-    private ComposeView ctvChart;
-    Button btnAportes,btnDeslogar;
     BottomNavigationView bottomNavigation;
-    TextView txtAtivoNome1,txtAtivoNome2,txtAtivoNome3,txtAtivoNome4,
-            txtAtivoPreco1, txtAtivoPreco2, txtAtivoPreco3, txtAtivoPreco4;
-    RecyclerView recyclerInvestimentos;
 
     private SessionManager sessionManager;
 
@@ -63,126 +61,41 @@ public class Dashboard extends AppCompatActivity {
             return insets;
         });
 
-        ctvChart = findViewById(R.id.ctvChart);
-        btnDeslogar = (Button) findViewById(R.id.btnDeslogar);
-        recyclerInvestimentos = findViewById(R.id.recyclerInvestimentos);
+        inicializarComponente();
+        configurarNavegacao();
+    }
 
-
-
-        //Trecho do menu
+    private void inicializarComponente(){
         bottomNavigation = findViewById(R.id.bottomNavigation);
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
+    }
 
+    private void configurarNavegacao(){
         bottomNavigation.setOnItemSelectedListener(item -> {
-            if(item.getItemId() == R.id.nav_home){
-                Intent it = new Intent(Dashboard.this, Dashboard.class);
-                startActivity(it);
-                return true;
+            Fragment fragmentSelecionado;
+
+            int itemId = item.getItemId();
+
+            if(itemId == R.id.nav_wallet){
+                fragmentSelecionado = new WalletFragment();
             }
-            if(item.getItemId() == R.id.nav_wallet){
-                Intent it = new Intent(Dashboard.this, WalletActivity.class);
-                startActivity(it);
-                return true;
-            }
-            if(item.getItemId() == R.id.nav_aporte){
-                Intent it = new Intent(Dashboard.this, Aportes.class);
-                startActivity(it);
-                return true;
-            }
-            return false;
-        });
-
-
-        carregarGrafico();
-        dashboard();
-    }
-
-    private void dashboard(){
-
-        //Volta para a tela de login
-        btnDeslogar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               logoutSession();
-            }
-        });
-
-        recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(this));
-
-        ApiService api = RetrofitClient
-                .getClient()
-                .create(ApiService.class);
-
-        api.getAportes().enqueue(new Callback<ApiResponse>() {
-            @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-
-                if(response.isSuccessful() && response.body() != null ){
-
-                    List<clsAportes> ativo = response.body().getLista();
-
-                    EmphasisAdapter adapter = new EmphasisAdapter(ativo);
-
-                    recyclerInvestimentos.setAdapter(adapter);
-
-                }
+            else if(itemId == R.id.nav_home){
+                fragmentSelecionado = new DashboardFragment();
             }
 
-            @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
-                Toast.makeText(Dashboard.this,
-                        "Nenhuma resposta chegou",
-                        LENGTH_LONG).show();
-            }
-        });
-    };
-    private void carregarGrafico(){
-
-        VicoService vico = RetrofitClient.getClient().create(VicoService.class);
-        vico.getGrafic().enqueue(new Callback<VicoResponse>() {
-            @Override
-            public void onResponse(Call<VicoResponse> call, Response<VicoResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-
-                    ArrayList<Number> valores = new ArrayList<>();
-
-                    for(clsGrafic item : response.body().getResults()){
-                        valores.add(item.getPreco());
-                    }
-
-
-                    if(!valores.isEmpty()){
-                        ChartHelper.GraphicConfig(ctvChart, valores);
-                    }
-
-                    Toast.makeText(Dashboard.this,
-                            "Quantidade: " + valores.size(),
-                            Toast.LENGTH_LONG
-                    ).show();
-                }
+            else {
+                return false;
             }
 
-            @Override
-            public void onFailure(Call<VicoResponse> call, Throwable t) {
-                Toast.makeText(Dashboard.this,
-                        "Erro " + t.getMessage(),
-                        LENGTH_LONG).show();
-            }
+            trocarFragment(fragmentSelecionado);
+            return true;
+
         });
     }
 
-    public void logoutSession(){
-        SessionManager sessionManager = new SessionManager(this);
-
-        sessionManager.logout();
-
-        Intent it = new Intent(Dashboard.this, LoginActivity.class);
-        it.setFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
-        );
-
-        startActivity(it);
-        finish();
-
+    private void trocarFragment(Fragment fragment){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameContent, fragment)
+                .commit();
     }
 }
