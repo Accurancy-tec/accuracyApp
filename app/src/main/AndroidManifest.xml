@@ -27,17 +27,21 @@
         <activity
             android:name=".activities.Aportes"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.Dashboard"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.WalletActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.MainPageActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>
