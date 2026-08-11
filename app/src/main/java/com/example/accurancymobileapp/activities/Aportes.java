@@ -4,7 +4,6 @@ import static android.widget.Toast.LENGTH_LONG;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,16 +16,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
+import com.example.accurancymobileapp.fragments.AportesFragment;
+import com.example.accurancymobileapp.fragments.DashboardFragment;
+import com.example.accurancymobileapp.fragments.WalletFragment;
 import com.example.accurancymobileapp.model.QuoteResult;
-import com.example.accurancymobileapp.model.TickerResult;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.response.QuoteResponse;
-import com.example.accurancymobileapp.response.TickerResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -39,192 +40,53 @@ import retrofit2.Response;
 
 public class Aportes extends AppCompatActivity {
 
-
-    Spinner spnAtivo, spnTipo,spnRecorrencia;
-    EditText txtPreco;
-    Button btnEnviar, btnHome;
     BottomNavigationView bottomNavigation;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_aportes);
+        setContentView(R.layout.fragment_aportes);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        inicializarComponente();
+        configurarNavegacao();
+    }
 
-
-        //Linkando com os componentes respectivos
-    spnAtivo = (Spinner) findViewById(R.id.spnAtivo);
-    spnRecorrencia = (Spinner) findViewById(R.id.spnRecorrencia);
-    spnTipo = (Spinner) findViewById(R.id.spnTipo);
-    btnEnviar = (Button) findViewById(R.id.btnEnviar);
-    txtPreco = (EditText) findViewById(R.id.txtPreco);
-    btnHome = (Button) findViewById(R.id.btnHome);
-
-    // Trecho do menu
+    private void inicializarComponente(){
         bottomNavigation = findViewById(R.id.bottomNavigation);
-        bottomNavigation.setSelectedItemId(R.id.nav_aporte);
+    }
 
+    private void configurarNavegacao(){
         bottomNavigation.setOnItemSelectedListener(item -> {
-            if(item.getItemId() == R.id.nav_home){
-                Intent it = new Intent(Aportes.this, Dashboard.class);
-                startActivity(it);
-                return true;
+            Fragment fragmentSelecionado;
+
+            int itemId = item.getItemId();
+
+            if(itemId == R.id.nav_wallet){
+                fragmentSelecionado = new WalletFragment();
             }
-            if(item.getItemId() == R.id.nav_wallet){
-                Intent it = new Intent(Aportes.this, WalletActivity.class);
-                startActivity(it);
-                return true;
+            else if(itemId == R.id.nav_home){
+                fragmentSelecionado = new DashboardFragment();
+            } else if (itemId == R.id.nav_aporte) {
+                fragmentSelecionado = new AportesFragment();
+            } else {
+                return false;
             }
-            if(item.getItemId() == R.id.nav_aporte){
-                Intent it = new Intent(Aportes.this, Aportes.class);
-                startActivity(it);
-                return true;
-            }
-            return false;
-        });
 
-        //Listas fixas
-        String[] Tipo = {"Escolha o Tipo","Compra"};
-        String[] Recorrencia = {"Escolha a Recorrência","Diário","Semanal","Mensal","Anual"};
+            trocarFragment(fragmentSelecionado);
+            return true;
 
-        ArrayAdapter<String> adapterTipo = new ArrayAdapter<String>(Aportes.this,
-                R.layout.my_select_item,
-                Tipo
-        );
-        ArrayAdapter<String> adapterRecorrencia = new ArrayAdapter<String>(Aportes.this,
-                R.layout.my_select_item,
-                Recorrencia
-        );
-
-        adapterTipo.setDropDownViewResource(R.layout.my_dropdown_item);
-        adapterRecorrencia.setDropDownViewResource(R.layout.my_dropdown_item);
-
-        spnTipo.setAdapter(adapterTipo);
-        spnRecorrencia.setAdapter(adapterRecorrencia);
-
-
-        carregarAtivos();
-        aportes();
-    }
-    private void aportes(){
-
-        //Executa ao clicar no botão de Enviar
-        btnEnviar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Puxa os dados nos campos
-                String Ativo = spnAtivo.getSelectedItem().toString();
-                String Tipo = spnTipo.getSelectedItem().toString();
-                String Recorrencia = spnRecorrencia.getSelectedItem().toString();
-                String SPreco = txtPreco.getText().toString();
-
-                //Verifica se foram preenchidos
-                if(Ativo.equals("Escolha o Ativo") || Tipo.equals("Escolha o Tipo") || Recorrencia.equals("Escolha a Recorrência") || SPreco.isEmpty()){
-                    Toast.makeText(Aportes.this,
-                            "Por favor preencha todos os campo",
-                            LENGTH_LONG).show();
-                    return;
-                }
-
-                //Converte o preço para double depois da verificação
-                Double Preco = Double.parseDouble(SPreco);
-
-                //Cria o objeto api, responsável por enviar os dados para o banco de dados
-                ApiService api = RetrofitClient
-                        .getClient()
-                        .create(ApiService.class);
-
-                //Cria a classe aporte e em seguida passa os seus dados para api
-                clsAportes aporte = new clsAportes(Ativo,Preco,Tipo,Recorrencia);
-                api.registerAporte(aporte).enqueue(new Callback<ApiResponse>() {
-
-                    //Lógica que verifica se deu tudo certo ao enviar as informações
-                    @Override
-                    public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-
-                        if (response.isSuccessful() && response.body() != null) {
-
-                            Toast.makeText(
-                                    Aportes.this,
-                                    response.body().getMensagem(),
-                                    LENGTH_LONG
-                            ).show();
-                            return;
-                        }
-                        Toast.makeText(Aportes.this,
-                                "Erro ao buscar a resposta da API",
-                                LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onFailure(Call<ApiResponse> call, Throwable t) {
-                        //Mostra o erro se por algum motivo ocorrer um erro
-                        Toast.makeText(
-                                Aportes.this,
-                                "Erro: " + t.getMessage(),
-                                LENGTH_LONG
-                        ).show();
-                    }
-                });
-            }
-        });
-
-        btnHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent home = new Intent(Aportes.this,
-                        Dashboard.class);
-                startActivity(home);
-            }
         });
     }
 
-    private void carregarAtivos(){
-        ApiService service = RetrofitClient.getClient().create(ApiService.class);
-
-        service.getService().enqueue(new Callback<QuoteResponse>() {
-
-            @Override
-            public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
-                if(response.isSuccessful() && response.body() != null){
-
-                    List<String> simbolos = new ArrayList<>();
-                    simbolos.add("Escolha o ativo");
-
-
-                    for(QuoteResult result : response.body().getResults()){
-                        simbolos.add(result.getSymbol());
-                    }
-
-                    ArrayAdapter <String> adapterAtivo = new ArrayAdapter<String>(Aportes.this,
-                            R.layout.my_select_item,
-                            simbolos
-                    );
-
-                    adapterAtivo.setDropDownViewResource(R.layout.my_dropdown_item);
-
-                    spnAtivo.setAdapter(adapterAtivo);
-                return;
-                }
-                Toast.makeText(Aportes.this,
-                        "N achamos nd",
-                        LENGTH_LONG).show();
-
-            }
-
-            @Override
-            public void onFailure(Call<QuoteResponse> call, Throwable t) {
-            Toast.makeText(Aportes.this,
-                    "Erro " +t .getMessage(),
-                    LENGTH_LONG).show();
-            }
-        });
+    private void trocarFragment(Fragment fragment){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameContent, fragment)
+                .commit();
     }
 }

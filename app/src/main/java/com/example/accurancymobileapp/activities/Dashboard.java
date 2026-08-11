@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.adapter.EmphasisAdapter;
 
+import com.example.accurancymobileapp.fragments.AportesFragment;
 import com.example.accurancymobileapp.fragments.DashboardFragment;
 import com.example.accurancymobileapp.fragments.WalletFragment;
 import com.example.accurancymobileapp.model.clsGrafic;
@@ -54,7 +55,7 @@ public class Dashboard extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_dashboard);
+        setContentView(R.layout.fragment_dashboard);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -81,7 +82,9 @@ public class Dashboard extends AppCompatActivity {
             else if(itemId == R.id.nav_home){
                 fragmentSelecionado = new DashboardFragment();
             }
-
+            else if(itemId == R.id.nav_aporte){
+                fragmentSelecionado = new AportesFragment();
+            }
             else {
                 return false;
             }
