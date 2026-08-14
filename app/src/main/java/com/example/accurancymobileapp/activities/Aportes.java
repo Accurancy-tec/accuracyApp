@@ -1,15 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
-import static android.widget.Toast.LENGTH_LONG;
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,22 +12,8 @@ import androidx.fragment.app.Fragment;
 import com.example.accurancymobileapp.fragments.AportesFragment;
 import com.example.accurancymobileapp.fragments.DashboardFragment;
 import com.example.accurancymobileapp.fragments.WalletFragment;
-import com.example.accurancymobileapp.model.QuoteResult;
-import com.example.accurancymobileapp.response.ApiResponse;
-import com.example.accurancymobileapp.network.service.ApiService;
-import com.example.accurancymobileapp.network.client.RetrofitClient;
-import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.response.QuoteResponse;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 
 public class Aportes extends AppCompatActivity {
 
