@@ -1,5 +1,7 @@
 package com.example.accurancymobileapp.network.repository;
 
+import android.content.Context;
+
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
@@ -16,8 +18,8 @@ import retrofit2.Response;
 public class QuoteRepository {
     private ApiService apiService;
 
-    public QuoteRepository(){
-        apiService = RetrofitClient.getClient().create(ApiService.class);
+    public QuoteRepository(Context context){
+        apiService = RetrofitClient.getClient(context).create(ApiService.class);
     }
 
     public void buscarCotacoes(String ticker, QuoteCallback callback){

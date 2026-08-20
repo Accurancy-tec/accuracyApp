@@ -116,7 +116,7 @@ public class AportesFragment extends Fragment {
 
                 //Cria o objeto api, responsável por enviar os dados para o banco de dados
                 ApiService api = RetrofitClient
-                        .getClient()
+                        .getClient(requireContext())
                         .create(ApiService.class);
 
                 //Cria a classe aporte e em seguida passa os seus dados para api
@@ -165,7 +165,7 @@ public class AportesFragment extends Fragment {
     }
 
     private void carregarAtivos() {
-        ApiService service = RetrofitClient.getClient().create(ApiService.class);
+        ApiService service = RetrofitClient.getClient(requireContext()).create(ApiService.class);
 
         service.getService().enqueue(new Callback<QuoteResponse>() {
 
