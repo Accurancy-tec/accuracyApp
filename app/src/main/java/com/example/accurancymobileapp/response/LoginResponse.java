@@ -6,6 +6,7 @@ public class LoginResponse {
     private boolean success;
     private String message;
     private User user;
+    private String token;
 
     public boolean isSuccess(){
         return success;
@@ -17,5 +18,8 @@ public class LoginResponse {
 
     public User getUser() {
         return user;
+    }
+    public String getToken() {
+        return token;
     }
 }
