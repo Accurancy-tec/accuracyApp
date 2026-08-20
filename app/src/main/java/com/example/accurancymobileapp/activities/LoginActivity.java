@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -260,7 +261,7 @@ public class LoginActivity extends AppCompatActivity {
         user.setEmail_usuario(email);
         user.setSenha_usuario(senha);
 
-        ApiService api = RetrofitClient.getClient().create(ApiService.class);
+        ApiService api = RetrofitClient.getClient(this).create(ApiService.class);
         api.loginVerification(user).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
@@ -272,7 +273,9 @@ public class LoginActivity extends AppCompatActivity {
 
                         User usuario = login.getUser();
 
-                        sessionManager.saveUserSession(
+                        sessionManager.saveToken(login.getToken());
+
+                        sessionManager.saveUser(
                                 user.getId_usuario(),
                                 user.getNome_usuario(),
                                 user.getEmail_usuario(),
@@ -292,6 +295,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable throwable) {
+                Log.e("LoginActivity","Erro ao Logar",throwable);
                 Toast.makeText(LoginActivity.this, "Erro: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -301,7 +305,7 @@ public class LoginActivity extends AppCompatActivity {
     private void fazerRegistro(String nome, String telefone, String cpf, String senha, String email){
         User user = new User(nome, telefone, cpf, senha, email);
 
-        ApiService api = RetrofitClient.getClient().create(ApiService.class);
+        ApiService api = RetrofitClient.getClient(this).create(ApiService.class);
         api.registerNewUser(user).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

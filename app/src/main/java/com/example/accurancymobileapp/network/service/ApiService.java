@@ -35,4 +35,5 @@ public interface ApiService {
     );
     @GET("quotes/getSymbols.php")
     Call<QuoteResponse> getService();
+
 }

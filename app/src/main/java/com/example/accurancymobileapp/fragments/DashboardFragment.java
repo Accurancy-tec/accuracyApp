@@ -81,7 +81,7 @@ public class DashboardFragment extends Fragment {
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         ApiService api = RetrofitClient
-                .getClient()
+                .getClient(requireContext())
                 .create(ApiService.class);
 
         api.getAportes().enqueue(new Callback<ApiResponse>() {
@@ -110,7 +110,7 @@ public class DashboardFragment extends Fragment {
 
     private void carregarGrafico(){
 
-        VicoService vico = RetrofitClient.getClient().create(VicoService.class);
+        VicoService vico = RetrofitClient.getClient(requireContext()).create(VicoService.class);
         vico.getGrafic().enqueue(new Callback<VicoResponse>() {
             @Override
             public void onResponse(Call<VicoResponse> call, Response<VicoResponse> response
