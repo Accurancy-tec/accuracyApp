@@ -46,7 +46,7 @@ public class WalletFragment extends Fragment {
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        quoteRepository = new QuoteRepository();
+        quoteRepository = new QuoteRepository(requireContext());
 
         carregarCotacoes();
         carregarGraficoPizza();
