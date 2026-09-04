@@ -34,7 +34,7 @@ public class MainPageActivity extends AppCompatActivity {
         configurarNavegacao();
 
         if(savedInstanceState == null){
-            bottomNavigation.setSelectedItemId(R.id.nav_wallet);
+            bottomNavigation.setSelectedItemId(R.id.nav_home);
         }
     }
 
