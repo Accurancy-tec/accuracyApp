@@ -31,7 +31,7 @@ public class RetrofitClient {
 
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2/accuracyApi/")
+                    .baseUrl("https://accuracyappapi.onrender.com/")
                     .client(client)
                     .addConverterFactory(
                             GsonConverterFactory.create()
