@@ -50,6 +50,7 @@ public class DashboardFragment extends Fragment {
     RecyclerView recyclerInvestimentos;
 
 
+
     public DashboardFragment() {
         super(R.layout.fragment_dashboard);
     }

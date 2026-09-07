@@ -4,6 +4,7 @@ import static android.widget.Toast.LENGTH_LONG;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -47,6 +48,7 @@ public class AportesFragment extends Fragment {
     Spinner spnAtivo, spnTipo, spnRecorrencia;
     EditText txtPreco;
     Button btnEnviar, btnHome;
+
 
     public AportesFragment() {
         super(R.layout.fragment_aportes);
@@ -97,6 +99,7 @@ public class AportesFragment extends Fragment {
         btnEnviar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 //Puxa os dados nos campos
                 String Ativo = spnAtivo.getSelectedItem().toString();
                 String Tipo = spnTipo.getSelectedItem().toString();
@@ -149,6 +152,8 @@ public class AportesFragment extends Fragment {
                                 "Erro: " + t.getMessage(),
                                 LENGTH_LONG
                         ).show();
+
+                        Log.e("Erro","Mensagem: " + t.getMessage());
                     }
                 });
             }
