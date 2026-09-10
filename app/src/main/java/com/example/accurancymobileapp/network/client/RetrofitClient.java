@@ -36,7 +36,7 @@ public class RetrofitClient {
 
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080/")
+                    .baseUrl(buildConfig.API_URL)
                     .client(client)
                     .addConverterFactory(
                             GsonConverterFactory.create()
