@@ -40,6 +40,7 @@ android {
 
 
 dependencies {
+    implementation("com.squareup.okhttp3:logging-interceptor:5.1.0")
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
