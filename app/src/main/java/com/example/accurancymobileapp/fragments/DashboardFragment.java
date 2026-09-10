@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,22 +90,25 @@ public class DashboardFragment extends Fragment {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
 
-                if(response.isSuccessful() && response.body() != null ){
+                if (response.isSuccessful() && response.body() != null) {
 
                     List<clsAportes> ativo = response.body().getLista();
 
+                    if (ativo == null) {
+                        Log.e("ERRO", "A lista não mostrou nada");
+                        return;
+                    }
+
                     EmphasisAdapter adapter = new EmphasisAdapter(ativo);
-
                     recyclerInvestimentos.setAdapter(adapter);
-
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable t) {
-                Toast.makeText(requireContext(),
-                        "Nenhuma resposta chegou",
-                        LENGTH_LONG).show();
+
+                Toast.makeText(requireContext(),"Erro ao mostrar aportes",LENGTH_LONG).show();
+                Log.e("ERRO", "msg: " + t.getMessage());
             }
         });
     };
