@@ -13,6 +13,9 @@ android {
 
     buildFeatures {
         compose = true
+        buildFeatures {
+            buildConfig = true
+        }
     }
 
     defaultConfig {
@@ -30,6 +33,18 @@ android {
             optimization {
                 enable = false
             }
+            buildConfigField(
+                "String",
+                "API_URL",
+                "\"https://accuracyappapi.onrender.com/\""
+            )
+        }
+        debug {
+            buildConfigField(
+                "String",
+                "API_URL",
+                "\"http://10.0.2.2:8080/\""
+            )
         }
     }
     compileOptions {
