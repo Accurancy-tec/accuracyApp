@@ -2,6 +2,7 @@ package com.example.accurancymobileapp.network.client;
 
 import android.content.Context;
 
+import com.example.accurancymobileapp.BuildConfig;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.utils.AuthInterceptor;
 import com.example.accurancymobileapp.utils.SessionManager;
@@ -36,7 +37,7 @@ public class RetrofitClient {
 
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080/")
+                    .baseUrl(BuildConfig.API_URL)
                     .client(client)
                     .addConverterFactory(
                             GsonConverterFactory.create()
