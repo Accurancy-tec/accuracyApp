@@ -1,5 +1,7 @@
 package com.example.accurancymobileapp.utils;
 
+import android.util.Log;
+
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -22,12 +24,8 @@ public class AuthInterceptor implements Interceptor {
 
         Request original = chain.request();
 
-        if (token == null) {
-            return chain.proceed(original);
-        }
-
         Request request = original.newBuilder()
-                .addHeader(
+                .header(
                         "Authorization",
                         "Bearer " + token
                 )
@@ -36,4 +34,3 @@ public class AuthInterceptor implements Interceptor {
         return chain.proceed(request);
     }
 }
-
