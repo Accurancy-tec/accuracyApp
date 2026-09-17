@@ -11,24 +11,30 @@ import androidx.fragment.app.Fragment;
 
 import com.example.accurancymobileapp.fragments.AportesFragment;
 import com.example.accurancymobileapp.fragments.DashboardFragment;
+import com.example.accurancymobileapp.fragments.ProfileFragment;
 import com.example.accurancymobileapp.fragments.WalletFragment;
+
+
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class Aportes extends AppCompatActivity {
-
+public class DashboardActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigation;
+
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.fragment_aportes);
+        setContentView(R.layout.fragment_dashboard);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         inicializarComponente();
         configurarNavegacao();
     }
@@ -48,9 +54,14 @@ public class Aportes extends AppCompatActivity {
             }
             else if(itemId == R.id.nav_home){
                 fragmentSelecionado = new DashboardFragment();
-            } else if (itemId == R.id.nav_aporte) {
+            }
+            else if(itemId == R.id.nav_aporte){
                 fragmentSelecionado = new AportesFragment();
-            } else {
+            }
+            else if(itemId == R.id.nav_profile){
+                fragmentSelecionado = new ProfileFragment();
+            }
+            else {
                 return false;
             }
 
