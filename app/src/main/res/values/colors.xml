@@ -24,24 +24,24 @@
     <color name="divider">#12FFFFFF</color>
     <!--  Tab inativa  -->
     <color name="tab_bg">#0DFFFFFF</color>
-
+    <!-- Cor dos botões principais -->
     <color name="btn_primary">#2563EB</color>
-
+    <!-- Verde positivo (lucros, ganhos e valores positivos) -->
     <color name="green_positive">#22C55E</color>
-
+    <!-- Vermelho negativo (perdas, quedas e valores negativos) -->
     <color name="red_negative">#F44336</color>
-
+    <!-- Fundo principal dos cards do perfil -->
     <color name="card_background">#0D1D30</color>
-
+    <!-- Fundo alternativo para cards e componentes -->
     <color name="card_background_2">#10243A</color>
-
+    <!-- Azul principal dos ícones e destaques do perfil -->
     <color name="blue_primary">#1677FF</color>
-
+    <!-- Azul claro para detalhes e variações dos destaques -->
     <color name="blue_light">#328BFF</color>
-
+    <!-- Vermelho principal do botão Sair da conta -->
     <color name="red_primary">#FF5265</color>
-
+    <!-- Vermelho secundário para textos e descrições -->
     <color name="red_secondary">#C65A68</color>
-
+    <!-- Fundo avermelhado do card Sair da conta -->
     <color name="red_background">#241A29</color>
 </resources>
