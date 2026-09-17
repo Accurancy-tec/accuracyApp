@@ -13,28 +13,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.activities.Dashboard;
 import com.example.accurancymobileapp.activities.LoginActivity;
 import com.example.accurancymobileapp.adapter.EmphasisAdapter;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.model.clsGrafic;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
-import com.example.accurancymobileapp.network.repository.QuoteRepository;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.service.VicoService;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.VicoResponse;
 import com.example.accurancymobileapp.ui.ChartHelper;
 import com.example.accurancymobileapp.utils.SessionManager;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;

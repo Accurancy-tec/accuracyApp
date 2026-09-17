@@ -1,0 +1,1104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="@color/bg_deep"
+
+    tools:context=".fragments.ProfileFragment">
+
+    <androidx.core.widget.NestedScrollView
+
+        android:id="@+id/scrollPerfil"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:clipToPadding="false"
+
+        android:fillViewport="true"
+
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:paddingStart="20dp"
+            android:paddingTop="24dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="24dp">
+
+
+            <!-- ================================================= -->
+            <!-- CABEÇALHO -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="20dp"
+
+                android:gravity="center_vertical"
+
+                android:orientation="horizontal">
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:layout_weight="1"
+
+                    android:text="Perfil"
+
+                    android:textColor="@color/text_primary"
+
+                    android:textSize="26sp"
+
+                    android:textStyle="bold" />
+
+                <ImageButton
+
+                    android:id="@+id/btnNotificacoes"
+
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+
+                    android:background="@drawable/bg_icon_button"
+
+                    android:contentDescription="Notificações"
+
+                    android:padding="12dp"
+
+                    android:src="@android:drawable/ic_popup_reminder"
+
+                    app:tint="@color/text_primary" />
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- CARD PRINCIPAL DO USUÁRIO -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="28dp"
+
+                android:background="@drawable/bg_card_perfil"
+
+                android:gravity="center_horizontal"
+
+                android:orientation="vertical"
+
+                android:padding="24dp">
+
+
+                <!-- Avatar -->
+
+                <FrameLayout
+
+                    android:layout_width="112dp"
+                    android:layout_height="112dp"
+
+                    android:layout_marginBottom="14dp">
+
+                    <ImageView
+
+                        android:id="@+id/imgFotoPerfil"
+
+                        android:layout_width="112dp"
+                        android:layout_height="112dp"
+
+                        android:background="@drawable/bg_avatar"
+
+                        android:contentDescription="Foto de perfil"
+
+                        android:padding="24dp"
+
+                        android:scaleType="centerInside"
+
+                        android:src="@android:drawable/ic_menu_myplaces"
+
+                        app:tint="@color/text_primary" />
+
+                    <!-- Botão da câmera -->
+
+                    <ImageButton
+
+                        android:id="@+id/btnAlterarFoto"
+
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+
+                        android:layout_gravity="bottom|end"
+
+                        android:background="@drawable/bg_avatar_button"
+
+                        android:contentDescription="Alterar foto"
+
+                        android:padding="9dp"
+
+                        android:src="@android:drawable/ic_menu_camera"
+
+                        app:tint="@color/white" />
+
+                </FrameLayout>
+
+
+                <!-- Nome -->
+
+                <TextView
+
+                    android:id="@+id/txtNomePerfil"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginBottom="6dp"
+
+                    android:text="João Davi"
+
+                    android:textColor="@color/text_primary"
+
+                    android:textSize="23sp"
+
+                    android:textStyle="bold" />
+
+
+                <!-- E-mail -->
+
+                <TextView
+
+                    android:id="@+id/txtEmailPerfil"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginBottom="20dp"
+
+                    android:text="joaodavi@email.com"
+
+                    android:textColor="@color/text_secondary"
+
+                    android:textSize="14sp" />
+
+
+                <!-- Editar perfil -->
+
+                <Button
+
+                    android:id="@+id/btnEditarPerfil"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+
+                    android:background="@drawable/bg_button_outline"
+
+                    android:minHeight="0dp"
+
+                    android:padding="0dp"
+
+                    android:text="✎  Editar perfil"
+
+                    android:textAllCaps="false"
+
+                    android:textColor="@color/blue_primary"
+
+                    android:textSize="15sp"
+
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- TÍTULO MINHA CONTA -->
+            <!-- ================================================= -->
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="12dp"
+
+                android:text="Minha conta"
+
+                android:textColor="@color/text_primary"
+
+                android:textSize="18sp"
+
+                android:textStyle="bold" />
+
+
+            <!-- ================================================= -->
+            <!-- DADOS DA CONTA -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="28dp"
+
+                android:background="@drawable/bg_card_perfil"
+
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+
+                android:paddingEnd="16dp">
+
+
+                <!-- NOME -->
+
+                <LinearLayout
+
+                    android:id="@+id/itemNome"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center_vertical"
+
+                    android:minHeight="78dp"
+
+                    android:orientation="horizontal"
+
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+
+                        android:background="@drawable/bg_item_icon"
+
+                        android:contentDescription="Nome"
+
+                        android:padding="11dp"
+
+                        android:src="@android:drawable/ic_menu_myplaces"
+
+                        app:tint="@color/blue_primary" />
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginStart="14dp"
+
+                        android:layout_weight="1"
+
+                        android:orientation="vertical">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginBottom="4dp"
+
+                            android:text="Nome"
+
+                            android:textColor="@color/text_secondary"
+
+                            android:textSize="13sp" />
+
+                        <TextView
+
+                            android:id="@+id/txtNomeConta"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="João Davi Silva"
+
+                            android:textColor="@color/text_primary"
+
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+
+                        android:contentDescription="Abrir nome"
+
+                        android:src="@android:drawable/ic_media_next"
+
+                        app:tint="@color/text_secondary" />
+
+                </LinearLayout>
+
+
+                <View
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+
+                    android:background="@color/divider" />
+
+
+                <!-- E-MAIL -->
+
+                <LinearLayout
+
+                    android:id="@+id/itemEmail"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center_vertical"
+
+                    android:minHeight="78dp"
+
+                    android:orientation="horizontal"
+
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+
+                        android:background="@drawable/bg_item_icon"
+
+                        android:contentDescription="E-mail"
+
+                        android:padding="11dp"
+
+                        android:src="@android:drawable/ic_dialog_email"
+
+                        app:tint="@color/blue_primary" />
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginStart="14dp"
+
+                        android:layout_weight="1"
+
+                        android:orientation="vertical">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginBottom="4dp"
+
+                            android:text="E-mail"
+
+                            android:textColor="@color/text_secondary"
+
+                            android:textSize="13sp" />
+
+                        <TextView
+
+                            android:id="@+id/txtEmailConta"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="joaodavi@email.com"
+
+                            android:textColor="@color/text_primary"
+
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+
+                        android:contentDescription="Abrir e-mail"
+
+                        android:src="@android:drawable/ic_media_next"
+
+                        app:tint="@color/text_secondary" />
+
+                </LinearLayout>
+
+
+                <View
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+
+                    android:background="@color/divider" />
+
+
+                <!-- TELEFONE -->
+
+                <LinearLayout
+
+                    android:id="@+id/itemTelefone"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center_vertical"
+
+                    android:minHeight="78dp"
+
+                    android:orientation="horizontal"
+
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+
+                        android:background="@drawable/bg_item_icon"
+
+                        android:contentDescription="Telefone"
+
+                        android:padding="11dp"
+
+                        android:src="@android:drawable/ic_menu_call"
+
+                        app:tint="@color/blue_primary" />
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginStart="14dp"
+
+                        android:layout_weight="1"
+
+                        android:orientation="vertical">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginBottom="4dp"
+
+                            android:text="Telefone"
+
+                            android:textColor="@color/text_secondary"
+
+                            android:textSize="13sp" />
+
+                        <TextView
+
+                            android:id="@+id/txtTelefoneConta"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="(11) 99999-4321"
+
+                            android:textColor="@color/text_primary"
+
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+
+                        android:contentDescription="Abrir telefone"
+
+                        android:src="@android:drawable/ic_media_next"
+
+                        app:tint="@color/text_secondary" />
+
+                </LinearLayout>
+
+
+                <View
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+
+                    android:background="@color/divider" />
+
+
+                <!-- CPF -->
+
+                <LinearLayout
+
+                    android:id="@+id/itemCpf"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center_vertical"
+
+                    android:minHeight="78dp"
+
+                    android:orientation="horizontal"
+
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+
+                        android:background="@drawable/bg_item_icon"
+
+                        android:contentDescription="CPF"
+
+                        android:padding="11dp"
+
+                        android:src="@android:drawable/ic_menu_info_details"
+
+                        app:tint="@color/blue_primary" />
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginStart="14dp"
+
+                        android:layout_weight="1"
+
+                        android:orientation="vertical">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginBottom="4dp"
+
+                            android:text="CPF"
+
+                            android:textColor="@color/text_secondary"
+
+                            android:textSize="13sp" />
+
+                        <TextView
+
+                            android:id="@+id/txtCpfConta"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="123.456.789-01"
+
+                            android:textColor="@color/text_primary"
+
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+
+                        android:contentDescription="CPF protegido"
+
+                        android:src="@android:drawable/ic_lock_lock"
+
+                        app:tint="@color/text_secondary" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- PREFERÊNCIAS -->
+            <!-- ================================================= -->
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="12dp"
+
+                android:text="Preferências"
+
+                android:textColor="@color/text_primary"
+
+                android:textSize="18sp"
+
+                android:textStyle="bold" />
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="20dp"
+
+                android:background="@drawable/bg_card_perfil"
+
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+
+                android:paddingEnd="16dp">
+
+
+                <!-- NOTIFICAÇÕES -->
+
+                <LinearLayout
+
+                    android:id="@+id/itemNotificacoes"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center_vertical"
+
+                    android:minHeight="78dp"
+
+                    android:orientation="horizontal"
+
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+
+                        android:background="@drawable/bg_item_icon"
+
+                        android:contentDescription="Notificações"
+
+                        android:padding="11dp"
+
+                        android:src="@android:drawable/ic_popup_reminder"
+
+                        app:tint="@color/blue_primary" />
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginStart="14dp"
+
+                        android:layout_weight="1"
+
+                        android:orientation="vertical">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginBottom="4dp"
+
+                            android:text="Notificações"
+
+                            android:textColor="@color/text_primary"
+
+                            android:textSize="14sp"
+
+                            android:textStyle="bold" />
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="Gerencie suas notificações"
+
+                            android:textColor="@color/text_secondary"
+
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+
+                        android:contentDescription="Abrir notificações"
+
+                        android:src="@android:drawable/ic_media_next"
+
+                        app:tint="@color/text_secondary" />
+
+                </LinearLayout>
+
+
+                <View
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+
+                    android:background="@color/divider" />
+
+
+                <!-- APARÊNCIA -->
+
+                <LinearLayout
+
+                    android:id="@+id/itemAparencia"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center_vertical"
+
+                    android:minHeight="78dp"
+
+                    android:orientation="horizontal"
+
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+
+                        android:background="@drawable/bg_item_icon"
+
+                        android:contentDescription="Aparência"
+
+                        android:padding="11dp"
+
+                        android:src="@android:drawable/ic_menu_manage"
+
+                        app:tint="@color/blue_primary" />
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginStart="14dp"
+
+                        android:layout_weight="1"
+
+                        android:orientation="vertical">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginBottom="4dp"
+
+                            android:text="Aparência"
+
+                            android:textColor="@color/text_primary"
+
+                            android:textSize="14sp"
+
+                            android:textStyle="bold" />
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="Tema escuro"
+
+                            android:textColor="@color/text_secondary"
+
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+
+                        android:contentDescription="Abrir aparência"
+
+                        android:src="@android:drawable/ic_media_next"
+
+                        app:tint="@color/text_secondary" />
+
+                </LinearLayout>
+
+
+                <View
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+
+                    android:background="@color/divider" />
+
+
+                <!-- SEGURANÇA -->
+
+                <LinearLayout
+
+                    android:id="@+id/itemSeguranca"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:gravity="center_vertical"
+
+                    android:minHeight="78dp"
+
+                    android:orientation="horizontal"
+
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+
+                        android:background="@drawable/bg_item_icon"
+
+                        android:contentDescription="Segurança"
+
+                        android:padding="11dp"
+
+                        android:src="@android:drawable/ic_lock_lock"
+
+                        app:tint="@color/blue_primary" />
+
+                    <LinearLayout
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginStart="14dp"
+
+                        android:layout_weight="1"
+
+                        android:orientation="vertical">
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginBottom="4dp"
+
+                            android:text="Segurança"
+
+                            android:textColor="@color/text_primary"
+
+                            android:textSize="14sp"
+
+                            android:textStyle="bold" />
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="Login e autenticação"
+
+                            android:textColor="@color/text_secondary"
+
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+
+                        android:contentDescription="Abrir segurança"
+
+                        android:src="@android:drawable/ic_media_next"
+
+                        app:tint="@color/text_secondary" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- ALTERAR SENHA -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+
+                android:id="@+id/itemAlterarSenha"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="20dp"
+
+                android:background="@drawable/bg_card_perfil"
+
+                android:gravity="center_vertical"
+
+                android:minHeight="76dp"
+
+                android:orientation="horizontal"
+
+                android:padding="16dp">
+
+                <ImageView
+
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+
+                    android:background="@drawable/bg_item_icon"
+
+                    android:contentDescription="Alterar senha"
+
+                    android:padding="11dp"
+
+                    android:src="@android:drawable/ic_lock_lock"
+
+                    app:tint="@color/blue_primary" />
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginStart="14dp"
+
+                    android:layout_weight="1"
+
+                    android:text="Alterar senha"
+
+                    android:textColor="@color/text_primary"
+
+                    android:textSize="15sp"
+
+                    android:textStyle="bold" />
+
+                <ImageView
+
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+
+                    android:contentDescription="Abrir alterar senha"
+
+                    android:src="@android:drawable/ic_media_next"
+
+                    app:tint="@color/text_secondary" />
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- SAIR DA CONTA -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+
+                android:id="@+id/itemSair"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="24dp"
+
+                android:background="@drawable/bg_card_sair"
+
+                android:gravity="center_vertical"
+
+                android:minHeight="76dp"
+
+                android:orientation="horizontal"
+
+                android:padding="16dp">
+
+                <ImageView
+
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+
+                    android:background="@drawable/bg_icon_sair"
+
+                    android:contentDescription="Sair da conta"
+
+                    android:padding="11dp"
+
+                    android:src="@android:drawable/ic_lock_power_off"
+
+                    app:tint="@color/red_primary" />
+
+                <LinearLayout
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+
+                    android:layout_marginStart="14dp"
+
+                    android:layout_weight="1"
+
+                    android:orientation="vertical">
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginBottom="4dp"
+
+                        android:text="Sair da conta"
+
+                        android:textColor="@color/red_primary"
+
+                        android:textSize="15sp"
+
+                        android:textStyle="bold" />
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="Encerrar sessão"
+
+                        android:textColor="@color/red_secondary"
+
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <ImageView
+
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+
+                    android:contentDescription="Sair"
+
+                    android:src="@android:drawable/ic_media_next"
+
+                    app:tint="@color/red_primary" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

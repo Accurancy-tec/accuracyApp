@@ -15,26 +15,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.activities.Aportes;
-import com.example.accurancymobileapp.activities.Dashboard;
-import com.example.accurancymobileapp.activities.LoginActivity;
-import com.example.accurancymobileapp.activities.WalletActivity;
-import com.example.accurancymobileapp.adapter.EmphasisAdapter;
+import com.example.accurancymobileapp.activities.DashboardActivity;
 import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.model.clsAportes;
-import com.example.accurancymobileapp.model.clsGrafic;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
-import com.example.accurancymobileapp.network.service.VicoService;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
-import com.example.accurancymobileapp.response.VicoResponse;
-import com.example.accurancymobileapp.ui.ChartHelper;
-import com.example.accurancymobileapp.utils.SessionManager;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +152,7 @@ public class AportesFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent home = new Intent(requireContext(),
-                        Dashboard.class);
+                        DashboardActivity.class);
                 startActivity(home);
             }
         });

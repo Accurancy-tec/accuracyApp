@@ -345,7 +345,7 @@ public class LoginActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         if(sessionManager.isLoggedIn()){
-            Intent it = new Intent(LoginActivity.this, Dashboard.class);
+            Intent it = new Intent(LoginActivity.this, DashboardActivity.class);
             startActivity(it);
             finish();
         }
