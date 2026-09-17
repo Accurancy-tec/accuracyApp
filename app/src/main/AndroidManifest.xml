@@ -25,11 +25,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.Aportes"
+            android:name=".activities.AportesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activities.Dashboard"
+            android:name=".activities.DashboardActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
@@ -42,6 +42,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.MainPageActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.ProfileActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

@@ -1,22 +1,22 @@
 package com.example.accurancymobileapp.activities;
 
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
-import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.fragments.AportesFragment;
 import com.example.accurancymobileapp.fragments.DashboardFragment;
 import com.example.accurancymobileapp.fragments.ProfileFragment;
 import com.example.accurancymobileapp.fragments.WalletFragment;
+import com.example.accurancymobileapp.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainPageActivity extends AppCompatActivity {
+public class AportesActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigation;
 
@@ -24,19 +24,14 @@ public class MainPageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main_page);
+        setContentView(R.layout.fragment_aportes);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
         inicializarComponente();
         configurarNavegacao();
-
-        if(savedInstanceState == null){
-            bottomNavigation.setSelectedItemId(R.id.nav_home);
-        }
     }
 
     private void inicializarComponente(){
@@ -54,14 +49,12 @@ public class MainPageActivity extends AppCompatActivity {
             }
             else if(itemId == R.id.nav_home){
                 fragmentSelecionado = new DashboardFragment();
-            }
-            else if(itemId == R.id.nav_aporte){
+            } else if (itemId == R.id.nav_aporte) {
                 fragmentSelecionado = new AportesFragment();
             }
             else if(itemId == R.id.nav_profile){
                 fragmentSelecionado = new ProfileFragment();
-            }
-            else {
+            }else {
                 return false;
             }
 

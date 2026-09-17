@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.fragments.AportesFragment;
 import com.example.accurancymobileapp.fragments.DashboardFragment;
+import com.example.accurancymobileapp.fragments.ProfileFragment;
 import com.example.accurancymobileapp.fragments.WalletFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -43,6 +44,9 @@ public class WalletActivity extends AppCompatActivity {
             }
             else if(itemId == R.id.nav_aporte){
                 fragmentSelecionado = new AportesFragment();
+            }
+            else if(itemId == R.id.nav_profile){
+                fragmentSelecionado = new ProfileFragment();
             }
             else {
                 return false;
