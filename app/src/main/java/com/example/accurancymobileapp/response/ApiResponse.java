@@ -1,8 +1,10 @@
 package com.example.accurancymobileapp.response;
 
+import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.clsAportes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 //Classe criada para pegar os dados do JSON enviados pelo PHP
@@ -21,4 +23,6 @@ public class ApiResponse {
     public ArrayList<clsAportes> getLista() {
         return ativos;
     }
+
+
 }
