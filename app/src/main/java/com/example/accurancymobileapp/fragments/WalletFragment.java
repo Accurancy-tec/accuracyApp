@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.QuoteAdapter;
 import com.example.accurancymobileapp.model.QuoteData;
+import com.example.accurancymobileapp.model.clsAportes;
+import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.QuoteRepository;
 import com.example.accurancymobileapp.ui.ChartHelper;
 
@@ -48,7 +50,7 @@ public class WalletFragment extends Fragment {
 
         quoteRepository = new QuoteRepository(requireContext());
 
-        carregarCotacoes();
+        carregarInvestimentos();
         carregarGraficoPizza();
     }
 
@@ -67,10 +69,50 @@ public class WalletFragment extends Fragment {
         );
     }
 
-    private void carregarCotacoes() {
-        String tickers = "VALE3, PETR4, ITUB4, PETR4, PETR4";
+    private void carregarInvestimentos() {
+        AporteRepository aporteRepository = new AporteRepository(requireContext());
 
-        quoteRepository.buscarCotacoes(tickers, new QuoteRepository.QuoteCallback() {
+        aporteRepository.buscarAportes(new AporteRepository.aporteCallback() {
+            @Override
+            public void onSucesso(List<clsAportes> aportes) {
+                if(aportes == null || aportes.isEmpty()){
+                    Toast.makeText(requireContext(), "Você ainda não possui nenhum investimento",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                StringBuilder tickers = new StringBuilder();
+
+                for(clsAportes aporte : aportes){
+                    String ticker = aporte.getAtivo();
+
+                    if(ticker == null || ticker.trim().isEmpty()){
+                        continue;
+                    }
+
+                    if(tickers.length() > 0){
+                        tickers.append(",");
+                    }
+
+                    tickers.append(ticker.trim());
+
+                }
+
+                if(tickers.length() == 0){
+                    Toast.makeText(requireContext(), "Nenhum ativo encontrado.", Toast.LENGTH_LONG).show();
+                }
+
+                buscarContacoesDosAportes(tickers.toString());
+
+
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+
+            }
+        });
+
+
+        /*quoteRepository.buscarCotacoes(tickers, new QuoteRepository.QuoteCallback() {
             @Override
             public void onSucesso(List<QuoteData> quotes) {
                 QuoteAdapter adapter = new QuoteAdapter(quotes);
@@ -83,6 +125,24 @@ public class WalletFragment extends Fragment {
                 Log.e("API: ", mensagem);
 
                 Toast.makeText(requireContext(), "Erro: " + mensagem, Toast.LENGTH_LONG).show();
+            }
+        });*/
+    }
+
+    private void buscarContacoesDosAportes(String ticker){
+        quoteRepository.buscarCotacoes(ticker, new QuoteRepository.QuoteCallback() {
+            @Override
+            public void onSucesso(List<QuoteData> quotes) {
+                QuoteAdapter adapter = new QuoteAdapter(quotes);
+                recyclerInvestimentos.setAdapter(adapter);
+
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                Log.e("Contações: ", mensagem);
+
+                Toast.makeText(requireContext(), "Erro ao carregar contações.", Toast.LENGTH_LONG).show();
             }
         });
     }
