@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.fragments.AportesFragment;
 import com.example.accurancymobileapp.fragments.DashboardFragment;
+import com.example.accurancymobileapp.fragments.HistoricFragment;
 import com.example.accurancymobileapp.fragments.ProfileFragment;
 import com.example.accurancymobileapp.fragments.WalletFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -57,6 +58,9 @@ public class MainPageActivity extends AppCompatActivity {
             }
             else if(itemId == R.id.nav_aporte){
                 fragmentSelecionado = new AportesFragment();
+            }
+            else if(itemId == R.id.nav_historic){
+                fragmentSelecionado = new HistoricFragment();
             }
             else if(itemId == R.id.nav_profile){
                 fragmentSelecionado = new ProfileFragment();
