@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //isLoggedVerify();
+        isLoggedVerify();
 
         editEmail = findViewById(R.id.editEmail);
         editSenha = findViewById(R.id.editSenha);
@@ -345,7 +345,7 @@ public class LoginActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         if(sessionManager.isLoggedIn()){
-            Intent it = new Intent(LoginActivity.this, DashboardActivity.class);
+            Intent it = new Intent(LoginActivity.this, MainPageActivity.class);
             startActivity(it);
             finish();
         }

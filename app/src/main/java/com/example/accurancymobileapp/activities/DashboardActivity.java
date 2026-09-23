@@ -22,8 +22,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class DashboardActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigation;
 
-    private SessionManager sessionManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

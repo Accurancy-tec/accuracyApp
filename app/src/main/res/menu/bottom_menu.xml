@@ -16,6 +16,11 @@
         android:title="Aportes"/>
 
     <item
+        android:id="@+id/nav_historic"
+        android:icon="@drawable/clock"
+        android:title="Histórico"/>
+
+    <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/user"
         android:title="Perfil"/>
