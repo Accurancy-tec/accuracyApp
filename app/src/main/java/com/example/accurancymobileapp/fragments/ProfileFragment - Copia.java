@@ -10,9 +10,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.LoginActivity;
@@ -23,26 +20,13 @@ public class  ProfileFragment extends Fragment {
     public ProfileFragment() {
         super(R.layout.fragment_profile);
     }
-    LinearLayout lnlLogout;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         super.onViewCreated(view, savedInstanceState);
 
-        lnlLogout = (LinearLayout) view.findViewById(R.id.itemSair);
-
-        Profile();
     }
 
-    public void Profile(){
-
-        lnlLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                logoutSession();
-            }
-        });
-    }
     public void logoutSession(){
         SessionManager sessionManager = new SessionManager(requireContext());
 

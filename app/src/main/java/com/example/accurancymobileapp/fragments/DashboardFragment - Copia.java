@@ -41,6 +41,7 @@ import retrofit2.Response;
 public class DashboardFragment extends Fragment {
 
     private ComposeView ctvChart;
+    Button btnDeslogar;
     RecyclerView recyclerInvestimentos;
 
 
