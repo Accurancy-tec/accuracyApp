@@ -41,7 +41,6 @@ import retrofit2.Response;
 public class DashboardFragment extends Fragment {
 
     private ComposeView ctvChart;
-    Button btnDeslogar;
     RecyclerView recyclerInvestimentos;
 
 
@@ -56,7 +55,6 @@ public class DashboardFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ctvChart = view.findViewById(R.id.ctvChart);
-        btnDeslogar = view.findViewById(R.id.btnDeslogar);
         recyclerInvestimentos = view.findViewById(R.id.recyclerInvestimentos);
 
         carregarGrafico();
@@ -65,14 +63,6 @@ public class DashboardFragment extends Fragment {
     }
 
     private void dashboard(){
-
-        //Volta para a tela de login
-        btnDeslogar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logoutSession();
-            }
-        });
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -154,17 +144,5 @@ public class DashboardFragment extends Fragment {
                 Toast.makeText(requireContext(),"Erro: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    public void logoutSession(){
-        SessionManager sessionManager = new SessionManager(requireContext());
-
-        sessionManager.logout();
-
-        Intent it = new Intent(requireContext(), LoginActivity.class);
-        it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        startActivity(it);
-
     }
 }
