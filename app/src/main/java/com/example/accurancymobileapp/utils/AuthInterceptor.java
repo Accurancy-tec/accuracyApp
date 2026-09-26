@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.utils;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.IOException;
@@ -31,6 +32,11 @@ public class AuthInterceptor implements Interceptor {
                 )
                 .build();
 
+        Log.d("AUTH", "URL: " + original.url());
+        Log.d("AUTH", "Token existe: " + (token != null && !token.isEmpty()));
+
         return chain.proceed(request);
+
+
     }
 }

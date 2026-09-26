@@ -30,6 +30,7 @@ import com.example.accurancymobileapp.response.VicoResponse;
 import com.example.accurancymobileapp.ui.ChartHelper;
 import com.example.accurancymobileapp.utils.SessionManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +86,10 @@ public class DashboardFragment extends Fragment {
 
                     EmphasisAdapter adapter = new EmphasisAdapter(ativo);
                     recyclerInvestimentos.setAdapter(adapter);
+                    return;
                 }
+                Log.e("ERRO","Erro HTTP aportes: " + response.code() + " " + response.message());
+                Toast.makeText(requireContext(),"Erro ao carregar aportes",LENGTH_LONG).show();
             }
 
             @Override
@@ -102,21 +106,28 @@ public class DashboardFragment extends Fragment {
         VicoService vico = RetrofitClient.getClient(requireContext()).create(VicoService.class);
         vico.getGrafic().enqueue(new Callback<VicoResponse>() {
             @Override
-            public void onResponse(Call<VicoResponse> call, Response<VicoResponse> response
-            ) {
-                // Evita que o require contexto seja chamado depois que o fragment foi removido
-                if (!isAdded()) {
+            public void onResponse(Call<VicoResponse> call, Response<VicoResponse> response) {
+
+                if (!response.isSuccessful()) {
+                    String corpo = "N/A";
+                    try {
+                        if (response.errorBody() != null) {
+                            corpo = response.errorBody().string();
+                        }
+                    } catch (IOException e) {
+                        corpo = "erro ao ler body: " + e.getMessage();
+                    }
+                    Log.e("ERRO", "Erro HTTP " + response.code() + " - corpo: " + corpo);
                     return;
                 }
 
-                if (!response.isSuccessful() || response.body() == null) {
-                    Toast.makeText(requireContext(),"Erro ao carregar o gráfico", Toast.LENGTH_LONG).show();
+                if (response.body() == null) {
+                    Log.e("ERRO", "BODY NULL");
                     return;
                 }
 
                 if (response.body().getResults() == null) {
-                    Toast.makeText(
-                            requireContext(),"A API não retornou dados", Toast.LENGTH_LONG).show();
+                    Log.e("ERRO", "RESULTS NULL");
                     return;
                 }
 
@@ -128,11 +139,9 @@ public class DashboardFragment extends Fragment {
                     }
                 }
 
-                if (!valores.isEmpty() && ctvChart != null) {
+                if (!valores.isEmpty()) {
                     ChartHelper.GraphicConfig(ctvChart, valores);
                 }
-
-                Toast.makeText(requireContext(), "Quantidade: " + valores.size(), Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -141,6 +150,7 @@ public class DashboardFragment extends Fragment {
                     return;
                 }
 
+                Log.e("ERRO","msg " + t.getMessage());
                 Toast.makeText(requireContext(),"Erro: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
