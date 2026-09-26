@@ -18,6 +18,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.DashboardActivity;
+import com.example.accurancymobileapp.model.ActiveSpinner;
+import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
@@ -34,9 +36,12 @@ import retrofit2.Response;
 
 public class AportesFragment extends Fragment {
 
-    Spinner spnAtivo, spnTipo, spnRecorrencia;
-    EditText txtPreco;
-    Button btnEnviar, btnHome;
+    Spinner spnAtivo, spnTipo, spnRecorrencia,spnCategoria;
+    EditText txtPreco,txtQuantidade;
+    Button btnEnviar;
+
+    List<ActiveSpinner> active = new ArrayList<>();
+    ArrayAdapter<ActiveSpinner> adapterActive;
 
 
     public AportesFragment() {
@@ -48,18 +53,19 @@ public class AportesFragment extends Fragment {
 
         super.onViewCreated(view, savedInstanceState);
 
-        //Linkando com os componentes respectivos
         spnAtivo = (Spinner) view.findViewById(R.id.spnAtivo);
         spnRecorrencia = (Spinner) view.findViewById(R.id.spnRecorrencia);
         spnTipo = (Spinner) view.findViewById(R.id.spnTipo);
+        spnCategoria = (Spinner) view.findViewById(R.id.spnCategoria);
         btnEnviar = (Button) view.findViewById(R.id.btnEnviar);
         txtPreco = (EditText) view.findViewById(R.id.txtPreco);
-        btnHome = (Button) view.findViewById(R.id.btnHome);
+        txtQuantidade = (EditText) view.findViewById(R.id.txtQuantidade);
 
+        String[] Categoria = {"Ações","Cripto","Renda Fixa","FIIs","Internacional"};
+        String[] Tipo = {"Escolha o Tipo", "Compra", "Venda","Dividendo"};
+        String[] Recorrencia = {"Escolha a Recorrência", "Único","Diário", "Semanal", "Mensal", "Anual"};
 
-        //Listas fixas
-        String[] Tipo = {"Escolha o Tipo", "Compra"};
-        String[] Recorrencia = {"Escolha a Recorrência", "Diário", "Semanal", "Mensal", "Anual"};
+        active.add(new ActiveSpinner("","Escolha o Ativo"));
 
         ArrayAdapter<String> adapterTipo = new ArrayAdapter<String>(requireContext(),
                 R.layout.my_select_item,
@@ -69,13 +75,24 @@ public class AportesFragment extends Fragment {
                 R.layout.my_select_item,
                 Recorrencia
         );
+        ArrayAdapter<String> adapterCategoria = new ArrayAdapter<String>(requireContext(),
+                R.layout.my_select_item,
+                Categoria
+        );
+
+        adapterActive = new ArrayAdapter<>(requireContext(),
+                R.layout.my_select_item,
+                active);
 
         adapterTipo.setDropDownViewResource(R.layout.my_dropdown_item);
         adapterRecorrencia.setDropDownViewResource(R.layout.my_dropdown_item);
+        adapterActive.setDropDownViewResource(R.layout.my_dropdown_item);
+        adapterCategoria.setDropDownViewResource(R.layout.my_dropdown_item);
 
         spnTipo.setAdapter(adapterTipo);
         spnRecorrencia.setAdapter(adapterRecorrencia);
-
+        spnAtivo.setAdapter(adapterActive);
+        spnCategoria.setAdapter(adapterCategoria);
 
         carregarAtivos();
         aportes();
@@ -84,40 +101,51 @@ public class AportesFragment extends Fragment {
 
     private void aportes() {
 
-        //Executa ao clicar no botão de Enviar
         btnEnviar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //Puxa os dados nos campos
-                String Ativo = spnAtivo.getSelectedItem().toString();
+                ActiveSpinner selectedActive = (ActiveSpinner) spnAtivo.getSelectedItem();
+
+                String symbol = selectedActive.getSymbol();
+                String name = selectedActive.getName();
+
+                String Categoria = spnCategoria.getSelectedItem().toString();
+                String SQuantidade = txtQuantidade.getText().toString();
                 String Tipo = spnTipo.getSelectedItem().toString();
                 String Recorrencia = spnRecorrencia.getSelectedItem().toString();
                 String SPreco = txtPreco.getText().toString();
 
-                //Verifica se foram preenchidos
-                if (Ativo.equals("Escolha o Ativo") || Tipo.equals("Escolha o Tipo") || Recorrencia.equals("Escolha a Recorrência") || SPreco.isEmpty()) {
+                if (symbol.isEmpty() ||name.equals("Escolha o Ativo") || SQuantidade.isEmpty() ||Tipo.equals("Escolha o Tipo") || Recorrencia.equals("Escolha a Recorrência") || SPreco.isEmpty()) {
                     Toast.makeText(requireContext(),
                             "Por favor preencha todos os campo",
                             LENGTH_LONG).show();
                     return;
                 }
+                Double Preco, Quantidade;
+                try {
+                    Quantidade = Double.parseDouble(SQuantidade);
+                    Preco = Double.parseDouble(SPreco);
+                }catch (NumberFormatException e) {
 
-                //Converte o preço para double depois da verificação
-                Double Preco = Double.parseDouble(SPreco);
+                    Toast.makeText(
+                            requireContext(),
+                            "Digite valores válidos",
+                            LENGTH_LONG
+                    ).show();
+                    return;
+                }
 
-                //Cria o objeto api, responsável por enviar os dados para o banco de dados
                 ApiService api = RetrofitClient
                         .getClient(requireContext())
                         .create(ApiService.class);
 
-                //Cria a classe aporte e em seguida passa os seus dados para api
-                clsAportes aporte = new clsAportes(Ativo, Preco, Tipo, Recorrencia);
+                clsAportes aporte = new clsAportes(symbol,name,Categoria,Quantidade ,Preco, Tipo, Recorrencia);
                 api.registerAporte(aporte).enqueue(new Callback<ApiResponse>() {
 
-                    //Lógica que verifica se deu tudo certo ao enviar as informações
                     @Override
                     public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                        try {
 
                         if (response.isSuccessful() && response.body() != null) {
 
@@ -131,11 +159,13 @@ public class AportesFragment extends Fragment {
                         Toast.makeText(requireContext(),
                                 "Erro ao buscar a resposta da API",
                                 LENGTH_LONG).show();
-                    }
+                        }catch (Exception e){
+                        Log.e("Erro", "Erro " + e.getMessage());
+                    } }
 
                     @Override
                     public void onFailure(Call<ApiResponse> call, Throwable t) {
-                        //Mostra o erro se por algum motivo ocorrer um erro
+
                         Toast.makeText(
                                 requireContext(),
                                 "Erro: " + t.getMessage(),
@@ -145,15 +175,6 @@ public class AportesFragment extends Fragment {
                         Log.e("Erro","Mensagem: " + t.getMessage());
                     }
                 });
-            }
-        });
-
-        btnHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent home = new Intent(requireContext(),
-                        DashboardActivity.class);
-                startActivity(home);
             }
         });
     }
@@ -167,26 +188,16 @@ public class AportesFragment extends Fragment {
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
 
-                    List<String> simbolos = new ArrayList<>();
-                    simbolos.add("Escolha o ativo");
-
-
-                    for (QuoteResult result : response.body().getResults()) {
-                        simbolos.add(result.getSymbol());
+                    for (QuoteData result : response.body().getData()) {
+                        ActiveSpinner actives = new ActiveSpinner(result.getSymbol(), result.getLongName());
+                        active.add(actives);
                     }
 
-                    ArrayAdapter<String> adapterAtivo = new ArrayAdapter<String>(requireContext(),
-                            R.layout.my_select_item,
-                            simbolos
-                    );
-
-                    adapterAtivo.setDropDownViewResource(R.layout.my_dropdown_item);
-
-                    spnAtivo.setAdapter(adapterAtivo);
+                    adapterActive.notifyDataSetChanged();
                     return;
                 }
                 Toast.makeText(requireContext(),
-                        "N achamos nd",
+                        "Não achamos nada",
                         LENGTH_LONG).show();
 
             }
