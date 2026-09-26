@@ -1,14 +1,20 @@
 package com.example.accurancymobileapp.model;
 
 public class clsAportes {
+    private String name_ativo;
+    private String categoria_ativo;
+    private double quantidade_aporte;
     private String ativo_aporte;
-    private double preco_aporte;
+    private double valor_aporte;
     private String tipo_aporte;
     private String recorrencia_aporte;
 
-    public clsAportes(String ativo, double preco, String tipo, String recorrencia) {
+    public clsAportes(String ativo,String name,String categoria,double quantidade,double preco, String tipo, String recorrencia) {
         ativo_aporte = ativo;
-        preco_aporte = preco;
+        name_ativo = name;
+        categoria_ativo = categoria;
+        quantidade_aporte = quantidade;
+        valor_aporte = preco;
         tipo_aporte = tipo;
         recorrencia_aporte = recorrencia;
     }
@@ -30,11 +36,11 @@ public class clsAportes {
     }
 
     public double getPreco() {
-        return preco_aporte;
+        return valor_aporte;
     }
 
     public void setPreco(double preco) {
-        preco_aporte = preco;
+        valor_aporte = preco;
     }
 
     public String getRecorrencia() {
@@ -45,4 +51,27 @@ public class clsAportes {
         recorrencia_aporte = recorrencia;
     }
 
+    public String getName() {
+        return name_ativo;
+    }
+
+    public void setName(String name) {
+        this.name_ativo = name;
+    }
+
+    public String getCategoria() {
+        return categoria_ativo;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria_ativo = categoria;
+    }
+
+    public double getQuantidade() {
+        return quantidade_aporte;
+    }
+
+    public void setQuantidade(double quantidade) {
+        this.quantidade_aporte = quantidade;
+    }
 }

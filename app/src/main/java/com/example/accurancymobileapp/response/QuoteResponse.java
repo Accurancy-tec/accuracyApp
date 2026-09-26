@@ -8,12 +8,15 @@ import java.util.List;
 
 public class QuoteResponse {
 
+    private List<QuoteResult> result;
     @SerializedName("results")
-    private List<QuoteResult> results;
-
-    private List<QuoteData> result;
+    private List<QuoteData> results;
 
     public List<QuoteResult> getResults(){
+        return result;
+    }
+
+    public List<QuoteData> getData(){
         return results;
     }
 }
