@@ -34,8 +34,24 @@
             android:layout_marginBottom="24dp"
             android:ems="10"
             android:hint="Preço"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:textColor="@color/text_primary"/>
+
+        <EditText
+            android:id="@+id/txtQuantidade"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="24dp"
+            android:ems="10"
+            android:hint="Quantidade"
+            android:inputType="numberDecimal"
+            android:textColor="@color/text_primary"/>
+
+        <Spinner
+            android:id="@+id/spnCategoria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp" />
 
         <Spinner
             android:id="@+id/spnTipo"
@@ -57,14 +73,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnHome"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="Home"/>
 
             <Button
                 android:id="@+id/btnEnviar"
