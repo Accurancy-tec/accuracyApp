@@ -13,7 +13,7 @@ public class Wallet {
         return nome_carteira;
     }
 
-    public String getTipo_wallet(){
+    public String getTipo_carteira(){
         return tipo_carteira;
     }
 }

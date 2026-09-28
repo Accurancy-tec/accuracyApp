@@ -6,6 +6,7 @@ import android.util.Log;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
+import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
 
 import java.util.List;
@@ -59,8 +60,43 @@ public class WalletRepository {
         });
     }
 
+    public void buscarWallets(WalletListCallback callback){
+
+        apiService.buscarWallets().enqueue(new Callback<BuscarWalletsResponse>() {
+            @Override
+            public void onResponse(Call<BuscarWalletsResponse> call, Response<BuscarWalletsResponse> response) {
+                if(!response.isSuccessful()){
+                    callback.onError("Erro HTTP: " + response.code());
+                    return;
+                }
+
+                BuscarWalletsResponse resultado = response.body();
+
+                if(resultado == null){
+                    callback.onError("Reposta da API vazia");
+                }
+
+                if(!resultado.isSuccess()){
+                    callback.onError(resultado.getMessage());
+                }
+
+                callback.onSuccess(resultado.getCarteiras());
+            }
+
+            @Override
+            public void onFailure(Call<BuscarWalletsResponse> call, Throwable t) {
+                callback.onError("Erro de conexao: " + t.getMessage());
+            }
+        });
+    }
+
     public interface WalletCallback{
         void onSuccess(String mensagem);
+        void onError(String message);
+    }
+
+    public interface WalletListCallback{
+        void onSuccess(List<Wallet> walltes);
         void onError(String message);
     }
 }
