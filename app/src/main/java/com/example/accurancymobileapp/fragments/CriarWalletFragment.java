@@ -17,10 +17,15 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.adapter.CriarWalletAdapter;
+import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class CriarWalletFragment extends Fragment {
@@ -28,6 +33,8 @@ public class CriarWalletFragment extends Fragment {
     private WalletRepository walletRepository;
     private RecyclerView minhasWallets;
     private MaterialButton btnCriarWallet;
+    private CriarWalletAdapter walletAdapter;
+    private List<Wallet> listaWallets = new ArrayList<>();
 
     public CriarWalletFragment() {
         super(R.layout.fragment_criar_wallet);
@@ -41,7 +48,9 @@ public class CriarWalletFragment extends Fragment {
      btnCriarWallet = view.findViewById(R.id.btnCriarWallet);
      walletRepository = new WalletRepository(requireContext());
 
+
      configurarRecyclerView();
+     carregarWallets();
 
      btnCriarWallet.setOnClickListener(v -> {abrirDialogoCriarWallet();});
    }
@@ -49,7 +58,13 @@ public class CriarWalletFragment extends Fragment {
    private void configurarRecyclerView(){
         minhasWallets.setLayoutManager( new LinearLayoutManager(requireContext()));
 
-        // Colocar o adapter
+        minhasWallets.setLayoutManager(new LinearLayoutManager(requireContext()));
+        walletAdapter = new CriarWalletAdapter(
+                listaWallets,
+                wallet -> abrirWallet(wallet));
+
+        minhasWallets.setAdapter(walletAdapter);
+
    }
 
    private void abrirDialogoCriarWallet(){
@@ -137,5 +152,41 @@ public class CriarWalletFragment extends Fragment {
        });
 
        Log.d("CARTEIRA", "Nome:" + nome + "| Tipo: " + tipo);
+   }
+
+   private void carregarWallets(){
+        walletRepository.buscarWallets(new WalletRepository.WalletListCallback() {
+            @Override
+            public void onSuccess(List<Wallet> wallets) {
+                listaWallets.clear();
+                listaWallets.addAll(wallets);
+
+                walletAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
+   }
+
+   private void abrirWallet(Wallet wallet){
+        Bundle bundle = new Bundle();
+
+        bundle.putString("nome_wallet", wallet.getNome_carteira());
+        bundle.putString("tipo_carteira", wallet.getTipo_carteira());
+
+        WalletFragment fragment = new WalletFragment();
+
+        fragment.setArguments(bundle);
+
+        requireActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameContent, fragment)
+                .addToBackStack(null)
+                .commit();
+
    }
 }

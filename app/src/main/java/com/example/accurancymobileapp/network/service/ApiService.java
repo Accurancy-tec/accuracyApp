@@ -3,6 +3,7 @@ package com.example.accurancymobileapp.network.service;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.AporteResponse;
+import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
@@ -48,5 +49,8 @@ public interface ApiService {
     Call<CriarWalletResponse> criarNovaWallet(
             @Body Wallet wallet
     );
+
+    @GET("service/buscarCarteiras.php")
+    Call<BuscarWalletsResponse> buscarWallets();
 
 }
