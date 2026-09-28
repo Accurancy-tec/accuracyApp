@@ -1,6 +1,7 @@
 package com.example.accurancymobileapp.network.service;
 
 import com.example.accurancymobileapp.response.ApiResponse;
+import com.example.accurancymobileapp.response.AporteResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.model.clsAportes;
@@ -11,6 +12,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -35,5 +37,8 @@ public interface ApiService {
     );
     @GET("quotes/getSymbols.php")
     Call<QuoteResponse> getService();
+
+    @GET("service/buscar_aportes_teste.php")
+    Call<AporteResponse> buscarAportes();
 
 }
