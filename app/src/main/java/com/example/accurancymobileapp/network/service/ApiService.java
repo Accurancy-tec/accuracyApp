@@ -38,7 +38,8 @@ public interface ApiService {
     @GET("quotes/getSymbols.php")
     Call<QuoteResponse> getService();
 
-    @GET("service/buscar_aportes_teste.php")
+    //Criado pra teste
+    @GET("service/buscar_aportes.php")
     Call<AporteResponse> buscarAportes();
 
 }

@@ -77,19 +77,36 @@ public class WalletFragment extends Fragment {
         aporteRepository.buscarAportes(new AporteRepository.aporteCallback() {
             @Override
             public void onSucesso(List<Aporte> aportes) {
-                Log.d("APORTES_TESTE", "onSucesso foi chamado!");
 
-                if(aportes == null || aportes.isEmpty()){
-                    Log.d("APORTES_TESTE", "Lista vazia ou null");
+                /*if(aportes == null || aportes.isEmpty()){
 
                     Toast.makeText(requireContext(), "Você ainda não possui nenhum investimento",Toast.LENGTH_LONG).show();
                     return;
                 }
 
-                Log.d(
-                        "APORTES_TESTE",
-                        "Quantidade de aportes: " + aportes.size()
-                );
+                StringBuilder tickers = new StringBuilder();
+
+                for(Aporte aporte : aportes){
+
+                    String ticker = aporte.getAtivoAporte();
+
+                    if(tickers.length() > 0){
+                        tickers.append(",");
+
+                    }
+
+                    tickers.append(ticker.trim());
+                }
+
+                if(tickers.length() == 0){
+                    Toast.makeText(
+                            requireContext(),
+                            "Nenhum ativo encontrado.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                    return;
+                }
+                buscarContacoesDosAportes(tickers.toString());*/
 
                 AporteAdapter adapter = new AporteAdapter(aportes);
 

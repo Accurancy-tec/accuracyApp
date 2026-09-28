@@ -32,6 +32,7 @@ public class AporteRepository {
         apiService = retrofit.create(ApiService.class);
     }
 
+    //Não apague as mensagens de teste ainda
     public void buscarAportes(aporteCallback callback){
         apiService.buscarAportes().enqueue(new Callback<AporteResponse>() {
             @Override
@@ -41,6 +42,8 @@ public class AporteRepository {
                             "TESTE_APORTE",
                             "Erro HTTP: " + response.code()
                     );
+
+                    callback.onErro("Erro HTTP:" + response.code());
                     return;
                 }
                 AporteResponse resultado = response.body();
@@ -50,6 +53,8 @@ public class AporteRepository {
                             "TESTE_APORTE",
                             "Body = NULL"
                     );
+
+                    callback.onErro("Resposta da API vazia: ");
                     return;
                 }
 
@@ -70,10 +75,9 @@ public class AporteRepository {
                             "Lista = NULL"
                     );
 
+                    callback.onErro("Lista de aportes vazia");
                     return;
                 }
-
-                callback.onErro("Lista de aportes vazia.");
 
                 for (Aporte aporte : resultado.getAtivos()) {
 
