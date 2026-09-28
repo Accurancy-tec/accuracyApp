@@ -19,6 +19,9 @@ public class clsAportes {
         recorrencia_aporte = recorrencia;
     }
 
+    public clsAportes() {
+    }
+
     public String getAtivo() {
         return ativo_aporte;
     }

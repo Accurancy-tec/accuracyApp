@@ -15,7 +15,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.adapter.AporteAdapter;
 import com.example.accurancymobileapp.adapter.QuoteAdapter;
+import com.example.accurancymobileapp.model.Aporte;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
@@ -74,41 +76,56 @@ public class WalletFragment extends Fragment {
 
         aporteRepository.buscarAportes(new AporteRepository.aporteCallback() {
             @Override
-            public void onSucesso(List<clsAportes> aportes) {
-                if(aportes == null || aportes.isEmpty()){
+            public void onSucesso(List<Aporte> aportes) {
+
+                /*if(aportes == null || aportes.isEmpty()){
+
                     Toast.makeText(requireContext(), "Você ainda não possui nenhum investimento",Toast.LENGTH_LONG).show();
                     return;
                 }
+
                 StringBuilder tickers = new StringBuilder();
 
-                for(clsAportes aporte : aportes){
-                    String ticker = aporte.getAtivo();
+                for(Aporte aporte : aportes){
 
-                    if(ticker == null || ticker.trim().isEmpty()){
-                        continue;
-                    }
+                    String ticker = aporte.getAtivoAporte();
 
                     if(tickers.length() > 0){
                         tickers.append(",");
+
                     }
 
                     tickers.append(ticker.trim());
-
                 }
 
                 if(tickers.length() == 0){
-                    Toast.makeText(requireContext(), "Nenhum ativo encontrado.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(
+                            requireContext(),
+                            "Nenhum ativo encontrado.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                    return;
                 }
+                buscarContacoesDosAportes(tickers.toString());*/
 
-                buscarContacoesDosAportes(tickers.toString());
+                AporteAdapter adapter = new AporteAdapter(aportes);
+
+                recyclerInvestimentos.setAdapter(adapter);
 
 
             }
 
             @Override
             public void onErro(String mensagem) {
+                Log.e("APORTES_TESTE", "Erro: " + mensagem);
 
+                Toast.makeText(
+                        requireContext(),
+                        "Erro ao carregar aportes.",
+                        Toast.LENGTH_LONG
+                ).show();
             }
+
         });
 
 
