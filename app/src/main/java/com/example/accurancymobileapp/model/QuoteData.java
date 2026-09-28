@@ -9,6 +9,9 @@ public class QuoteData {
     @SerializedName("shortName")
     private String shortName;
 
+    @SerializedName("longName")
+    private String longName;
+
     @SerializedName("regularMarketVolume")
     private int regularMarketVolume;
 
@@ -24,6 +27,10 @@ public class QuoteData {
 
     public String getShortName() {
         return shortName;
+    }
+
+    public String getLongName() {
+        return longName;
     }
 
     public int getRegularMarketVolume(){

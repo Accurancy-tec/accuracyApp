@@ -275,13 +275,6 @@ public class LoginActivity extends AppCompatActivity {
 
                         sessionManager.saveToken(login.getToken());
 
-                        sessionManager.saveUser(
-                                user.getId_usuario(),
-                                user.getNome_usuario(),
-                                user.getEmail_usuario(),
-                                user.getSenha_usuario()
-                        );
-
                         Toast.makeText(LoginActivity.this, "Bem vindo " + usuario.getNome_usuario(), Toast.LENGTH_LONG).show();
 
                         Intent it = new Intent(LoginActivity.this, MainPageActivity.class);
