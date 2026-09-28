@@ -17,11 +17,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
     private static Retrofit retrofit;
     public static Retrofit getClient(Context context){
-        SessionManager sessionManager =
-                new SessionManager(context.getApplicationContext());
+        SessionManager sessionManager = new SessionManager(context.getApplicationContext());
 
-        AuthInterceptor interceptor =
-                new AuthInterceptor(sessionManager);
+        AuthInterceptor interceptor = new AuthInterceptor(sessionManager);
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 
