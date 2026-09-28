@@ -23,6 +23,4 @@ public class ApiResponse {
     public ArrayList<clsAportes> getLista() {
         return ativos;
     }
-
-
 }
