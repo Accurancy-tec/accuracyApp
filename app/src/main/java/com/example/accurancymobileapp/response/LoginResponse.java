@@ -7,6 +7,7 @@ public class LoginResponse {
     private String message;
     private User user;
     private String token;
+    private String refreshToken;
 
     public boolean isSuccess(){
         return success;
@@ -19,6 +20,7 @@ public class LoginResponse {
     public User getUser() {
         return user;
     }
+    public String getRefreshToken(){return refreshToken;}
     public String getToken() {
         return token;
     }
