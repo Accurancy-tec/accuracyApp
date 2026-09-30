@@ -264,25 +264,62 @@ public class LoginActivity extends AppCompatActivity {
         ApiService api = RetrofitClient.getClient(this).create(ApiService.class);
         api.loginVerification(user).enqueue(new Callback<LoginResponse>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(
+                    Call<LoginResponse> call,
+                    Response<LoginResponse> response
+            ) {
+                if (!response.isSuccessful()) {
+                    Log.e(
+                            "LoginActivity",
+                            "Erro HTTP: " + response.code()
+                    );
 
-                if(response.isSuccessful() && response.body() != null){
-                    LoginResponse login = response.body();
+                    Toast.makeText(
+                            LoginActivity.this,
+                            "Erro no servidor: HTTP " + response.code(),
+                            Toast.LENGTH_LONG
+                    ).show();
 
-                    if(login.isSuccess()){
+                    return;
+                }
 
-                        User usuario = login.getUser();
+                if (response.body() == null) {
+                    Toast.makeText(
+                            LoginActivity.this,
+                            "O servidor retornou uma resposta vazia.",
+                            Toast.LENGTH_LONG
+                    ).show();
 
-                        sessionManager.saveToken(login.getToken());
+                    return;
+                }
 
-                        Toast.makeText(LoginActivity.this, "Bem vindo " + usuario.getNome_usuario(), Toast.LENGTH_LONG).show();
+                LoginResponse login = response.body();
 
-                        Intent it = new Intent(LoginActivity.this, MainPageActivity.class);
-                        startActivity(it);
-                    }
-                    else{
-                        Toast.makeText(LoginActivity.this, login.getMessage(), Toast.LENGTH_LONG).show();
-                    }
+                if (login.isSuccess()) {
+                    User usuario = login.getUser();
+
+                    sessionManager.saveToken(login.getToken());
+
+                    Toast.makeText(
+                            LoginActivity.this,
+                            "Bem-vindo " + usuario.getNome_usuario(),
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                    Intent it = new Intent(
+                            LoginActivity.this,
+                            MainPageActivity.class
+                    );
+
+                    startActivity(it);
+                    finish();
+
+                } else {
+                    Toast.makeText(
+                            LoginActivity.this,
+                            login.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
                 }
             }
 

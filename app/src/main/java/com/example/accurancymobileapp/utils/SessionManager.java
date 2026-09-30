@@ -7,6 +7,7 @@ public class SessionManager {
     private static final String PREF_NAME = "user_session";
     private static final String KEY_TOKEN = "jwt_token";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+    private static final String KEY_REFRESH_TOKEN = "refreshToken";
     private static final String KEY_USER_ID = "id_usuario";
     private static final String KEY_USER_NAME = "nome_usuario";
     private static final String KEY_USER_EMAIL = "email_usuario";
@@ -27,7 +28,19 @@ public class SessionManager {
 
         editor.apply();
     }
+    public void saveRefreshToken(String refreshToken) {
+        editor.putString(KEY_REFRESH_TOKEN,refreshToken);
 
+        editor.apply();
+    }
+
+    public void saveTokens(String accessToken, String refreshToken) {
+        editor.putString(KEY_TOKEN, accessToken);
+        editor.putString(KEY_REFRESH_TOKEN, refreshToken);
+        editor.putBoolean(KEY_IS_LOGGED_IN, true);
+
+        editor.apply();
+    }
     public void saveUser(int userId, String userName, String userEmail,String userPass) {
         editor.putInt(KEY_USER_ID, userId);
         editor.putString(KEY_USER_NAME, userName);
@@ -40,6 +53,13 @@ public class SessionManager {
 
         return sharedPreferences.getString(
                 KEY_TOKEN,
+                null
+        );
+    }
+    public String getRefreshToken() {
+
+        return sharedPreferences.getString(
+                KEY_REFRESH_TOKEN,
                 null
         );
     }
