@@ -19,7 +19,7 @@ public class RetrofitClient {
     public static Retrofit getClient(Context context){
         SessionManager sessionManager = new SessionManager(context.getApplicationContext());
 
-        AuthInterceptor interceptor = new AuthInterceptor(sessionManager);
+        AuthInterceptor interceptor = new AuthInterceptor(sessionManager,context);
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 

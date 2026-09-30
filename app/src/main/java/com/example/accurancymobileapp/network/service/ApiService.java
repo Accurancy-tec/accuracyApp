@@ -11,6 +11,8 @@ import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.TickerResponse;
 
+import java.util.Map;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -25,7 +27,7 @@ public interface ApiService {
     @POST("user/registerNewUser.php")
     Call<ResponseBody> registerNewUser(@Body User user);
 
-    @POST("user/login.php")
+    @POST("user/login/login.php")
     Call<LoginResponse> loginVerification(@Body User user);
 
     @POST("user/aportes.php")
@@ -40,6 +42,8 @@ public interface ApiService {
     );
     @GET("quotes/getSymbols.php")
     Call<QuoteResponse> getService();
+    @POST("user/login/refresh.php")
+    Call<LoginResponse> refreshToken(@Body Map<String, String> body);
 
     //Criado pra teste
     @GET("service/buscar_aportes.php")
