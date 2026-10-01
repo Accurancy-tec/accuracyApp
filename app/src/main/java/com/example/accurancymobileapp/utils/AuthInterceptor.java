@@ -211,7 +211,7 @@ public class AuthInterceptor implements Interceptor {
 
     private String chainUrlParaRefresh() {
 
-        return BuildConfig.API_URL + "user/refresh.php";
+        return BuildConfig.API_URL + "user/login/refresh.php";
     }
 
     private boolean deveIgnorarAutenticacao(Request request) {

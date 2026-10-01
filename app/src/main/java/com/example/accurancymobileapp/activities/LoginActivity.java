@@ -298,7 +298,9 @@ public class LoginActivity extends AppCompatActivity {
                 if (login.isSuccess()) {
                     User usuario = login.getUser();
 
-                    sessionManager.saveToken(login.getToken());
+                    sessionManager.saveTokens(
+                            login.getToken(),
+                            login.getRefreshToken());
 
                     Toast.makeText(
                             LoginActivity.this,
