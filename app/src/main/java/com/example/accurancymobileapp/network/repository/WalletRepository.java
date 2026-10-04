@@ -38,13 +38,13 @@ public class WalletRepository {
 
                 CriarWalletResponse resultado = response.body();
 
-                Log.d("RESPONSE BODY", "Conteudo body: " + response.body());
                 if(resultado == null){
                     callback.onError("Resposta da API vazia");
                     return;
                 }
 
                 if(!resultado.isSuccess()){
+                    Log.e("CARTEIRA", "API retornou erro. Mensagem: " + resultado.getMessage());
                     callback.onError(resultado.getMessage());
                     return;
                 }

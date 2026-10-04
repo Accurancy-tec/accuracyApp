@@ -7,6 +7,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface VicoService {
-    @GET("service/VicoService.php")
+    @GET("vico/gerar-grafico")
     Call<VicoResponse> getGrafic();
 }
