@@ -24,37 +24,37 @@ import retrofit2.http.Query;
 //Classe criada para enviar e buscar as informações do banco de dados atráves do php
 public interface ApiService {
 
-    @POST("user/registerNewUser.php")
+    @POST("auth/registrarNovoUsuario")
     Call<ResponseBody> registerNewUser(@Body User user);
 
-    @POST("user/login/login.php")
+    @POST("auth/login")
     Call<LoginResponse> loginVerification(@Body User user);
 
-    @POST("user/aportes.php")
+    @POST("aportes/registrar-aporte")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
 
-    @GET("user/dashboard.php")
+    @GET("aportes/buscar-aportes")
     Call<ApiResponse> getAportes();
 
-    @GET("quotes/getQuote.php")
+    @GET("brapi/get-quotes")
     Call<QuoteResponse> getQuote(
             @Query("symbol") String symbol
     );
-    @GET("quotes/getSymbols.php")
+    @GET("brapi/get-symbols")
     Call<QuoteResponse> getService();
-    @POST("user/login/refresh.php")
+    @POST("auth/refresh")
     Call<LoginResponse> refreshToken(@Body Map<String, String> body);
 
     //Criado pra teste
-    @GET("service/buscar_aportes.php")
+    @GET("aportes/buscar-aportes")
     Call<AporteResponse> buscarAportes();
 
-    @POST("service/criarCarteira.php")
+    @POST("carteiras/criar-carteira")
     Call<CriarWalletResponse> criarNovaWallet(
             @Body Wallet wallet
     );
 
-    @GET("service/buscarCarteiras.php")
+    @GET("carteiras/buscar-carteiras")
     Call<BuscarWalletsResponse> buscarWallets();
 
 }
