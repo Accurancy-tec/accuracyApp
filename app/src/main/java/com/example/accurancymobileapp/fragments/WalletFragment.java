@@ -1,9 +1,7 @@
 package com.example.accurancymobileapp.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.compose.ui.platform.ComposeView;
@@ -14,61 +12,101 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.AporteAdapter;
-import com.example.accurancymobileapp.adapter.QuoteAdapter;
 import com.example.accurancymobileapp.model.Aporte;
-import com.example.accurancymobileapp.model.QuoteData;
-import com.example.accurancymobileapp.model.clsAportes;
+import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
-import com.example.accurancymobileapp.network.repository.QuoteRepository;
+import com.example.accurancymobileapp.network.service.VicoService;
+import com.example.accurancymobileapp.response.VicoResponse;
 import com.example.accurancymobileapp.ui.ChartHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class WalletFragment extends Fragment {
-    RecyclerView recyclerInvestimentos;
-    ComposeView carteiraChart;
 
-    QuoteRepository quoteRepository;
-
+    private RecyclerView recyclerInvestimentos;
+    private ComposeView carteiraChart;
 
     public WalletFragment() {
         super(R.layout.fragment_wallet);
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
+    public void onViewCreated(
+            @NonNull View view,
+            @Nullable Bundle savedInstanceState
+    ) {
         super.onViewCreated(view, savedInstanceState);
 
         recyclerInvestimentos = view.findViewById(R.id.recyclerInvestimentos);
-
         carteiraChart = view.findViewById(R.id.carteiraChart);
 
-        recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
-
-        quoteRepository = new QuoteRepository(requireContext());
+        recyclerInvestimentos.setLayoutManager(
+                new LinearLayoutManager(requireContext())
+        );
 
         carregarInvestimentos();
-        carregarGraficoPizza();
+        carregarGraficoDistribuicao();
     }
 
-    public void carregarGraficoPizza(){
-        ArrayList<Number> valores = new ArrayList<>();
+    private void carregarGraficoDistribuicao() {
+        VicoService vico = RetrofitClient
+                .getClient(requireContext())
+                .create(VicoService.class);
 
-        valores.add(933.0);
-        valores.add(422.0);
-        valores.add(1380.0);
-        valores.add(600.0);
-        valores.add(1450.0);
+        vico.getDistribuicao(null).enqueue(new Callback<VicoResponse>() {
+            @Override
+            public void onResponse(
+                    @NonNull Call<VicoResponse> call,
+                    @NonNull Response<VicoResponse> response
+            ) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    Log.e("GRAFICO_CARTEIRA", "Erro HTTP: " + response.code());
+                    return;
+                }
 
-        ChartHelper.configurarGraficoPizza(
-                carteiraChart,
-                valores
-        );
+                VicoResponse body = response.body();
+                if (!body.isSucesso() || body.getDistribuicao() == null || body.getDistribuicao().isEmpty()) {
+                    Log.e("GRAFICO_CARTEIRA", "Sem dados: " + body.getMensagem());
+                    return;
+                }
+
+                List<String> categorias = new ArrayList<>();
+                List<Double> valores = new ArrayList<>();
+
+                for (VicoResponse.Distribuicao item : body.getDistribuicao()) {
+                    if (item == null) {
+                        continue;
+                    }
+
+                    categorias.add(item.getCategoria());
+                    valores.add(item.getValor());
+                }
+
+                if (!valores.isEmpty()) {
+                    ChartHelper.configurarGraficoDistribuicao(
+                            carteiraChart,
+                            categorias,
+                            valores
+                    );
+                }
+            }
+
+            @Override
+            public void onFailure(
+                    @NonNull Call<VicoResponse> call,
+                    @NonNull Throwable t
+            ) {
+                Log.e("GRAFICO_CARTEIRA", "Erro ao carregar distribuição", t);
+            }
+        });
     }
 
     private void carregarInvestimentos() {
@@ -77,47 +115,16 @@ public class WalletFragment extends Fragment {
         aporteRepository.buscarAportes(new AporteRepository.aporteCallback() {
             @Override
             public void onSucesso(List<Aporte> aportes) {
-
-                /*if(aportes == null || aportes.isEmpty()){
-
-                    Toast.makeText(requireContext(), "Você ainda não possui nenhum investimento",Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                StringBuilder tickers = new StringBuilder();
-
-                for(Aporte aporte : aportes){
-
-                    String ticker = aporte.getAtivoAporte();
-
-                    if(tickers.length() > 0){
-                        tickers.append(",");
-
-                    }
-
-                    tickers.append(ticker.trim());
-                }
-
-                if(tickers.length() == 0){
-                    Toast.makeText(
-                            requireContext(),
-                            "Nenhum ativo encontrado.",
-                            Toast.LENGTH_LONG
-                    ).show();
-                    return;
-                }
-                buscarContacoesDosAportes(tickers.toString());*/
-
-                AporteAdapter adapter = new AporteAdapter(aportes);
-
-                recyclerInvestimentos.setAdapter(adapter);
-
-
+                recyclerInvestimentos.setAdapter(new AporteAdapter(aportes));
             }
 
             @Override
             public void onErro(String mensagem) {
                 Log.e("APORTES_TESTE", "Erro: " + mensagem);
+
+                if (!isAdded()) {
+                    return;
+                }
 
                 Toast.makeText(
                         requireContext(),
@@ -125,43 +132,6 @@ public class WalletFragment extends Fragment {
                         Toast.LENGTH_LONG
                 ).show();
             }
-
-        });
-
-
-        /*quoteRepository.buscarCotacoes(tickers, new QuoteRepository.QuoteCallback() {
-            @Override
-            public void onSucesso(List<QuoteData> quotes) {
-                QuoteAdapter adapter = new QuoteAdapter(quotes);
-
-                recyclerInvestimentos.setAdapter(adapter);
-            }
-
-            @Override
-            public void onErro(String mensagem) {
-                Log.e("API: ", mensagem);
-
-                Toast.makeText(requireContext(), "Erro: " + mensagem, Toast.LENGTH_LONG).show();
-            }
-        });*/
-    }
-
-    private void buscarContacoesDosAportes(String ticker){
-        quoteRepository.buscarCotacoes(ticker, new QuoteRepository.QuoteCallback() {
-            @Override
-            public void onSucesso(List<QuoteData> quotes) {
-                QuoteAdapter adapter = new QuoteAdapter(quotes);
-                recyclerInvestimentos.setAdapter(adapter);
-
-            }
-
-            @Override
-            public void onErro(String mensagem) {
-                Log.e("Contações: ", mensagem);
-
-                Toast.makeText(requireContext(), "Erro ao carregar contações.", Toast.LENGTH_LONG).show();
-            }
         });
     }
-
 }
