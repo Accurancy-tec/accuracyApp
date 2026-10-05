@@ -7,7 +7,9 @@ import android.util.Log;
 import com.example.accurancymobileapp.BuildConfig;
 import com.example.accurancymobileapp.activities.LoginActivity;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
 
@@ -113,7 +115,6 @@ public class AuthInterceptor implements Interceptor {
         if (refreshToken == null || refreshToken.isEmpty()) {
 
             Log.d("AUTH", "Refresh Token não encontrado.");
-
             return null;
         }
 
@@ -128,82 +129,153 @@ public class AuthInterceptor implements Interceptor {
                     refreshToken
             );
 
-            RequestBody body =
-                    RequestBody.create(
-                            json.toString(),
-                            JSON
-                    );
+            RequestBody body = RequestBody.create(
+                    json.toString(),
+                    JSON
+            );
 
-            OkHttpClient refreshClient = new OkHttpClient.Builder().build();
-
+            OkHttpClient refreshClient =
+                    new OkHttpClient.Builder().build();
 
             String refreshUrl = chainUrlParaRefresh();
+
+            Log.d("AUTH", "URL refresh: " + refreshUrl);
 
             Request refreshRequest =
                     new Request.Builder()
                             .url(refreshUrl)
                             .post(body)
+                            .header("Content-Type", "application/json")
                             .build();
 
-            Response refreshResponse =
-                    refreshClient.newCall(
-                            refreshRequest
-                    ).execute();
+            try (Response refreshResponse =
+                         refreshClient.newCall(refreshRequest).execute()) {
 
-            if (!refreshResponse.isSuccessful()) {
+                String responseBody = "";
 
-                refreshResponse.close();
+                if (refreshResponse.body() != null) {
+                    responseBody = refreshResponse.body().string();
+                }
 
-                return null;
-            }
+                Log.d(
+                        "AUTH",
+                        "Refresh HTTP: " + refreshResponse.code()
+                );
 
-            if (refreshResponse.body() == null) {
+                Log.d(
+                        "AUTH",
+                        "Refresh response: " + responseBody
+                );
 
-                refreshResponse.close();
+                if (!refreshResponse.isSuccessful()) {
 
-                return null;
-            }
-
-            String responseBody = refreshResponse.body().string();
-
-            refreshResponse.close();
-
-            JsonObject resposta =
-                    gson.fromJson(
-                            responseBody,
-                            JsonObject.class
+                    Log.e(
+                            "AUTH",
+                            "Falha no refresh HTTP: " +
+                                    refreshResponse.code()
                     );
 
-            if (resposta == null || !resposta.has("success")) {
+                    return null;
+                }
 
-                return null;
+                if (responseBody.isEmpty()) {
+
+                    Log.e(
+                            "AUTH",
+                            "API retornou corpo vazio no refresh."
+                    );
+
+                    return null;
+                }
+
+                JsonElement elemento =
+                        JsonParser.parseString(responseBody);
+
+                if (!elemento.isJsonObject()) {
+
+                    Log.e(
+                            "AUTH",
+                            "Resposta do refresh não é JsonObject: " +
+                                    responseBody
+                    );
+
+                    return null;
+                }
+
+                JsonObject resposta =
+                        elemento.getAsJsonObject();
+
+                if (!resposta.has("success")) {
+
+                    Log.e(
+                            "AUTH",
+                            "Resposta sem campo success: " +
+                                    responseBody
+                    );
+
+                    return null;
+                }
+
+                boolean sucesso =
+                        resposta.get("success").getAsBoolean();
+
+                if (!sucesso) {
+
+                    String mensagem =
+                            resposta.has("message")
+                                    ? resposta.get("message").getAsString()
+                                    : "Mensagem não informada";
+
+                    Log.e(
+                            "AUTH",
+                            "Refresh recusado pela API: " +
+                                    mensagem
+                    );
+
+                    return null;
+                }
+
+                if (!resposta.has("token")) {
+
+                    Log.e(
+                            "AUTH",
+                            "Refresh respondeu sucesso, mas não enviou token."
+                    );
+
+                    return null;
+                }
+
+                String novoToken =
+                        resposta.get("token").getAsString();
+
+                if (novoToken == null ||
+                        novoToken.isEmpty()) {
+
+                    Log.e(
+                            "AUTH",
+                            "Novo Access Token vazio."
+                    );
+
+                    return null;
+                }
+
+                sessionManager.saveToken(novoToken);
+
+                Log.d(
+                        "AUTH",
+                        "Access Token renovado com sucesso."
+                );
+
+                return novoToken;
             }
-
-            boolean sucesso =
-                    resposta.get("success")
-                            .getAsBoolean();
-
-            if (!sucesso || !resposta.has("token")) {
-
-                return null;
-            }
-
-            String novoToken =
-                    resposta.get("token")
-                            .getAsString();
-
-            if (novoToken.isEmpty()) {
-
-                return null;
-            }
-
-            sessionManager.saveToken(novoToken);
-
-            return novoToken;
 
         } catch (Exception e) {
 
-            Log.e("AUTH", "Erro ao renovar token", e);
+            Log.e(
+                    "AUTH",
+                    "Erro ao renovar token",
+                    e
+            );
 
             return null;
         }
@@ -211,7 +283,7 @@ public class AuthInterceptor implements Interceptor {
 
     private String chainUrlParaRefresh() {
 
-        return BuildConfig.API_URL + "user/login/refresh.php";
+        return BuildConfig.API_URL + "auth/refresh";
     }
 
     private boolean deveIgnorarAutenticacao(Request request) {
@@ -220,9 +292,9 @@ public class AuthInterceptor implements Interceptor {
                 request.url()
                         .encodedPath();
 
-        return path.endsWith("user/login/login.php") ||
-                path.endsWith("user/registerNewUser.php") ||
-                path.endsWith("user/login/refresh.php");
+        return path.endsWith("auth/login") ||
+                path.endsWith("auth/registrarNovoUsuario") ||
+                path.endsWith("auth/refresh");
     }
 
     private Response createUnauthorizedResponse(Request request) {
