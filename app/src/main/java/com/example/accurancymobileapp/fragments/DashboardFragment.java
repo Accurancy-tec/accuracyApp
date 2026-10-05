@@ -94,6 +94,9 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable t) {
+                if (!isAdded()) {
+                    return;
+                }
 
                 Toast.makeText(requireContext(),"Erro ao mostrar aportes",LENGTH_LONG).show();
                 Log.e("ERRO", "msg: " + t.getMessage());

@@ -119,6 +119,10 @@ public class WalletFragment extends Fragment {
             public void onErro(String mensagem) {
                 Log.e("APORTES_TESTE", "Erro: " + mensagem);
 
+                if(mensagem == null || mensagem.trim().isEmpty()){
+                    mensagem = "Não foi possível criar a carteira";
+                }
+
                 Toast.makeText(
                         requireContext(),
                         "Erro ao carregar aportes.",
