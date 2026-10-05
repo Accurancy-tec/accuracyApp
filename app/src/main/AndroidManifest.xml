@@ -33,10 +33,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activities.RegisterActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name=".activities.WalletActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
