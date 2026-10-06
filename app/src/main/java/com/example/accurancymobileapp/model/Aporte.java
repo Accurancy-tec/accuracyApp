@@ -10,6 +10,7 @@ public class Aporte {
     private double valor_aporte;
     private String tipo_aporte;
     private String recorrencia_aporte;
+    private String data_aporte;
 
     public int getIdAporte() {
         return id_aporte;
@@ -41,5 +42,8 @@ public class Aporte {
 
     public String getRecorrenciaAporte() {
         return recorrencia_aporte;
+    }
+    public String getData_aporte() {
+        return data_aporte;
     }
 }

@@ -129,7 +129,6 @@ public class AporteRepository {
     }
 
 
-
     public interface aporteCallback {
         void onSucesso(List<Aporte> aportes);
 
