@@ -25,6 +25,67 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
 
+            <!-- Cabeçalho do gráfico -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="12dp">
+
+                <!-- Título -->
+                <TextView
+                    android:id="@+id/tvEvolucaoCarteira"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Evolução da carteira"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btn1M"
+                    android:layout_width="48dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_periodo_normal"
+                    android:gravity="center"
+                    android:text="1M"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    />
+
+                <TextView
+                    android:id="@+id/btn6M"
+                    android:layout_width="48dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_periodo_selecionado"
+                    android:gravity="center"
+                    android:text="6M"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/btn1A"
+                    android:layout_width="48dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_periodo_normal"
+                    android:gravity="center"
+                    android:text="1A"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/ctvChart"

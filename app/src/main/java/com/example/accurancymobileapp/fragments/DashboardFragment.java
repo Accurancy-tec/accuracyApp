@@ -5,12 +5,14 @@ import static android.widget.Toast.LENGTH_LONG;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.compose.ui.platform.ComposeView;
 import androidx.fragment.app.Fragment;
+import androidx.navigationevent.ViewTreeNavigationEventDispatcherOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +36,7 @@ import retrofit2.Response;
 public class DashboardFragment extends Fragment {
 
     private ComposeView ctvChart;
+    private TextView btn1M,btn6M,btn1A;
     private RecyclerView recyclerInvestimentos;
 
     public DashboardFragment() {
@@ -42,20 +45,21 @@ public class DashboardFragment extends Fragment {
     String periodo = "6M";
 
     @Override
-    public void onViewCreated(
-            @NonNull View view,
-            @Nullable Bundle savedInstanceState
-    ) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
 
         ctvChart = view.findViewById(R.id.ctvChart);
-        recyclerInvestimentos =
-                view.findViewById(R.id.recyclerInvestimentos);
+        recyclerInvestimentos = view.findViewById(R.id.recyclerInvestimentos);
+        btn1M = view.findViewById(R.id.btn1M);
+        btn6M = view.findViewById(R.id.btn6M);
+        btn1A = view.findViewById(R.id.btn1A);
 
         ctvChart.setVisibility(View.GONE);
 
-        carregarGrafico();
+        carregarGrafico(periodo);
         dashboard();
+        timeInvested();
     }
 
     private void dashboard() {
@@ -104,7 +108,7 @@ public class DashboardFragment extends Fragment {
         );
     }
 
-    private void carregarGrafico() {
+    private void carregarGrafico(String periodo) {
 
         VicoService vico = RetrofitClient.getClient(requireContext()).create(VicoService.class);
 
@@ -232,5 +236,47 @@ public class DashboardFragment extends Fragment {
         if (ctvChart != null) {
             ctvChart.setVisibility(View.GONE);
         }
+    }
+
+    private void timeInvested(){
+
+        btn1M.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                periodo = "1M";
+
+                updateColorButtom(btn1M);
+
+                carregarGrafico(periodo);
+            }
+        });
+
+        btn6M.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                periodo = "6M";
+
+                updateColorButtom(btn6M);
+                carregarGrafico(periodo);
+            }
+        });
+
+        btn1A.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                periodo = "1A";
+
+                updateColorButtom(btn1A);
+                carregarGrafico(periodo);
+            }
+        });
+    }
+
+    private  void updateColorButtom(TextView btn){
+        btn1M.setBackgroundResource(R.drawable.bg_periodo_normal);
+        btn6M.setBackgroundResource(R.drawable.bg_periodo_normal);
+        btn1A.setBackgroundResource(R.drawable.bg_periodo_normal);
+
+        btn.setBackgroundResource(R.drawable.bg_periodo_selecionado);
     }
 }
