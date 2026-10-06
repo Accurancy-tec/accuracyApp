@@ -31,6 +31,7 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
@@ -47,34 +48,170 @@ import com.patrykandpatrick.vico.compose.pie.data.PieChartModelProducer
 import com.patrykandpatrick.vico.compose.pie.data.pieSeries
 import java.text.NumberFormat
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
-private val FundoGrafico = Color(0xFF06101E)
-private val TextoGrafico = Color(0xFF6F829D)
-private val AzulGrafico = Color(0xFF2563EB)
-
-private val CoresDistribuicao = listOf(
-    Color(0xFF2563EB),
-    Color(0xFF22C55E),
-    Color(0xFFA855F7),
-    Color(0xFFF59E0B),
-    Color(0xFFEF4444)
+private data class PontoGrafico(
+    val data: LocalDate,
+    val valor: Double
 )
 
-private val FormatoData = DateTimeFormatter.ofPattern("dd/MM")
+private data class SerieGrafico(
+    val rotulos: List<String>,
+    val valores: List<Double>,
+    val passoEixo: Int
+)
 
-private fun formatarData(data: String): String {
-    return runCatching {
-        LocalDate.parse(data).format(FormatoData)
-    }.getOrDefault(data)
+private val FormatoDataGrafico =
+    DateTimeFormatter.ofPattern("dd/MM")
+
+private val NomesMeses = listOf(
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez"
+)
+
+private fun formatarMes(
+    data: LocalDate,
+    mostrarAno: Boolean
+): String {
+    val mes = NomesMeses[data.monthValue - 1]
+
+    return if (mostrarAno) {
+        "$mes/${data.year.toString().takeLast(2)}"
+    } else {
+        mes
+    }
 }
 
-private fun formatarMoeda(valor: Double): String {
-    val formato = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+private fun formatarMoedaGrafico(valor: Double): String {
+    val formato = NumberFormat.getCurrencyInstance(
+        Locale("pt", "BR")
+    )
+
     formato.maximumFractionDigits = 0
     formato.minimumFractionDigits = 0
+
     return formato.format(valor)
+}
+
+private fun prepararPontosGrafico(
+    datas: List<String>,
+    valores: List<Double>
+): List<PontoGrafico> {
+
+    return datas
+        .zip(valores)
+        .mapNotNull { (data, valor) ->
+
+            val dataConvertida = runCatching {
+                LocalDate.parse(data)
+            }.getOrNull()
+
+            if (
+                dataConvertida == null ||
+                valor.isNaN() ||
+                valor.isInfinite()
+            ) {
+                null
+            } else {
+                PontoGrafico(
+                    data = dataConvertida,
+                    valor = valor
+                )
+            }
+        }
+        .sortedBy { it.data }
+}
+
+private fun removerZerosIniciais(
+    pontos: List<PontoGrafico>
+): List<PontoGrafico> {
+
+    val primeiroValorReal = pontos.indexOfFirst {
+        it.valor > 0.0
+    }
+
+    if (primeiroValorReal == -1) {
+        return emptyList()
+    }
+
+    return pontos.drop(primeiroValorReal)
+}
+
+private fun criarSerieGrafico(
+    pontos: List<PontoGrafico>
+): SerieGrafico {
+
+    if (pontos.size < 2) {
+        return SerieGrafico(
+            rotulos = emptyList(),
+            valores = emptyList(),
+            passoEixo = 1
+        )
+    }
+
+    val quantidadeDias = ChronoUnit.DAYS.between(
+        pontos.first().data,
+        pontos.last().data
+    ).toInt()
+
+    if (quantidadeDias <= 45) {
+
+        val passo = (pontos.size / 6)
+            .coerceAtLeast(1)
+
+        return SerieGrafico(
+            rotulos = pontos.map {
+                it.data.format(FormatoDataGrafico)
+            },
+            valores = pontos.map {
+                it.valor
+            },
+            passoEixo = passo
+        )
+    }
+
+    val pontosPorMes = linkedMapOf<YearMonth, PontoGrafico>()
+
+    pontos.forEach { ponto ->
+        pontosPorMes[
+            YearMonth.from(ponto.data)
+        ] = ponto
+    }
+
+    val pontosMensais = pontosPorMes
+        .values
+        .toList()
+
+    val possuiMaisDeUmAno = pontosMensais
+        .map { it.data.year }
+        .distinct()
+        .size > 1
+
+    return SerieGrafico(
+        rotulos = pontosMensais.map {
+            formatarMes(
+                data = it.data,
+                mostrarAno = possuiMaisDeUmAno
+            )
+        },
+        valores = pontosMensais.map {
+            it.valor
+        },
+        passoEixo = 1
+    )
 }
 
 @Composable
@@ -82,98 +219,168 @@ fun EvolucaoCarteiraChart(
     datas: List<String>,
     valores: List<Double>
 ) {
-    if (datas.isEmpty() || valores.isEmpty() || datas.size != valores.size) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(FundoGrafico),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Sem dados para exibir",
-                color = TextoGrafico,
-                fontSize = 13.sp
-            )
-        }
+    val pontos = remember(datas, valores) {
+        prepararPontosGrafico(
+            datas = datas,
+            valores = valores
+        )
+    }
+
+    val pontosValidos = remember(pontos) {
+        removerZerosIniciais(pontos)
+    }
+
+    if (pontosValidos.size < 2) {
         return
     }
 
-    val modelProducer = remember { CartesianChartModelProducer() }
+    if (pontosValidos.none { it.valor > 0.0 }) {
+        return
+    }
 
-    LaunchedEffect(valores) {
+    val serie = remember(pontosValidos) {
+        criarSerieGrafico(pontosValidos)
+    }
+
+    if (serie.valores.size < 2) {
+        return
+    }
+
+    val modelProducer = remember {
+        CartesianChartModelProducer()
+    }
+
+    LaunchedEffect(serie.valores) {
         modelProducer.runTransaction {
-            lineSeries {
-                series(valores)
+            lineModel {
+                series(serie.valores)
             }
         }
     }
 
-    val passo = remember(datas) {
-        (datas.size / 5).coerceAtLeast(1)
-    }
+    val corLinha = Color(0xFF2563EB)
+    val corFundo = Color(0xFF06101E)
+    val corTexto = Color(0xFF6F829D)
+    val corGrade = Color.White.copy(alpha = 0.07f)
 
     val linha = LineCartesianLayer.rememberLine(
-        fill = LineCartesianLayer.LineFill.single(Fill(AzulGrafico)),
-        stroke = LineCartesianLayer.LineStroke.Continuous(3.dp),
+
+        fill = LineCartesianLayer.LineFill.single(
+            Fill(corLinha)
+        ),
+
+        stroke = LineCartesianLayer.LineStroke.Continuous(
+            3.dp
+        ),
+
         areaFill = LineCartesianLayer.AreaFill.single(
             Fill(
                 Brush.verticalGradient(
                     listOf(
-                        AzulGrafico.copy(alpha = 0.30f),
+                        corLinha.copy(alpha = 0.30f),
                         Color.Transparent
                     )
                 )
             )
         ),
-        interpolator = LineCartesianLayer.Interpolator.catmullRom()
+
+        interpolator =
+            LineCartesianLayer.Interpolator.catmullRom()
     )
 
     val linhaGrade = rememberLineComponent(
-        fill = Fill(Color.White.copy(alpha = 0.07f))
+        fill = Fill(corGrade)
     )
 
-    val estiloTexto = rememberTextComponent(
-        TextStyle(color = TextoGrafico)
+    val textoEixo = rememberTextComponent(
+        TextStyle(
+            color = corTexto
+        )
     )
 
-    val formatadorEixoY = remember {
+    val formatadorY = remember {
         CartesianValueFormatter { _, value, _ ->
-            formatarMoeda(value)
+            formatarMoedaGrafico(value)
         }
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(FundoGrafico)
+            .background(corFundo)
             .padding(12.dp)
     ) {
+
         CartesianChartHost(
+
             chart = rememberCartesianChart(
+
                 rememberLineCartesianLayer(
-                    lineProvider = LineCartesianLayer.LineProvider.series(linha)
+                    lineProvider =
+                        LineCartesianLayer.LineProvider.series(
+                            linha
+                        )
                 ),
+
                 startAxis = VerticalAxis.rememberStart(
-                    label = estiloTexto,
+                    label = textoEixo,
                     guideline = linhaGrade,
-                    valueFormatter = formatadorEixoY
+                    valueFormatter = formatadorY
                 ),
+
                 bottomAxis = HorizontalAxis.rememberBottom(
-                    label = estiloTexto,
+
+                    label = textoEixo,
                     guideline = null,
-                    itemPlacer = HorizontalAxis.ItemPlacer.aligned(
-                        spacing = { passo }
-                    ),
-                    valueFormatter = CartesianValueFormatter { _, value, _ ->
-                        datas.getOrNull(value.toInt())?.let(::formatarData) ?: "-"
-                    }
+                    itemPlacer =
+                        HorizontalAxis.ItemPlacer.aligned(
+                            spacing = {
+                                serie.passoEixo
+                            }
+                        ),
+
+                    valueFormatter =
+                        CartesianValueFormatter {
+                                _,
+                                value,
+                                _ ->
+
+                            serie.rotulos.getOrNull(
+                                value.toInt()
+                            ) ?: ""
+                        }
                 )
             ),
+
             modelProducer = modelProducer,
+
             modifier = Modifier.fillMaxSize(),
+
             animateIn = true
         )
     }
+}
+
+private val CoresDistribuicao = listOf(
+    Color(0xFF2563EB),
+    Color(0xFF22C55E),
+    Color(0xFFA855F7),
+    Color(0xFFF59E0B),
+    Color(0xFFEF4444),
+    Color(0xFF06B6D4),
+    Color(0xFFEC4899),
+    Color(0xFF84CC16)
+)
+
+private fun formatarMoedaCarteira(valor: Double): String {
+    val formato = NumberFormat.getCurrencyInstance(
+        Locale("pt", "BR")
+    )
+
+    formato.maximumFractionDigits = 0
+    formato.minimumFractionDigits = 0
+
+    return formato.format(valor)
 }
 
 @Composable
@@ -181,29 +388,44 @@ fun DistribuicaoCarteiraChart(
     categorias: List<String>,
     valores: List<Double>
 ) {
-    val itens = categorias.zip(valores).filter { it.second > 0.0 }
+
+    val itens = categorias
+        .zip(valores)
+        .filter { (_, valor) ->
+            valor > 0.0 &&
+                    !valor.isNaN() &&
+                    !valor.isInfinite()
+        }
 
     if (itens.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(FundoGrafico),
+                .background(Color(0xFF06101E)),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Sem investimentos para distribuir",
-                color = TextoGrafico,
+                text = "Sem investimentos para exibir",
+                color = Color(0xFF6F829D),
                 fontSize = 13.sp
             )
         }
+
         return
     }
 
     val nomes = itens.map { it.first }
     val dados = itens.map { it.second }
+
     val total = dados.sum()
 
-    val modelProducer = remember { PieChartModelProducer() }
+    if (total <= 0.0) {
+        return
+    }
+
+    val modelProducer = remember {
+        PieChartModelProducer()
+    }
 
     LaunchedEffect(dados) {
         modelProducer.runTransaction {
@@ -213,27 +435,40 @@ fun DistribuicaoCarteiraChart(
         }
     }
 
-    val sliceProvider = remember(nomes.size) {
-        PieChart.SliceProvider.series(
-            CoresDistribuicao.map { cor ->
-                PieChart.Slice(fill = Fill(cor))
-            }
-        )
+    val slices = remember(nomes.size) {
+        nomes.mapIndexed { index, _ ->
+            PieChart.Slice(
+                fill = Fill(
+                    CoresDistribuicao[
+                        index % CoresDistribuicao.size
+                    ]
+                )
+            )
+        }
+    }
+
+    val sliceProvider = remember(slices) {
+        PieChart.SliceProvider.series(slices)
     }
 
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .background(FundoGrafico)
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .background(Color(0xFF06101E))
+            .padding(
+                horizontal = 8.dp,
+                vertical = 4.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         Box(
             modifier = Modifier
-                .weight(1.15f)
+                .weight(1.1f)
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center
         ) {
+
             PieChartHost(
                 chart = rememberPieChart(
                     sliceProvider = sliceProvider,
@@ -242,67 +477,88 @@ fun DistribuicaoCarteiraChart(
                 modelProducer = modelProducer,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp),
+                    .height(230.dp),
                 animateIn = true
             )
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "100%",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "carteira",
-                    color = TextoGrafico,
-                    fontSize = 11.sp
-                )
             }
         }
 
-        Spacer(modifier = Modifier.size(8.dp))
+        Spacer(
+            modifier = Modifier.size(8.dp)
+        )
 
         Column(
-            modifier = Modifier.weight(0.85f),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = Modifier
+                .weight(0.9f),
+            verticalArrangement =
+                Arrangement.spacedBy(9.dp)
         ) {
+
             nomes.forEachIndexed { index, categoria ->
-                val percentual = (dados[index] / total) * 100.0
+
+                val valor = dados[index]
+
+                val percentual =
+                    (valor / total) * 100.0
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment =
+                        Alignment.CenterVertically
                 ) {
+
                     Box(
                         modifier = Modifier
                             .size(10.dp)
                             .background(
-                                CoresDistribuicao[index % CoresDistribuicao.size],
+                                CoresDistribuicao[
+                                    index %
+                                            CoresDistribuicao.size
+                                ],
                                 CircleShape
                             )
                     )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Column(modifier = Modifier.weight(1f)) {
+
+                    Spacer(
+                        modifier = Modifier.size(7.dp)
+                    )
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+
                         Text(
                             text = categoria,
                             color = Color.White,
                             fontSize = 12.sp,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow =
+                                TextOverflow.Ellipsis
                         )
+
                         Text(
-                            text = formatarMoeda(dados[index]),
-                            color = TextoGrafico,
+                            text =
+                                formatarMoedaCarteira(valor),
+                            color =
+                                Color(0xFF6F829D),
                             fontSize = 10.sp
                         )
                     }
+
                     Text(
-                        text = String.format(Locale("pt", "BR"), "%.1f%%", percentual),
+                        text = String.format(
+                            Locale("pt", "BR"),
+                            "%.1f%%",
+                            percentual
+                        ),
                         color = Color.White,
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight =
+                            FontWeight.SemiBold
                     )
                 }
             }

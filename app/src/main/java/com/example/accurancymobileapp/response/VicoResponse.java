@@ -2,15 +2,16 @@ package com.example.accurancymobileapp.response;
 
 import java.util.List;
 
-/**
- * Resposta dos endpoints usados pelos dois gráficos.
- */
 public class VicoResponse {
 
     private boolean sucesso;
     private String mensagem;
+
+    // Dashboard
     private String periodo;
     private List<Ponto> pontos;
+
+    // Wallet
     private List<Distribuicao> distribuicao;
 
     public boolean isSucesso() {
@@ -34,6 +35,7 @@ public class VicoResponse {
     }
 
     public static class Ponto {
+
         private String data;
         private double valor;
 
@@ -47,6 +49,7 @@ public class VicoResponse {
     }
 
     public static class Distribuicao {
+
         private String categoria;
         private double valor;
         private double percentual;

@@ -34,8 +34,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerInvestimentos"
                 android:layout_width="match_parent"
-                android:layout_height="287dp"
-                android:nestedScrollingEnabled="true"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
                 android:paddingHorizontal="16dp"
                 tools:itemCount="8"
                 tools:listitem="@layout/item_investiment" />

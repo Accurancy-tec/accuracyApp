@@ -16,87 +16,109 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-
 public class WalletRepository {
-    private ApiService apiService;
 
-    public WalletRepository(Context context){
+    private final ApiService apiService;
+
+    public WalletRepository(Context context) {
+
         Retrofit retrofit = RetrofitClient.getClient(context);
+
         apiService = retrofit.create(ApiService.class);
     }
 
-    public void criarNovaWallet(String nomeWallet, String tipoWallet, WalletCallback callback){
+    public void criarNovaWallet(String nomeWallet, String tipoWallet, WalletCallback callback) {
+
         Wallet wallet = new Wallet(nomeWallet, tipoWallet);
 
         apiService.criarNovaWallet(wallet).enqueue(new Callback<CriarWalletResponse>() {
-            @Override
-            public void onResponse(Call<CriarWalletResponse> call, Response<CriarWalletResponse> response) {
-                if(!response.isSuccessful()){
+
+            @Override public void onResponse(Call<CriarWalletResponse> call, Response<CriarWalletResponse> response) {
+
+                if (!response.isSuccessful()) {
+
                     callback.onError("Erro HTTP: " + response.code());
                     return;
                 }
 
                 CriarWalletResponse resultado = response.body();
 
-                if(resultado == null){
+                if (resultado == null) {
+
                     callback.onError("Resposta da API vazia");
                     return;
                 }
 
-                if(!resultado.isSuccess()){
+                if (!resultado.isSuccess()) {
+
                     Log.e("CARTEIRA", "API retornou erro. Mensagem: " + resultado.getMessage());
+
                     callback.onError(resultado.getMessage());
                     return;
                 }
 
                 callback.onSuccess(resultado.getMessage());
-
             }
 
             @Override
             public void onFailure(Call<CriarWalletResponse> call, Throwable t) {
+
                 callback.onError("Erro de conexão: " + t.getMessage());
             }
         });
     }
 
-    public void buscarWallets(WalletListCallback callback){
+    public void buscarWallets(WalletListCallback callback) {
 
-        apiService.buscarWallets().enqueue(new Callback<BuscarWalletsResponse>() {
-            @Override
-            public void onResponse(Call<BuscarWalletsResponse> call, Response<BuscarWalletsResponse> response) {
-                if(!response.isSuccessful()){
-                    callback.onError("Erro HTTP: " + response.code());
-                    return;
-                }
+        apiService.buscarWallets().enqueue(
+                new Callback<BuscarWalletsResponse>() {
 
-                BuscarWalletsResponse resultado = response.body();
+                    @Override
+                    public void onResponse(Call<BuscarWalletsResponse> call, Response<BuscarWalletsResponse> response) {
 
-                if(resultado == null){
-                    callback.onError("Reposta da API vazia");
-                }
+                        if (!response.isSuccessful()) {
 
-                if(!resultado.isSuccess()){
-                    callback.onError(resultado.getMessage());
-                }
+                            callback.onError(
+                                    "Erro HTTP: " + response.code());
+                            return;
+                        }
 
-                callback.onSuccess(resultado.getCarteiras());
-            }
+                        BuscarWalletsResponse resultado = response.body();
 
-            @Override
-            public void onFailure(Call<BuscarWalletsResponse> call, Throwable t) {
-                callback.onError("Erro de conexao: " + t.getMessage());
-            }
-        });
+                        if (resultado == null) {
+                            callback.onError("Resposta da API vazia");
+
+                            return;}
+
+                        if (!resultado.isSuccess()) {
+
+                            callback.onError(resultado.getMessage());
+
+                            return;
+                        }
+
+                        callback.onSuccess(resultado.getCarteiras());
+                    }
+
+                    @Override public void onFailure(Call<BuscarWalletsResponse> call,Throwable t) {
+
+                        callback.onError("Erro de conexão: " + t.getMessage()
+                        );
+                    }
+                });
     }
 
-    public interface WalletCallback{
+    public interface WalletCallback {
+
         void onSuccess(String mensagem);
+
         void onError(String message);
     }
 
-    public interface WalletListCallback{
-        void onSuccess(List<Wallet> walltes);
+    public interface WalletListCallback {
+
+        void onSuccess(List<Wallet> wallets);
+
         void onError(String message);
     }
 }
