@@ -370,7 +370,7 @@
 
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerInvestimentos"
+                android:id="@+id/recyclerHistorico"
                 android:layout_width="match_parent"
                 android:layout_height="287dp"
                 android:nestedScrollingEnabled="true"
