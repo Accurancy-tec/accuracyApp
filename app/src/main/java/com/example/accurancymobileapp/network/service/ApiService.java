@@ -3,6 +3,8 @@ package com.example.accurancymobileapp.network.service;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.AporteResponse;
+//import com.example.accurancymobileapp.response.BuscarWalletsResponse;
+//import com.example.accurancymobileapp.response.CriarWalletResponse;
 import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
@@ -33,8 +35,9 @@ public interface ApiService {
     @POST("aportes/registrar-aporte")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
 
+    // limite = quantos aportes trazer (Dashboard usa 4); null = todos
     @GET("aportes/buscar-aportes")
-    Call<ApiResponse> getAportes();
+    Call<ApiResponse> getAportes(@Query("limite") Integer limite);
 
     @GET("brapi/get-quotes")
     Call<QuoteResponse> getQuote(
@@ -56,8 +59,4 @@ public interface ApiService {
 
     @GET("carteiras/buscar-carteiras")
     Call<BuscarWalletsResponse> buscarWallets();
-
-    @GET("aportes/historico-aportes")
-    Call<AporteResponse> buscarHistorico();
-
 }

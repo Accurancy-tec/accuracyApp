@@ -44,13 +44,27 @@ public class EmphasisAdapter  extends RecyclerView.Adapter<EmphasisAdapter.ViewH
 
         clsAportes aportes = this.aportes.get(position);
 
-       holder.txtIconAtivo.setText(aportes.getAtivo());
-        holder.txtNomeAtivo.setText(aportes.getAtivo());
-        holder.txtSubtituloAtivo.setText(
-                String.valueOf(aportes.getAtivo())
+        String ativo = aportes.getAtivo();
+
+        holder.txtIconAtivo.setText(
+                ativo != null && !ativo.isEmpty()
+                        ? ativo.substring(0, 1).toUpperCase(Locale.ROOT)
+                        : "?"
         );
 
-        holder.txtVariacaoAtivo.setText("15%");
+        String nome = aportes.getName();
+        holder.txtNomeAtivo.setText(nome != null && !nome.isEmpty() ? nome : ativo);
+        holder.txtSubtituloAtivo.setText(aportes.getCategoria());
+
+        String tipo = aportes.getTipo();
+        String recorrencia = aportes.getRecorrencia();
+        String informacao = tipo != null ? tipo : "";
+
+        if (recorrencia != null && !recorrencia.isEmpty()) {
+            informacao += informacao.isEmpty() ? recorrencia : " • " + recorrencia;
+        }
+
+        holder.txtVariacaoAtivo.setText(informacao);
 
         //Tem que atualizar o banco de dados para poder puxar esses requisitos
       /*  holder.txtVariacaoAtivo.setText(quoteData.getRegularMarketChangePercent() + "%");
@@ -66,7 +80,7 @@ public class EmphasisAdapter  extends RecyclerView.Adapter<EmphasisAdapter.ViewH
         }
         holder.txtValorAtivo.setText(formato.format(quoteData.getRegularMarketPrice()));*/
 
-        holder.txtValorAtivo.setText("R$ 99");
+        holder.txtValorAtivo.setText(formato.format(aportes.getPreco()));
     }
 
     @Override
