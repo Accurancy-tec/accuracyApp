@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class AporteResponse {
     private boolean sucesso;
     private int quantidade;
-    private ArrayList<Aporte> ativos;
+    private ArrayList<Aporte> aportes;
 
     public boolean isSucesso() {
         return sucesso;
@@ -18,6 +18,6 @@ public class AporteResponse {
     }
 
     public ArrayList<Aporte> getAtivos() {
-        return ativos;
+        return aportes;
     }
 }
