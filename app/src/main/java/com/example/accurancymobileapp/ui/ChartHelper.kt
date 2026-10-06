@@ -1,37 +1,38 @@
 package com.example.accurancymobileapp.ui
 
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.material3.MaterialTheme
-
+import androidx.compose.ui.platform.ComposeView
 
 object ChartHelper {
-    @JvmStatic
-    fun GraphicConfig(composeView: ComposeView, valores: List<Number>) {
-        composeView.setContent {
-            ChartLineDashboard(valores)
-        }
-    }
 
     @JvmStatic
-    fun configurarGraficoLine(
+    fun configurarGraficoEvolucao(
         composeView: ComposeView,
-        valores: List<Number>
+        datas: List<String>,
+        valores: List<Double>
     ) {
         composeView.setContent {
             MaterialTheme {
-                LineChart(valores)
+                EvolucaoCarteiraChart(
+                    datas = datas,
+                    valores = valores
+                )
             }
         }
     }
 
     @JvmStatic
-    fun configurarGraficoPizza(
+    fun configurarGraficoDistribuicao(
         composeView: ComposeView,
-        valores: List<Number>
+        categorias: List<String>,
+        valores: List<Double>
     ) {
         composeView.setContent {
             MaterialTheme {
-                pizzaChart(valores = valores)
+                DistribuicaoCarteiraChart(
+                    categorias = categorias,
+                    valores = valores
+                )
             }
         }
     }

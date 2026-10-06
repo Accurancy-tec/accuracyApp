@@ -1,10 +1,7 @@
 package com.example.accurancymobileapp.network.service;
 
-import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.AporteResponse;
-import com.example.accurancymobileapp.response.BuscarWalletsResponse;
-import com.example.accurancymobileapp.response.CriarWalletResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.model.clsAportes;
@@ -24,37 +21,29 @@ import retrofit2.http.Query;
 //Classe criada para enviar e buscar as informações do banco de dados atráves do php
 public interface ApiService {
 
-    @POST("auth/registrarNovoUsuario")
+    @POST("user/registerNewUser.php")
     Call<ResponseBody> registerNewUser(@Body User user);
 
-    @POST("auth/login")
+    @POST("user/login/login.php")
     Call<LoginResponse> loginVerification(@Body User user);
 
-    @POST("aportes/registrar-aporte")
+    @POST("user/aportes.php")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
 
-    @GET("aportes/buscar-aportes")
+    @GET("user/dashboard.php")
     Call<ApiResponse> getAportes();
 
-    @GET("brapi/get-quotes")
+    @GET("quotes/getQuote.php")
     Call<QuoteResponse> getQuote(
             @Query("symbol") String symbol
     );
-    @GET("brapi/get-symbols")
+    @GET("quotes/getSymbols.php")
     Call<QuoteResponse> getService();
-    @POST("auth/refresh")
+    @POST("user/login/refresh.php")
     Call<LoginResponse> refreshToken(@Body Map<String, String> body);
 
     //Criado pra teste
-    @GET("aportes/buscar-aportes")
+    @GET("service/buscar_aportes.php")
     Call<AporteResponse> buscarAportes();
-
-    @POST("carteiras/criar-carteira")
-    Call<CriarWalletResponse> criarNovaWallet(
-            @Body Wallet wallet
-    );
-
-    @GET("carteiras/buscar-carteiras")
-    Call<BuscarWalletsResponse> buscarWallets();
 
 }

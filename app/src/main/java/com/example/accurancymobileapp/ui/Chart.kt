@@ -1,26 +1,31 @@
 package com.example.accurancymobileapp.ui
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
@@ -29,37 +34,73 @@ import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.common.Fill
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
-import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
+import com.patrykandpatrick.vico.compose.pie.PieChart
 import com.patrykandpatrick.vico.compose.pie.PieChartHost
+import com.patrykandpatrick.vico.compose.pie.PieSize
+import com.patrykandpatrick.vico.compose.pie.rememberPieChart
 import com.patrykandpatrick.vico.compose.pie.data.PieChartModelProducer
 import com.patrykandpatrick.vico.compose.pie.data.pieSeries
-import com.patrykandpatrick.vico.compose.pie.rememberPieChart
-import kotlinx.coroutines.delay
+import java.text.NumberFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
+private val FundoGrafico = Color(0xFF06101E)
+private val TextoGrafico = Color(0xFF6F829D)
+private val AzulGrafico = Color(0xFF2563EB)
 
-//Gráfico de linhas na Dashboard
+private val CoresDistribuicao = listOf(
+    Color(0xFF2563EB),
+    Color(0xFF22C55E),
+    Color(0xFFA855F7),
+    Color(0xFFF59E0B),
+    Color(0xFFEF4444)
+)
+
+private val FormatoData = DateTimeFormatter.ofPattern("dd/MM")
+
+private fun formatarData(data: String): String {
+    return runCatching {
+        LocalDate.parse(data).format(FormatoData)
+    }.getOrDefault(data)
+}
+
+private fun formatarMoeda(valor: Double): String {
+    val formato = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
+    formato.maximumFractionDigits = 0
+    formato.minimumFractionDigits = 0
+    return formato.format(valor)
+}
+
 @Composable
-fun ChartLineDashboard(valores: List<Number>) {
-
-    val meses = listOf(
-        "Jan",
-        "Fev",
-        "Mar",
-        "Abr",
-        "Mai",
-        "Jun")
-
+fun EvolucaoCarteiraChart(
+    datas: List<String>,
+    valores: List<Double>
+) {
+    if (datas.isEmpty() || valores.isEmpty() || datas.size != valores.size) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(FundoGrafico),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Sem dados para exibir",
+                color = TextoGrafico,
+                fontSize = 13.sp
+            )
+        }
+        return
+    }
 
     val modelProducer = remember { CartesianChartModelProducer() }
 
     LaunchedEffect(valores) {
-        if (valores.isEmpty()) return@LaunchedEffect
         modelProducer.runTransaction {
             lineSeries {
                 series(valores)
@@ -67,218 +108,204 @@ fun ChartLineDashboard(valores: List<Number>) {
         }
     }
 
+    val passo = remember(datas) {
+        (datas.size / 5).coerceAtLeast(1)
+    }
 
-    var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { visible = true }
-
-    val alphaGrafico by animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = tween(700),
-        label = "alphaGrafico"
-    )
-
-    val corLinha = Color(0xFF246BFD)
-    val corFundo = Color(0xFF06101E)
-    val corTexto = Color(0xFF6F829D)
-    val corGrade = Color.White.copy(alpha = 0.08f)
-
-    val linhaCustomizada = LineCartesianLayer.rememberLine(
-        fill = LineCartesianLayer.LineFill.single(Fill(corLinha)),
+    val linha = LineCartesianLayer.rememberLine(
+        fill = LineCartesianLayer.LineFill.single(Fill(AzulGrafico)),
         stroke = LineCartesianLayer.LineStroke.Continuous(3.dp),
         areaFill = LineCartesianLayer.AreaFill.single(
             Fill(
                 Brush.verticalGradient(
-                    listOf(corLinha.copy(alpha = 0.35f), Color.Transparent)
+                    listOf(
+                        AzulGrafico.copy(alpha = 0.30f),
+                        Color.Transparent
+                    )
                 )
             )
         ),
-        interpolator = LineCartesianLayer.Interpolator.catmullRom(),
+        interpolator = LineCartesianLayer.Interpolator.catmullRom()
     )
 
-
-    val linhaDeGrade = rememberLineComponent(
-        fill = Fill(corGrade)
+    val linhaGrade = rememberLineComponent(
+        fill = Fill(Color.White.copy(alpha = 0.07f))
     )
-    val estiloTextoEixo = rememberTextComponent(TextStyle(color = corTexto))
+
+    val estiloTexto = rememberTextComponent(
+        TextStyle(color = TextoGrafico)
+    )
+
+    val formatadorEixoY = remember {
+        CartesianValueFormatter { _, value, _ ->
+            formatarMoeda(value)
+        }
+    }
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(220.dp)
-            .alpha(alphaGrafico)
-            .background(corFundo)
+            .fillMaxSize()
+            .background(FundoGrafico)
             .padding(12.dp)
     ) {
-
         CartesianChartHost(
             chart = rememberCartesianChart(
                 rememberLineCartesianLayer(
-                    lineProvider = LineCartesianLayer.LineProvider.series(linhaCustomizada)
+                    lineProvider = LineCartesianLayer.LineProvider.series(linha)
                 ),
                 startAxis = VerticalAxis.rememberStart(
-                    label = estiloTextoEixo,
-                    guideline = linhaDeGrade,
-                    valueFormatter = CartesianValueFormatter.decimal(suffix = "R$"),
+                    label = estiloTexto,
+                    guideline = linhaGrade,
+                    valueFormatter = formatadorEixoY
                 ),
                 bottomAxis = HorizontalAxis.rememberBottom(
-                    label = estiloTextoEixo,
+                    label = estiloTexto,
                     guideline = null,
-                    valueFormatter = { _, value, _ ->
-                        meses.getOrElse(value.toInt()) { "" }
-                    },
-                ),
+                    itemPlacer = HorizontalAxis.ItemPlacer.aligned(
+                        spacing = { passo }
+                    ),
+                    valueFormatter = CartesianValueFormatter { _, value, _ ->
+                        datas.getOrNull(value.toInt())?.let(::formatarData) ?: "-"
+                    }
+                )
             ),
             modelProducer = modelProducer,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
+            animateIn = true
         )
     }
 }
-    //Gráfico de linhas
-    @Composable
-    fun LineChart(valores: List<Number>) {
 
-        val meses = listOf(
-            "Jan",
-            "Fev",
-            "Mar",
-            "Abr",
-            "Mai"
-        )
+@Composable
+fun DistribuicaoCarteiraChart(
+    categorias: List<String>,
+    valores: List<Double>
+) {
+    val itens = categorias.zip(valores).filter { it.second > 0.0 }
 
-        val modelProducer = remember {
-            CartesianChartModelProducer()
-        }
-
-        var visible by remember {
-            mutableStateOf(false)
-        }
-
-        LaunchedEffect(Unit) {
-            visible = true
-        }
-
-        LaunchedEffect(valores) {
-            if(valores.isEmpty()) return@LaunchedEffect
-
-            delay(250)
-            modelProducer.runTransaction {
-                lineSeries {
-                    series(valores)
-                }
-            }
-        }
-
-        val alphaGrafico by animateFloatAsState(
-            targetValue = if(visible) 1f else 0f,
-            animationSpec = tween(700),
-            label = "alphaGráfico"
-        )
-
-        val azulGrafico = Color(0xFF246BFD)
-        val fundoGrafico = Color(0xFF06101E)
-        val corTextoEixo = Color(0xFF6F829D)
-
-        // Marcador ao clicar na linha
-        val axisLabel = rememberTextComponent(TextStyle(corTextoEixo))
-
-        val marker = rememberDefaultCartesianMarker(
-            label = rememberTextComponent()
-        )
-
-        val pointComponent = rememberShapeComponent(
-            fill = Fill(azulGrafico),
-            shape = CircleShape
-        )
-
-        val point = LineCartesianLayer.Point(
-            component = pointComponent,
-            size = 8.dp
-        )
-
-        val guideline = rememberLineComponent(
-            fill = Fill(Color.White.copy(alpha = 0.08f))
-        )
-
-        val horizontalGuideLine = rememberLineComponent(
-            fill = Fill(Color.White.copy(alpha = 0.06f))
-        )
-
-        val customLine = LineCartesianLayer.rememberLine(
-            fill = LineCartesianLayer.LineFill.single(
-                Fill(azulGrafico)
-            ),
-
-            stroke = LineCartesianLayer.LineStroke.Continuous(
-                3.dp
-            ),
-
-            areaFill = LineCartesianLayer.AreaFill.single(
-                Fill(
-                    azulGrafico.copy(alpha = 0.20f)
-                )
-            ),
-
-            interpolator = LineCartesianLayer.Interpolator.catmullRom(0.4f)
-
-        )
+    if (itens.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .alpha(alphaGrafico)
-                .background(fundoGrafico)
-                .padding(12.dp)
+                .background(FundoGrafico),
+            contentAlignment = Alignment.Center
         ) {
-            CartesianChartHost(
-                chart = rememberCartesianChart(
-                    rememberLineCartesianLayer(
-                        // Personalização da linha do gráfico
-                        lineProvider = LineCartesianLayer.LineProvider.series(
-                            customLine
-                        )
-                    ),
-                    startAxis = VerticalAxis.rememberStart(
-                        guideline = horizontalGuideLine,
-                        label = axisLabel,
-                    ),
-                    bottomAxis = HorizontalAxis.rememberBottom(
-                        guideline = null,
-                        label = axisLabel,
-                        valueFormatter = { _, value, _ ->
-                            meses.getOrElse(value.toInt()) {""}
-                        }
-                    ),
-
-                    marker = marker
-                ),
-                modelProducer = modelProducer,
-                modifier = Modifier.fillMaxWidth()
+            Text(
+                text = "Sem investimentos para distribuir",
+                color = TextoGrafico,
+                fontSize = 13.sp
             )
+        }
+        return
+    }
+
+    val nomes = itens.map { it.first }
+    val dados = itens.map { it.second }
+    val total = dados.sum()
+
+    val modelProducer = remember { PieChartModelProducer() }
+
+    LaunchedEffect(dados) {
+        modelProducer.runTransaction {
+            pieSeries {
+                series(dados)
+            }
         }
     }
 
-    //Gráfico em Pizza
-    @Composable
-    fun pizzaChart(
-        valores: List<Number>,
-        modifier: Modifier = Modifier
-            .fillMaxWidth()
-            .height(240.dp)
-    ) {
-        val modelProducer = remember {
-            PieChartModelProducer()
-        }
+    val sliceProvider = remember(nomes.size) {
+        PieChart.SliceProvider.series(
+            CoresDistribuicao.map { cor ->
+                PieChart.Slice(fill = Fill(cor))
+            }
+        )
+    }
 
-        LaunchedEffect(Unit) {
-            modelProducer.runTransaction {
-                pieSeries {
-                    series(40, 30, 20, 10)
-                }
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(FundoGrafico)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1.15f)
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            PieChartHost(
+                chart = rememberPieChart(
+                    sliceProvider = sliceProvider,
+                    innerSize = PieSize.Inner.fixed(58.dp)
+                ),
+                modelProducer = modelProducer,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp),
+                animateIn = true
+            )
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "100%",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "carteira",
+                    color = TextoGrafico,
+                    fontSize = 11.sp
+                )
             }
         }
 
-        PieChartHost(
-            chart = rememberPieChart(),
-            modelProducer = modelProducer,
-            modifier = modifier
-        )
+        Spacer(modifier = Modifier.size(8.dp))
+
+        Column(
+            modifier = Modifier.weight(0.85f),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            nomes.forEachIndexed { index, categoria ->
+                val percentual = (dados[index] / total) * 100.0
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .background(
+                                CoresDistribuicao[index % CoresDistribuicao.size],
+                                CircleShape
+                            )
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = categoria,
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = formatarMoeda(dados[index]),
+                            color = TextoGrafico,
+                            fontSize = 10.sp
+                        )
+                    }
+                    Text(
+                        text = String.format(Locale("pt", "BR"), "%.1f%%", percentual),
+                        color = Color.White,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
+    }
 }
