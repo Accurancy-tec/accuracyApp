@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.fragments.AportesFragment;
+import com.example.accurancymobileapp.fragments.CriarWalletFragment;
 import com.example.accurancymobileapp.fragments.DashboardFragment;
 import com.example.accurancymobileapp.fragments.HistoricFragment;
 import com.example.accurancymobileapp.fragments.ProfileFragment;
@@ -51,7 +52,7 @@ public class MainPageActivity extends AppCompatActivity {
             int itemId = item.getItemId();
 
             if(itemId == R.id.nav_wallet){
-                fragmentSelecionado = new WalletFragment();
+                fragmentSelecionado = new CriarWalletFragment();
             }
             else if(itemId == R.id.nav_home){
                 fragmentSelecionado = new DashboardFragment();

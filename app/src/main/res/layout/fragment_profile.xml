@@ -639,6 +639,7 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/imgLogout"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:contentDescription="Sair"
