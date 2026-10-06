@@ -342,15 +342,16 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/btnTodos"
                     android:layout_width="50dp"
                     android:layout_height="22dp"
-                    android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
                     android:text="Todos"
                     android:textColor="@color/text_primary"
                     android:textSize="10sp" />
 
                 <TextView
+                    android:id="@+id/btnCompra"
                     android:layout_width="45dp"
                     android:layout_height="22dp"
                     android:gravity="center"
@@ -359,6 +360,7 @@
                     android:textSize="10sp" />
 
                 <TextView
+                    android:id="@+id/btnVenda"
                     android:layout_width="40dp"
                     android:layout_height="22dp"
                     android:gravity="center"
