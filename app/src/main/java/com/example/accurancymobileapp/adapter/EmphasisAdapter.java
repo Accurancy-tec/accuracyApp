@@ -54,7 +54,7 @@ public class EmphasisAdapter  extends RecyclerView.Adapter<EmphasisAdapter.ViewH
 
         String nome = aportes.getName();
         holder.txtNomeAtivo.setText(nome != null && !nome.isEmpty() ? nome : ativo);
-        holder.txtSubtituloAtivo.setText(aportes.getCategoria());
+        holder.txtSubtituloAtivo.setText(aportes.getName() + " - " + aportes.getCategoria());
 
         String tipo = aportes.getTipo();
         String recorrencia = aportes.getRecorrencia();
@@ -64,12 +64,12 @@ public class EmphasisAdapter  extends RecyclerView.Adapter<EmphasisAdapter.ViewH
             informacao += informacao.isEmpty() ? recorrencia : " • " + recorrencia;
         }
 
-        holder.txtVariacaoAtivo.setText(informacao);
-
-        //Tem que atualizar o banco de dados para poder puxar esses requisitos
-      /*  holder.txtVariacaoAtivo.setText(quoteData.getRegularMarketChangePercent() + "%");
-
-        if(quoteData.getRegularMarketChangePercent() > 0){
+        if(informacao.equals("Compra • Único")){
+            holder.txtVariacaoAtivo.setText(informacao);
+        }
+        else{
+            holder.txtVariacaoAtivo.setText("15");
+            if(15 > 0){
             holder.txtVariacaoAtivo.setTextColor(
                     ContextCompat.getColor(holder.itemView.getContext(),R.color.green_positive));
         }
@@ -77,8 +77,7 @@ public class EmphasisAdapter  extends RecyclerView.Adapter<EmphasisAdapter.ViewH
             holder.txtVariacaoAtivo.setTextColor(
                     ContextCompat.getColor(holder.itemView.getContext(), R.color.red_negative)
             );
-        }
-        holder.txtValorAtivo.setText(formato.format(quoteData.getRegularMarketPrice()));*/
+        }}
 
         holder.txtValorAtivo.setText(formato.format(aportes.getPreco()));
     }
