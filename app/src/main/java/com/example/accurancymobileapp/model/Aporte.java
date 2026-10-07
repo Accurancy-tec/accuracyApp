@@ -3,6 +3,7 @@ package com.example.accurancymobileapp.model;
 // Criei essa classe para testes, depois da pra trocar pela que ja tem o AporteAdapter esta usando essa classe
 public class Aporte {
 
+    private int id_carteira;
     private int id_aporte;
     private String ativo_aporte;
     private String name_ativo;

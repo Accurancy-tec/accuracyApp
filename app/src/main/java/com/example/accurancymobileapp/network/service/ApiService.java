@@ -50,7 +50,9 @@ public interface ApiService {
 
     //Criado pra teste
     @GET("aportes/buscar-aportes")
-    Call<AporteResponse> buscarAportes();
+    Call<AporteResponse> buscarAportes(
+            @Query("id_carteira") int idCarteira
+    );
 
     @POST("carteiras/criar-carteira")
     Call<CriarWalletResponse> criarNovaWallet(

@@ -173,7 +173,9 @@ public class CriarWalletFragment extends Fragment {
 
    private void abrirWallet(Wallet wallet){
         Bundle bundle = new Bundle();
+        int idCarteira = wallet.getId_carteira();
 
+        bundle.putInt("id_carteira", idCarteira);
         bundle.putString("nome_wallet", wallet.getNome_carteira());
         bundle.putString("tipo_carteira", wallet.getTipo_carteira());
 

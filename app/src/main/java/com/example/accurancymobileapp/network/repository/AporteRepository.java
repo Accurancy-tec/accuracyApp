@@ -32,21 +32,20 @@ public class AporteRepository {
         apiService = retrofit.create(ApiService.class);
     }
 
-    public void buscarAportes(aporteCallback callback){
-        apiService.buscarAportes().enqueue(new Callback<AporteResponse>() {
+    public void buscarAportes(int idCarteira, aporteCallback callback){
+
+        Log.d("TESTE_APORTE", "ID carteira enviado: " + idCarteira);
+        apiService.buscarAportes(idCarteira).enqueue(new Callback<AporteResponse>() {
             @Override
             public void onResponse(Call<AporteResponse> call, Response<AporteResponse> response) {
-                if (!response.isSuccessful()) {
-                    Log.e("TESTE_APORTE", "Erro HTTP: " + response.code());
 
+                if (!response.isSuccessful()) {
                     callback.onErro("Erro HTTP:" + response.code());
                     return;
                 }
                 AporteResponse resultado = response.body();
 
                 if (resultado == null) {
-                    Log.e("TESTE_APORTE", "Body = NULL");
-
                     callback.onErro("Resposta da API vazia: ");
                     return;
                 }
@@ -63,28 +62,11 @@ public class AporteRepository {
                     return;
                 }
 
-                for (Aporte aporte : resultado.getAtivos()) {
-
-                    Log.d("TESTE_APORTE", "ID: " + aporte.getIdAporte());
-
-                    Log.d("TESTE_APORTE", "Ativo: " + aporte.getAtivoAporte());
-
-                    Log.d("TESTE_APORTE", "Nome: " + aporte.getNameAtivo());
-
-                    Log.d("TESTE_APORTE", "Categoria: " + aporte.getCategoriaAtivo());
-
-                    Log.d("TESTE_APORTE", "Quantidade: " + aporte.getQuantidadeAporte());
-
-                    Log.d("TESTE_APORTE", "Valor: " + aporte.getValorAporte());
-                }
-
                 callback.onSucesso(resultado.getAtivos());
             }
 
             @Override
             public void onFailure(Call<AporteResponse> call, Throwable t) {
-                Log.e("TESTE_APORTE", "Falha: " + t.getMessage(), t);
-
                 callback.onErro("Falha de conexão: " + t.getMessage());
             }
         });

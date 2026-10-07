@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.DashboardActivity;
 import com.example.accurancymobileapp.model.ActiveSpinner;
+import com.example.accurancymobileapp.model.Aporte;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.model.Wallet;
@@ -109,24 +110,16 @@ public class AportesFragment extends Fragment {
         spnCarteiras.setAdapter(spinnerAdapter);
 
 
-        spnCarteiras.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener() {
+        spnCarteiras.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
                     @Override
-                    public void onItemSelected(
-                            AdapterView<?> parent,
-                            View view,
-                            int position,
-                            long id) {
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                        Wallet carteiraSelecionada =
-                                (Wallet) parent.getItemAtPosition(position);
+                        Wallet carteiraSelecionada = (Wallet) parent.getItemAtPosition(position);
 
-                        int idCarteira =
-                                carteiraSelecionada.getId_carteira();
+                        int idCarteira = carteiraSelecionada.getId_carteira();
 
-                        String nomeCarteira =
-                                carteiraSelecionada.getNome_carteira();
+                        String nomeCarteira = carteiraSelecionada.getNome_carteira();
 
                         Log.d("CARTEIRA", "ID: " + idCarteira);
                         Log.d("CARTEIRA", "Nome: " + nomeCarteira);
@@ -161,6 +154,17 @@ public class AportesFragment extends Fragment {
                 String Recorrencia = spnRecorrencia.getSelectedItem().toString();
                 String SPreco = txtPreco.getText().toString();
 
+                Wallet carteiraSelecionada = (Wallet) spnCarteiras.getSelectedItem();
+
+                int id_carteira = carteiraSelecionada.getId_carteira();
+
+                Log.d("APORTE_DEBUG",
+                        "Carteira selecionada: "
+                                + carteiraSelecionada.getNome_carteira()
+                                + " | ID: "
+                                + id_carteira
+                );
+
                 if (symbol.isEmpty() ||name.equals("Escolha o Ativo") || SQuantidade.isEmpty() ||Tipo.equals("Escolha o Tipo") || Recorrencia.equals("Escolha a Recorrência") || SPreco.isEmpty()) {
                     Toast.makeText(requireContext(),
                             "Por favor preencha todos os campo",
@@ -185,7 +189,14 @@ public class AportesFragment extends Fragment {
                         .getClient(requireContext())
                         .create(ApiService.class);
 
-                clsAportes aporte = new clsAportes(symbol,name,Categoria,Quantidade ,Preco, Tipo, Recorrencia);
+
+                clsAportes aporte = new clsAportes(symbol,name,Categoria,Quantidade ,Preco, Tipo, Recorrencia, id_carteira);
+                Log.d(
+                        "APORTE_DEBUG",
+                        "ID carteira no aporte: "
+                                + aporte.getId_Carteira()
+                );
+
                 api.registerAporte(aporte).enqueue(new Callback<ApiResponse>() {
 
                     @Override
