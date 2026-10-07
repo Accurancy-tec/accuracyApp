@@ -105,7 +105,8 @@ public class WalletRepository {
                         callback.onError("Erro de conexão: " + t.getMessage()
                         );
                     }
-                });
+                }
+        );
     }
 
     public interface WalletCallback {
