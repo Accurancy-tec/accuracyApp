@@ -37,7 +37,10 @@ public interface ApiService {
 
     // limite = quantos aportes trazer (Dashboard usa 4); null = todos
     @GET("aportes/buscar-aportes")
-    Call<ApiResponse> getAportes(@Query("limite") Integer limite);
+    Call<ApiResponse> getAportes(
+            @Query("limite") Integer limite,
+            @Query("id_carteira") int id_carteira
+    );
 
     @GET("brapi/get-quotes")
     Call<QuoteResponse> getQuote(
