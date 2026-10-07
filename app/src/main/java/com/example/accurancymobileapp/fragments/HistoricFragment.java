@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.AporteAdapter;
+import com.example.accurancymobileapp.adapter.HistoricAdapter;
 import com.example.accurancymobileapp.model.Aporte;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.HistoricRepository;
@@ -32,7 +33,7 @@ public class HistoricFragment extends Fragment {
     TextView btnCompra;
     TextView btnVenda;
     private List<Aporte> listaHistorico = new ArrayList<>();
-    private AporteAdapter adapter;
+    private HistoricAdapter adapter;
 
     public HistoricFragment(){
         super(R.layout.fragment_historic);
@@ -76,7 +77,7 @@ public class HistoricFragment extends Fragment {
             public void OnSuccess(List<Aporte> historico) {
                 listaHistorico = historico;
 
-                adapter = new AporteAdapter(listaHistorico);
+                adapter = new HistoricAdapter(listaHistorico);
 
                 recyclerHistorico.setAdapter(adapter);
             }
