@@ -77,7 +77,7 @@ public class HistoricFragment extends Fragment {
             public void OnSuccess(List<Aporte> historico) {
                 listaHistorico = historico;
 
-                adapter = new HistoricAdapter(listaHistorico);
+                adapter = new HistoricAdapter(requireContext(), listaHistorico);
 
                 recyclerHistorico.setAdapter(adapter);
             }
