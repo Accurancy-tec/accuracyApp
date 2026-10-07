@@ -8,8 +8,9 @@ public class clsAportes {
     private double valor_aporte;
     private String tipo_aporte;
     private String recorrencia_aporte;
+    private int id_carteira;
 
-    public clsAportes(String ativo,String name,String categoria,double quantidade,double preco, String tipo, String recorrencia) {
+    public clsAportes(String ativo,String name,String categoria,double quantidade,double preco, String tipo, String recorrencia, int idCarteira) {
         ativo_aporte = ativo;
         name_ativo = name;
         categoria_ativo = categoria;
@@ -17,6 +18,7 @@ public class clsAportes {
         valor_aporte = preco;
         tipo_aporte = tipo;
         recorrencia_aporte = recorrencia;
+        id_carteira = idCarteira;
     }
 
     public clsAportes() {
@@ -76,5 +78,11 @@ public class clsAportes {
 
     public void setQuantidade(double quantidade) {
         this.quantidade_aporte = quantidade;
+    }
+    public int getId_Carteira(){
+        return id_carteira;
+    }
+    public void setId_carteira(int id_carteira) {
+        this.id_carteira = id_carteira;
     }
 }
