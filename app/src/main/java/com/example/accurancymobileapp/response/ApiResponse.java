@@ -16,7 +16,7 @@ public class ApiResponse {
    private String mensagem;
   
    @SerializedName(value = "ativos", alternate = {"aportes"})
-   private ArrayList<clsAportes> ativos;
+   private ArrayList<clsAportes> aportes;
    public boolean isSucesso() {
        return sucesso;
    }
