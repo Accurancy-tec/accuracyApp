@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.adapter;
 
+import android.icu.util.LocaleData;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +12,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Aporte;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
 public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteViewHolder> {
 
-    private final List<Aporte> listaAportes;
+    private List<Aporte> listaAportes;
 
     public AporteAdapter(List<Aporte> listaAportes) {
         this.listaAportes = listaAportes;
+    }
+
+    public void atualizarLista(List<Aporte> novalista){
+        this.listaAportes = novalista;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -52,8 +60,8 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
         }
 
         // Categoria do ativo
-        holder.txtSubtituloAtivo.setText(
-                aporte.getCategoriaAtivo()
+        holder.txtVariacaoAtivo.setText(
+                aporte.getTipoAporte()
         );
 
         // Valor do aporte
@@ -66,25 +74,32 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
         );
 
         // Tipo e recorrência
-        String tipo = aporte.getTipoAporte();
-        String recorrencia = aporte.getRecorrenciaAporte();
+        double quantidade = aporte.getQuantidadeAporte();
+        String dataAporte = aporte.getData_aporte();
+        String categoriaAtivo = aporte.getCategoriaAtivo();
 
         String informacao = "";
 
-        if (tipo != null && !tipo.isEmpty()) {
-            informacao = tipo;
+        if(quantidade != 0){
+            informacao = String.valueOf((int) quantidade) + " " + categoriaAtivo;
         }
 
-        if (recorrencia != null && !recorrencia.isEmpty()) {
+        if (dataAporte != null && !dataAporte.isEmpty()) {
+
+            LocalDate data = LocalDate.parse(dataAporte);
+
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyyy");
+
+            dataAporte = data.format(formato);
 
             if (!informacao.isEmpty()) {
                 informacao += " • ";
             }
 
-            informacao += recorrencia;
+            informacao += dataAporte;
         }
 
-        holder.txtVariacaoAtivo.setText(informacao);
+        holder.txtSubtituloAtivo.setText(informacao);
     }
 
     @Override

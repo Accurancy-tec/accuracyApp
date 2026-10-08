@@ -43,6 +43,7 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
         holder.itemView.setOnClickListener(v -> {
 
             if (listener != null) {
+                int idCarteira = wallet.getId_carteira();
                 listener.onWalletClick(wallet);
             }
 

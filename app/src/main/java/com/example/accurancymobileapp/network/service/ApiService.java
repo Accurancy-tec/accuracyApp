@@ -37,7 +37,10 @@ public interface ApiService {
 
     // limite = quantos aportes trazer (Dashboard usa 4); null = todos
     @GET("aportes/buscar-aportes")
-    Call<ApiResponse> getAportes(@Query("limite") Integer limite);
+    Call<ApiResponse> getAportes(
+            @Query("limite") Integer limite,
+            @Query("id_carteira") int id_carteira
+    );
 
     @GET("brapi/get-quotes")
     Call<QuoteResponse> getQuote(
@@ -50,7 +53,9 @@ public interface ApiService {
 
     //Criado pra teste
     @GET("aportes/buscar-aportes")
-    Call<AporteResponse> buscarAportes();
+    Call<AporteResponse> buscarAportes(
+            @Query("id_carteira") int idCarteira
+    );
 
     @POST("carteiras/criar-carteira")
     Call<CriarWalletResponse> criarNovaWallet(
@@ -59,4 +64,7 @@ public interface ApiService {
 
     @GET("carteiras/buscar-carteiras")
     Call<BuscarWalletsResponse> buscarWallets();
+
+    @GET("aportes/historico-aportes")
+    Call<AporteResponse> buscarHistorico();
 }
