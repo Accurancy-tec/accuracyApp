@@ -58,11 +58,11 @@ public class DashboardFragment extends Fragment {
         ctvChart.setVisibility(View.GONE);
 
         carregarGrafico(periodo);
-        dashboard();
+        recicleView();
         timeInvested();
     }
 
-    private void dashboard() {
+    private void recicleView() {
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -272,11 +272,15 @@ public class DashboardFragment extends Fragment {
         });
     }
 
-    private  void updateColorButtom(TextView btn){
+    private void updateColorButtom(TextView btn){
         btn1M.setBackgroundResource(R.drawable.bg_periodo_normal);
         btn6M.setBackgroundResource(R.drawable.bg_periodo_normal);
         btn1A.setBackgroundResource(R.drawable.bg_periodo_normal);
 
         btn.setBackgroundResource(R.drawable.bg_periodo_selecionado);
+    }
+
+    private void name(){
+        //TODO: adicionar logica para buscar nome do usuario
     }
 }

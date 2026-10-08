@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <!-- Card de investimento -->
+<!-- Card de "Ativos em destaque" do Dashboard (EmphasisAdapter).
+     Layout próprio: o item_investiment.xml é compartilhado com Aportes,
+     Histórico e Quote, então não foi alterado. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,7 +12,7 @@
     android:orientation="horizontal"
     android:padding="14dp">
 
-    <!-- Ícone do ativo -->
+    <!-- Ícone: a cor de fundo e do texto é aplicada no adapter por categoria -->
     <TextView
         android:id="@+id/txtIconAtivo"
         android:layout_width="44dp"
@@ -78,5 +80,4 @@
             android:textStyle="bold"
             tools:text="▲ +1,7%" />
     </LinearLayout>
-
 </LinearLayout>
