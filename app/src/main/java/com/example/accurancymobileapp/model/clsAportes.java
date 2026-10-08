@@ -21,9 +21,6 @@ public class clsAportes {
         id_carteira = idCarteira;
     }
 
-    public clsAportes() {
-    }
-
     public String getAtivo() {
         return ativo_aporte;
     }
