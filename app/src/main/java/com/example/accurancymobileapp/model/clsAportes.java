@@ -8,6 +8,7 @@ public class clsAportes {
     private double valor_aporte;
     private String tipo_aporte;
     private String recorrencia_aporte;
+    private int id_carteira;
 
     public clsAportes(String ativo,String name,String categoria,double quantidade,double preco, String tipo, String recorrencia) {
         ativo_aporte = ativo;

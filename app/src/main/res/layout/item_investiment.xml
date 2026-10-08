@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+    <!-- Card de investimento -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/bg_card_ativo"
     android:gravity="center_vertical"
-    android:background="?attr/selectableItemBackground"
-    android:paddingVertical="10dp">
+    android:orientation="horizontal"
+    android:padding="14dp">
 
     <!-- Ícone do ativo -->
     <TextView
@@ -14,13 +16,13 @@
         android:layout_width="44dp"
         android:layout_height="44dp"
         android:layout_marginEnd="12dp"
-        android:background="@drawable/bg_icon_circle"
+        android:background="@drawable/bg_item_icon"
         android:gravity="center"
-        android:text="B"
-        android:textColor="@android:color/white"
+        android:textColor="#60A5FA"
+        android:textSize="13sp"
         android:textStyle="bold"
-        tools:ignore="HardcodedText" />
-    
+        tools:text="P4" />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -31,46 +33,50 @@
             android:id="@+id/txtNomeAtivo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bitcoin"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/text_primary"
             android:textSize="15sp"
-            android:textStyle="bold"/>
-        
+            android:textStyle="bold"
+            tools:text="Petrobras" />
+
         <TextView
             android:id="@+id/txtSubtituloAtivo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Qualquer coisa"
             android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/text_secondary"
-            android:textSize="12sp"/>
-
+            android:textSize="12sp"
+            tools:text="PETR4 · Ações" />
     </LinearLayout>
-    
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="end">
-        
+        android:layout_marginStart="8dp"
+        android:gravity="end"
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/txtValorAtivo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="R$ 99999"
             android:textColor="@color/text_primary"
             android:textSize="15sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            tools:text="R$ 38,94" />
 
         <TextView
             android:id="@+id/txtVariacaoAtivo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="▲ +18,4%"
             android:textColor="@color/green_positive"
             android:textSize="12sp"
-            android:textStyle="bold"/>
-
+            android:textStyle="bold"
+            tools:text="▲ +1,7%" />
     </LinearLayout>
+
 </LinearLayout>
