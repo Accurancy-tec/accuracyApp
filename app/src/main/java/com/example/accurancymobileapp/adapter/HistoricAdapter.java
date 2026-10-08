@@ -1,5 +1,5 @@
 package com.example.accurancymobileapp.adapter;
-
+import android.content.Context;
 import android.icu.util.LocaleData;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
@@ -16,17 +17,18 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+public class HistoricAdapter extends RecyclerView.Adapter<HistoricAdapter.AporteViewHolder> {
 
-public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteViewHolder> {
+    Context context;
+    private List<Aporte> historicList;
 
-    private List<Aporte> listaAportes;
-
-    public AporteAdapter(List<Aporte> listaAportes) {
-        this.listaAportes = listaAportes;
+    public HistoricAdapter(Context context, List<Aporte> historicList) {
+        this.historicList = historicList;
+        this.context = context;
     }
 
     public void atualizarLista(List<Aporte> novalista){
-        this.listaAportes = novalista;
+        this.historicList = novalista;
         notifyDataSetChanged();
     }
 
@@ -43,7 +45,7 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
     @Override
     public void onBindViewHolder(@NonNull AporteViewHolder holder, int position) {
 
-        Aporte aporte = listaAportes.get(position);
+        Aporte aporte = historicList.get(position);
 
         // Nome do ativo
         holder.txtNomeAtivo.setText(aporte.getNameAtivo());
@@ -59,10 +61,20 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
             holder.txtIconAtivo.setText("?");
         }
 
-        // Categoria do ativo
+        // Tipo de aporte
         holder.txtVariacaoAtivo.setText(
                 aporte.getTipoAporte()
         );
+
+        if(aporte.getTipoAporte().equals("Venda")){
+            holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(context, R.color.red_negative));
+        }
+        else if(aporte.getTipoAporte().equals("Dividendo")){
+            holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(context, R.color.blue_primary));
+        }
+        else {
+            holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(context, R.color.green_positive));
+        }
 
         // Valor do aporte
         holder.txtValorAtivo.setText(
@@ -73,7 +85,7 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
                 )
         );
 
-        // Tipo e recorrência
+        // quantidade e data
         double quantidade = aporte.getQuantidadeAporte();
         String dataAporte = aporte.getData_aporte();
         String categoriaAtivo = aporte.getCategoriaAtivo();
@@ -100,11 +112,13 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
         }
 
         holder.txtSubtituloAtivo.setText(informacao);
+
+
     }
 
     @Override
     public int getItemCount() {
-        return listaAportes.size();
+        return historicList.size();
     }
 
     public static class AporteViewHolder extends RecyclerView.ViewHolder {

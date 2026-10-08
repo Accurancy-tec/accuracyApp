@@ -45,9 +45,7 @@ public class WalletFragment extends Fragment {
         recyclerInvestimentos = view.findViewById(R.id.recyclerInvestimentos);
         carteiraChart = view.findViewById(R.id.carteiraChart);
 
-        recyclerInvestimentos.setLayoutManager(
-                new LinearLayoutManager(requireContext())
-        );
+        recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         carregarInvestimentos();
         carregarGraficoDistribuicao();
@@ -109,7 +107,14 @@ public class WalletFragment extends Fragment {
     private void carregarInvestimentos() {
         AporteRepository aporteRepository = new AporteRepository(requireContext());
 
-        aporteRepository.buscarAportes(new AporteRepository.aporteCallback() {
+        Bundle bundle = getArguments();
+        int idCarteira = bundle.getInt("id_carteira");
+
+        if(bundle != null){
+            Log.d("CARTEIRA", "ID carteira recebido: " + idCarteira);
+        }
+
+        aporteRepository.buscarAportes(idCarteira, new AporteRepository.aporteCallback() {
             @Override
             public void onSucesso(List<Aporte> aportes) {
                 if (!isAdded()) {

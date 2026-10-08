@@ -70,8 +70,7 @@ public class WalletRepository {
 
     public void buscarWallets(WalletListCallback callback) {
 
-        apiService.buscarWallets().enqueue(
-                new Callback<BuscarWalletsResponse>() {
+        apiService.buscarWallets().enqueue(new Callback<BuscarWalletsResponse>() {
 
                     @Override
                     public void onResponse(Call<BuscarWalletsResponse> call, Response<BuscarWalletsResponse> response) {
@@ -105,7 +104,8 @@ public class WalletRepository {
                         callback.onError("Erro de conexão: " + t.getMessage()
                         );
                     }
-                });
+                }
+        );
     }
 
     public interface WalletCallback {
