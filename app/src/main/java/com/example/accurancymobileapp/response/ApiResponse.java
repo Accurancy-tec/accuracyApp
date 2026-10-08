@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable;
 public class ApiResponse {
    private boolean sucesso;
    private String mensagem;
+  
    @SerializedName(value = "ativos", alternate = {"aportes"})
    private ArrayList<clsAportes> ativos;
    public boolean isSucesso() {
@@ -25,6 +26,6 @@ public class ApiResponse {
    }
 
     public ArrayList<clsAportes> getLista() {
-        return ativos;
+        return aportes;
     }
 }

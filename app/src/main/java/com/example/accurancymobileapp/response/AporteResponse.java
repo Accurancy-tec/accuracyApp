@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class AporteResponse {
     private boolean sucesso;
     private int quantidade;
+  
     @SerializedName(value = "ativos", alternate = {"aportes"})
     private ArrayList<Aporte> ativos;
 
@@ -20,6 +21,6 @@ public class AporteResponse {
     }
 
     public ArrayList<Aporte> getAtivos() {
-        return ativos;
+        return aportes;
     }
 }

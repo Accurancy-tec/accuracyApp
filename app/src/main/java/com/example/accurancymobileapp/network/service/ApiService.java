@@ -59,4 +59,7 @@ public interface ApiService {
 
     @GET("carteiras/buscar-carteiras")
     Call<BuscarWalletsResponse> buscarWallets();
+
+    @GET("aportes/historico-aportes")
+    Call<AporteResponse> buscarHistorico();
 }

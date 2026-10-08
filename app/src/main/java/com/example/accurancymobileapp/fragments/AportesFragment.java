@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,8 +22,10 @@ import com.example.accurancymobileapp.activities.DashboardActivity;
 import com.example.accurancymobileapp.model.ActiveSpinner;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.QuoteResult;
+import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
+import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
@@ -36,12 +39,15 @@ import retrofit2.Response;
 
 public class AportesFragment extends Fragment {
 
-    Spinner spnAtivo, spnTipo, spnRecorrencia,spnCategoria;
+    Spinner spnAtivo, spnTipo, spnRecorrencia,spnCategoria, spnCarteiras;
     EditText txtPreco,txtQuantidade;
     Button btnEnviar;
+    WalletRepository walletRepository;
 
     List<ActiveSpinner> active = new ArrayList<>();
     ArrayAdapter<ActiveSpinner> adapterActive;
+
+    ArrayAdapter<Wallet> spinnerAdapter;
 
 
     public AportesFragment() {
@@ -57,13 +63,17 @@ public class AportesFragment extends Fragment {
         spnRecorrencia = (Spinner) view.findViewById(R.id.spnRecorrencia);
         spnTipo = (Spinner) view.findViewById(R.id.spnTipo);
         spnCategoria = (Spinner) view.findViewById(R.id.spnCategoria);
+        spnCarteiras = (Spinner) view.findViewById(R.id.spnCarteiras);
         btnEnviar = (Button) view.findViewById(R.id.btnEnviar);
         txtPreco = (EditText) view.findViewById(R.id.txtPreco);
         txtQuantidade = (EditText) view.findViewById(R.id.txtQuantidade);
+        walletRepository = new WalletRepository(requireContext());
 
         String[] Categoria = {"Ações","Cripto","Renda Fixa","FIIs","Internacional"};
         String[] Tipo = {"Escolha o Tipo", "Compra", "Venda","Dividendo"};
         String[] Recorrencia = {"Escolha a Recorrência", "Único","Diário", "Semanal", "Mensal", "Anual"};
+        List<Wallet> listaCarteiras = new ArrayList<>();
+
 
         active.add(new ActiveSpinner("","Escolha o Ativo"));
 
@@ -80,6 +90,8 @@ public class AportesFragment extends Fragment {
                 Categoria
         );
 
+        spinnerAdapter = new ArrayAdapter<>(requireContext(), R.layout.my_select_item, listaCarteiras);
+
         adapterActive = new ArrayAdapter<>(requireContext(),
                 R.layout.my_select_item,
                 active);
@@ -88,14 +100,47 @@ public class AportesFragment extends Fragment {
         adapterRecorrencia.setDropDownViewResource(R.layout.my_dropdown_item);
         adapterActive.setDropDownViewResource(R.layout.my_dropdown_item);
         adapterCategoria.setDropDownViewResource(R.layout.my_dropdown_item);
+        spinnerAdapter.setDropDownViewResource(R.layout.my_dropdown_item);
 
         spnTipo.setAdapter(adapterTipo);
         spnRecorrencia.setAdapter(adapterRecorrencia);
         spnAtivo.setAdapter(adapterActive);
         spnCategoria.setAdapter(adapterCategoria);
+        spnCarteiras.setAdapter(spinnerAdapter);
+
+
+        spnCarteiras.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+
+                    @Override
+                    public void onItemSelected(
+                            AdapterView<?> parent,
+                            View view,
+                            int position,
+                            long id) {
+
+                        Wallet carteiraSelecionada =
+                                (Wallet) parent.getItemAtPosition(position);
+
+                        int idCarteira =
+                                carteiraSelecionada.getId_carteira();
+
+                        String nomeCarteira =
+                                carteiraSelecionada.getNome_carteira();
+
+                        Log.d("CARTEIRA", "ID: " + idCarteira);
+                        Log.d("CARTEIRA", "Nome: " + nomeCarteira);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                }
+        );
 
         carregarAtivos();
         aportes();
+        buscarCarteiras();
 
     }
 
@@ -207,6 +252,23 @@ public class AportesFragment extends Fragment {
                 Toast.makeText(requireContext(),
                         "Erro " + t.getMessage(),
                         LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void buscarCarteiras() {
+        walletRepository.buscarWallets(new WalletRepository.WalletListCallback() {
+            @Override
+            public void onSuccess(List<Wallet> wallets) {
+                spinnerAdapter.clear();
+                spinnerAdapter.addAll(wallets);
+
+                spinnerAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(requireContext(), message, LENGTH_LONG).show();
             }
         });
     }
