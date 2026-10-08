@@ -2,10 +2,18 @@ package com.example.accurancymobileapp.fragments;
 
 import static android.widget.Toast.LENGTH_LONG;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -30,9 +38,13 @@ import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.google.android.material.button.MaterialButton;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,13 +54,15 @@ public class AportesFragment extends Fragment {
 
     Spinner spnAtivo, spnTipo, spnRecorrencia,spnCategoria, spnCarteiras;
     EditText txtPreco,txtQuantidade;
-    Button btnEnviar;
+    MaterialButton btnEnviar, btnValorOutro, btnSelecionado, btnValor100, btnValor250, btnValor500, btnValor750, btnValor1k;
     WalletRepository walletRepository;
 
     List<ActiveSpinner> active = new ArrayList<>();
     ArrayAdapter<ActiveSpinner> adapterActive;
 
     ArrayAdapter<Wallet> spinnerAdapter;
+    private boolean atualizandoCampo = false; //Evita loop do TextWatcher
+    private final Locale ptBR = new Locale("pt", "BR");
 
 
     public AportesFragment() {
@@ -65,9 +79,16 @@ public class AportesFragment extends Fragment {
         spnTipo = (Spinner) view.findViewById(R.id.spnTipo);
         spnCategoria = (Spinner) view.findViewById(R.id.spnCategoria);
         spnCarteiras = (Spinner) view.findViewById(R.id.spnCarteiras);
-        btnEnviar = (Button) view.findViewById(R.id.btnEnviar);
+        btnEnviar = (MaterialButton) view.findViewById(R.id.btnEnviar);
+        btnValorOutro = (MaterialButton) view.findViewById(R.id.btnValorOutro);
+        btnValor100 = (MaterialButton) view.findViewById(R.id.btnValor100);
+        btnValor250 = (MaterialButton) view.findViewById(R.id.btnValor250);
+        btnValor500 = (MaterialButton) view.findViewById(R.id.btnValor500);
+        btnValor750 = (MaterialButton) view.findViewById(R.id.btnValor750);
+        btnValor1k = (MaterialButton) view.findViewById(R.id.btnValor1k);
         txtPreco = (EditText) view.findViewById(R.id.txtPreco);
         txtQuantidade = (EditText) view.findViewById(R.id.txtQuantidade);
+
         walletRepository = new WalletRepository(requireContext());
 
         String[] Categoria = {"Ações","Cripto","Renda Fixa","FIIs","Internacional"};
@@ -134,6 +155,8 @@ public class AportesFragment extends Fragment {
         carregarAtivos();
         aportes();
         buscarCarteiras();
+        configurarCampoValor();
+        configurarValoresRapidos();
 
     }
 
@@ -171,17 +194,18 @@ public class AportesFragment extends Fragment {
                             LENGTH_LONG).show();
                     return;
                 }
-                Double Preco, Quantidade;
-                try {
-                    Quantidade = Double.parseDouble(SQuantidade);
-                    Preco = Double.parseDouble(SPreco);
-                }catch (NumberFormatException e) {
+                double Preco = converterDecimal(SPreco);
+                double Quantidade = converterDecimal(SQuantidade);
 
-                    Toast.makeText(
-                            requireContext(),
-                            "Digite valores válidos",
-                            LENGTH_LONG
-                    ).show();
+                if(symbol.isEmpty() || name.equals("Escolha o ativo") || SQuantidade.isEmpty()
+                        || Tipo.equals("Escolha o tipo") || Recorrencia.equals("Escolha a recorrencia")
+                        || SPreco.isEmpty()){
+                    Toast.makeText(requireContext(), "Por favor preencha todos os campo", LENGTH_LONG).show();
+                    return;
+                }
+
+                if(Quantidade <= 0 || Preco <= 0){
+                    Toast.makeText(requireContext(), "Digite valores válidos", LENGTH_LONG).show();
                     return;
                 }
 
@@ -282,5 +306,139 @@ public class AportesFragment extends Fragment {
                 Toast.makeText(requireContext(), message, LENGTH_LONG).show();
             }
         });
+    }
+    private void setValorNoCampo(double valor) {
+        atualizandoCampo = true;
+        txtPreco.setText(String.format(ptBR, "%.2f", valor));
+        txtPreco.setSelection(txtPreco.getText().length());
+        atualizandoCampo = false;
+    }
+
+    private void configurarCampoValor() {
+        txtPreco.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) { }
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Se o usuário digitou, marca o chip "Outro"
+                if (!atualizandoCampo && btnSelecionado != btnValorOutro) {
+                    selecionarBotao(btnValorOutro);
+                }
+            }
+        });
+    }
+
+    private double lerValor() {
+        return converterDecimal(txtPreco.getText().toString());
+    }
+
+    private void selecionarBotao(MaterialButton novo) {
+        if (btnSelecionado != null) estilizarChip(btnSelecionado, false);
+        estilizarChip(novo, true);
+        btnSelecionado = novo;
+    }
+
+    private void configurarValoresRapidos() {
+        Log.d("APORTE", "configurarValoresRapidos chamado");
+        View root = requireView();
+
+        MaterialButton[] botoes = {
+                root.findViewById(R.id.btnValor100),
+                root.findViewById(R.id.btnValor250),
+                root.findViewById(R.id.btnValor500), root.findViewById(R.id.btnValor750),
+                root.findViewById(R.id.btnValor1k)
+        };
+        double[] valores = {100, 250, 500, 750, 1000};
+
+        for (int i = 0; i < botoes.length; i++) {
+            final MaterialButton botao = botoes[i];
+            final double valor = valores[i];
+            botao.setOnClickListener(v -> {
+                setValorNoCampo(valor);
+                selecionarBotao(botao);
+                txtPreco.clearFocus();
+            });
+        }
+
+        btnSelecionado = root.findViewById(R.id.btnValor500); // já vem selecionado no layout
+
+        // "Outro": limpa o campo e abre o teclado
+        btnValorOutro.setOnClickListener(v -> {
+            atualizandoCampo = true;
+            txtPreco.setText("");
+            atualizandoCampo = false;
+            selecionarBotao(btnValorOutro);
+            txtPreco.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(requireContext(), InputMethodManager.class);
+            if (imm != null) imm.showSoftInput(txtPreco, InputMethodManager.SHOW_IMPLICIT);
+        });
+
+    }
+
+    private void estilizarChip(MaterialButton b, boolean selecionado) {
+        b.setBackgroundTintList(ColorStateList.valueOf(
+                Color.parseColor(selecionado ? "#1D3A8A" : "#111A2B")));
+        b.setStrokeColor(ColorStateList.valueOf(
+                Color.parseColor(selecionado ? "#3B82F6" : "#1E3A8A")));
+        b.setTextColor(Color.parseColor(selecionado ? "#FFFFFF" : "#60A5FA"));
+    }
+
+    /*private void atualizarContagemAtivos() {
+        int ativos = 0;
+        for (AporteRecorrente r : recorrentes) if (r.isAtivo()) ativos++;
+        txtQtdAtivos.setText(ativos + (ativos == 1 ? " ativo" : " ativos"));
+    }*/
+
+    private void confirmarAporte() {
+        double valor = lerValor();
+        if (valor <= 0) {
+            txtPreco.setError("Informe um valor válido");
+            txtPreco.requestFocus();
+            return;
+        }
+
+        /*String carteira = spnCarteiras.getSelectedItem().toString();
+        String ativoCompleto = spnAtivo.getSelectedItem().toString();
+        String tipo = spnTipo.getSelectedItem().toString();
+        String recorrencia = spnRecorrencia.getSelectedItem().toString();
+        String nome = ativoCompleto.contains(" — ") ? ativoCompleto.split(" — ")[0] : ativoCompleto;
+
+        // Só compras entram no "aportado este mês"
+        if (tipo.equals("Compra")) {
+            totalMes += valor;
+            txtAportadoMes.setText(moeda.format(totalMes).replace('\u00A0', ' '));
+        }
+
+        // Aporte recorrente entra na lista
+        if (!recorrencia.equals("Única")) {
+            Calendar cal = Calendar.getInstance();
+            String frequencia;
+            if (recorrencia.equals("Semanal")) {
+                frequencia = "Semanal · " + new SimpleDateFormat("EEEE", ptBR).format(cal.getTime());
+                cal.add(Calendar.DAY_OF_MONTH, 7);
+            } else {
+                frequencia = "Mensal · dia " + cal.get(Calendar.DAY_OF_MONTH);
+                cal.add(Calendar.MONTH, 1);
+            }
+            String proxima = new SimpleDateFormat("dd/MM/yyyy", ptBR).format(cal.getTime());
+            String sigla = nome.length() > 3 ? nome.substring(0, 2).toUpperCase() : nome;
+
+            recorrentes.add(0, new AporteRecorrente(sigla, nome, frequencia, valor, proxima, true));
+            adapter.notifyItemInserted(0);
+            atualizarContagemAtivos();*/
+        }
+
+    private double converterDecimal(String texto) {
+        String t = texto.trim();
+        if (t.isEmpty()) return -1;
+        if (t.contains(",")) {
+            t = t.replace(".", "").replace(',', '.');
+        }
+        try {
+            return Double.parseDouble(t);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 }
