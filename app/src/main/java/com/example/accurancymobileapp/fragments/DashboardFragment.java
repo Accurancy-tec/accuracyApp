@@ -68,7 +68,7 @@ public class DashboardFragment extends Fragment {
 
         ApiService api = RetrofitClient.getClient(requireContext()).create(ApiService.class);
 
-        api.getAportes(4).enqueue(new Callback<ApiResponse>() {
+        api.getAportes(4, 28).enqueue(new Callback<ApiResponse>() {
 
                     @Override
                     public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {
