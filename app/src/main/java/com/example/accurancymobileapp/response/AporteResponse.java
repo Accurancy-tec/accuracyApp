@@ -8,9 +8,9 @@ import java.util.ArrayList;
 public class AporteResponse {
     private boolean sucesso;
     private int quantidade;
-  
+
     @SerializedName(value = "ativos", alternate = {"aportes"})
-    private ArrayList<Aporte> ativos;
+    private ArrayList<Aporte> aportes;
 
     public boolean isSucesso() {
         return sucesso;

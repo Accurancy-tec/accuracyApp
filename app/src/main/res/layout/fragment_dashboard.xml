@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -21,7 +22,8 @@
             android:paddingTop="16dp"
             android:paddingBottom="24dp">
 
-            <!-- Cabeçalho: saudação + sino -->
+            <!-- ==================== CABEÇALHO ==================== -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,22 +37,15 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tvSaudacao"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="13sp"
-                        tools:text="Bom dia," />
-
-                    <TextView
                         android:id="@+id/tvNomeUsuario"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
+                        android:text="Usuário"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp"
-                        android:textStyle="bold"
-                        tools:text="João 👋" />
+                        android:textStyle="bold" />
+
                 </LinearLayout>
 
                 <ImageView
@@ -60,11 +55,10 @@
                     android:background="@drawable/bg_icon_button"
                     android:contentDescription="Notificações"
                     android:padding="10dp"
-                    android:src="@drawable/ic_bell"
-                    tools:ignore="HardcodedText" />
+                    android:src="@drawable/ic_bell" />
+
             </LinearLayout>
 
-            <!-- Card de patrimônio -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,26 +73,24 @@
                     android:letterSpacing="0.08"
                     android:text="SALDO TOTAL"
                     android:textColor="#B3C7FF"
-                    android:textSize="11sp"
-                    tools:ignore="HardcodedText" />
+                    android:textSize="11sp" />
 
                 <TextView
                     android:id="@+id/tvSaldoTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="—"
+                    android:text="R$ 48.392,17"
                     android:textColor="@android:color/white"
                     android:textSize="32sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText"
-                    tools:text="R$ 48.392,17" />
+                    android:textStyle="bold" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="16dp"
                     android:background="#33FFFFFF" />
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -118,21 +110,20 @@
                             android:layout_height="wrap_content"
                             android:text="Investido"
                             android:textColor="#B3C7FF"
-                            android:textSize="11sp"
-                            tools:ignore="HardcodedText" />
+                            android:textSize="11sp" />
 
                         <TextView
                             android:id="@+id/tvInvestido"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="—"
+                            android:text="R$ 41.000,00"
                             android:textColor="@android:color/white"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText"
-                            tools:text="R$ 41.000" />
+                            android:textStyle="bold" />
+
                     </LinearLayout>
+
 
                     <View
                         android:layout_width="1dp"
@@ -152,21 +143,20 @@
                             android:layout_height="wrap_content"
                             android:text="Saldo livre"
                             android:textColor="#B3C7FF"
-                            android:textSize="11sp"
-                            tools:ignore="HardcodedText" />
+                            android:textSize="11sp" />
 
                         <TextView
                             android:id="@+id/tvSaldoLivre"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="—"
+                            android:text="R$ 3.200,00"
                             android:textColor="@android:color/white"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText"
-                            tools:text="R$ 3.200" />
+                            android:textStyle="bold" />
+
                     </LinearLayout>
+
 
                     <View
                         android:layout_width="1dp"
@@ -186,25 +176,24 @@
                             android:layout_height="wrap_content"
                             android:text="Rendimento"
                             android:textColor="#B3C7FF"
-                            android:textSize="11sp"
-                            tools:ignore="HardcodedText" />
+                            android:textSize="11sp" />
 
                         <TextView
                             android:id="@+id/tvRendimento"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="—"
+                            android:text="+R$ 4.192,00"
                             android:textColor="#34D399"
                             android:textSize="14sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText"
-                            tools:text="+R$ 4.192" />
+                            android:textStyle="bold" />
+
                     </LinearLayout>
+
                 </LinearLayout>
+
             </LinearLayout>
 
-            <!-- Badge de rendimento total (verde ou vermelho, definido no Java) -->
             <TextView
                 android:id="@+id/tvBadgeTotal"
                 android:layout_width="wrap_content"
@@ -213,14 +202,12 @@
                 android:background="@drawable/bg_tag_positivo"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="5dp"
+                android:text="▲ +10,2% total"
                 android:textColor="@color/green_positive"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:visibility="gone"
-                tools:text="▲ +10,2% total"
-                tools:visibility="visible" />
+                android:visibility="visible" />
 
-            <!-- Evolução da carteira -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -237,8 +224,7 @@
                     android:text="Evolução da carteira"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/btn1M"
@@ -251,8 +237,7 @@
                     android:gravity="center"
                     android:text="1M"
                     android:textColor="@android:color/white"
-                    android:textSize="13sp"
-                    tools:ignore="HardcodedText" />
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/btn6M"
@@ -265,8 +250,7 @@
                     android:gravity="center"
                     android:text="6M"
                     android:textColor="@android:color/white"
-                    android:textSize="13sp"
-                    tools:ignore="HardcodedText" />
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/btn1A"
@@ -279,8 +263,8 @@
                     android:gravity="center"
                     android:text="1A"
                     android:textColor="@android:color/white"
-                    android:textSize="13sp"
-                    tools:ignore="HardcodedText" />
+                    android:textSize="13sp" />
+
             </LinearLayout>
 
             <androidx.compose.ui.platform.ComposeView
@@ -288,7 +272,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp" />
 
-            <!-- Ativos em destaque -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -297,30 +280,32 @@
                 android:text="Ativos em destaque"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText" />
+                android:textStyle="bold" />
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerInvestimentos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
                 tools:itemCount="4"
-                tools:listitem="@layout/item_ativo_destaque" />
+                tools:listitem="@layout/item_investiment" />
 
-            <!-- Estado vazio / erro -->
             <TextView
                 android:id="@+id/tvDestaquesVazio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:background="@drawable/bg_card_ativo"
                 android:gravity="center"
                 android:padding="20dp"
+                android:text="Faça seu primeiro aporte para ver seus ativos aqui."
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
-                android:visibility="gone"
-                tools:text="Faça seu primeiro aporte para ver seus ativos aqui."
-                tools:visibility="visible" />
+                android:visibility="gone" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
 </FrameLayout>
