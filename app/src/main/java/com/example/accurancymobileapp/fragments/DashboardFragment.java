@@ -12,9 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.compose.ui.platform.ComposeView;
 import androidx.fragment.app.Fragment;
-import androidx.navigationevent.ViewTreeNavigationEventDispatcherOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.widget.Spinner;
+import com.example.accurancymobileapp.ui.AnimationSpinner;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.EmphasisAdapter;
@@ -28,6 +29,7 @@ import com.example.accurancymobileapp.ui.ChartHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,11 +40,17 @@ public class DashboardFragment extends Fragment {
     private ComposeView ctvChart;
     private TextView btn1M,btn6M,btn1A;
     private RecyclerView recyclerInvestimentos;
+    private Spinner spFiltroDestaques;
 
     public DashboardFragment() {
         super(R.layout.fragment_dashboard);
     }
     String periodo = "6M";
+    String[] filtros = {
+            "Mais caros",
+            "Mais lucrativos",
+            "Maiores perdas"
+    };
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -54,57 +62,76 @@ public class DashboardFragment extends Fragment {
         btn1M = view.findViewById(R.id.btn1M);
         btn6M = view.findViewById(R.id.btn6M);
         btn1A = view.findViewById(R.id.btn1A);
+        spFiltroDestaques = view.findViewById(R.id.spFiltroDestaques);
 
         ctvChart.setVisibility(View.GONE);
+
+
 
         carregarGrafico(periodo);
         recicleView();
         timeInvested();
+
+
     }
 
     private void recicleView() {
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        AnimationSpinner.configurar(
+                requireContext(),
+                spFiltroDestaques,
+                filtros,
+                posicao -> {
+                    String type = posicao == 0 ? "Mais caros" : posicao == 1 ? "Mais lucrativos" : "Maiores perdas";
+                    carregarDestques(type);
+                }
+        );
+    }
+
+    private void carregarDestques(String type){
         ApiService api = RetrofitClient.getClient(requireContext()).create(ApiService.class);
 
-        api.getAportes(4, 28).enqueue(new Callback<ApiResponse>() {
+        api.buscarLista(type).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {
 
-                    @Override
-                    public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {
-
-                        if (!isAdded()) {
-                            return;
-                        }
-
-                        if (!response.isSuccessful() || response.body() == null
-                        ) {
-                            Log.e("DASHBOARD", "Erro HTTP aportes: " + response.code());
-                            return;
-                        }
-
-                        List<clsAportes> aportes = response.body().getLista();
-
-                        if (aportes == null) {
-                            Log.e("DASHBOARD", "Lista de aportes nula");
-                            return;
-                        }
-
-                        recyclerInvestimentos.setAdapter(new EmphasisAdapter(aportes));
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<ApiResponse> call, @NonNull Throwable t) {
-
-                        if (!isAdded()) {
-                            return;
-                        }
-
-                        Toast.makeText(requireContext(), "Erro ao mostrar aportes", LENGTH_LONG).show();
-
-                        Log.e("DASHBOARD", "Erro ao carregar aportes", t);
-                    }
+                if (!isAdded()) {
+                    return;
                 }
+
+                if (!response.isSuccessful() || response.body() == null) {
+                    String erro = "";
+                    try {
+                        if (response.errorBody() != null) erro = response.errorBody().string();
+                    } catch (Exception ignored) {}
+                    Log.e("DASHBOARD", "Erro HTTP aportes: " + response.code() + " | " + erro);
+                    return;
+                }
+
+                List<clsAportes> aportes = response.body().getLista();
+
+                if (aportes == null) {
+                    Log.e("DASHBOARD", "Lista de aportes nula");
+                    return;
+                }
+
+                recyclerInvestimentos.setAdapter(new EmphasisAdapter(aportes));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse> call, @NonNull Throwable t) {
+
+                if (!isAdded()) {
+                    return;
+                }
+
+                Toast.makeText(requireContext(), "Erro ao mostrar aportes", LENGTH_LONG).show();
+
+                Log.e("DASHBOARD", "Erro ao carregar aportes", t);
+            }
+        }
         );
     }
 
