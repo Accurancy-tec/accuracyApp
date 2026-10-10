@@ -14,6 +14,7 @@ import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.TickerResponse;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -67,4 +68,7 @@ public interface ApiService {
 
     @GET("aportes/historico-aportes")
     Call<AporteResponse> buscarHistorico();
+
+    @POST("aportes/listar-aportes")
+    Call<ApiResponse> buscarLista(@Query("Choise") String Choise);
 }
