@@ -1,3 +1,4 @@
+
 package com.example.accurancymobileapp.adapter;
 
 import android.view.LayoutInflater;
@@ -10,83 +11,167 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.clsAportes;
 
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class EmphasisAdapter  extends RecyclerView.Adapter<EmphasisAdapter.ViewHolder>{
+public class EmphasisAdapter
+        extends RecyclerView.Adapter<EmphasisAdapter.ViewHolder> {
 
-    private List<clsAportes> aportes;
-    NumberFormat formato = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+    private final List<clsAportes> aportes;
 
-    public EmphasisAdapter(List<clsAportes> aportes){
+    private final NumberFormat formato =
+            NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+
+    public EmphasisAdapter(List<clsAportes> aportes) {
         this.aportes = aportes;
     }
 
     @NonNull
     @Override
-    public EmphasisAdapter.ViewHolder onCreateViewHolder(
+    public ViewHolder onCreateViewHolder(
             @NonNull ViewGroup parent,
             int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_investiment,parent,false);
 
-        return new EmphasisAdapter.ViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_investiment, parent, false);
+
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(
-            @NonNull EmphasisAdapter.ViewHolder holder,
+            @NonNull ViewHolder holder,
             int position) {
 
-        clsAportes aportes = this.aportes.get(position);
+        clsAportes aporte = aportes.get(position);
 
-        String ativo = aportes.getAtivo();
+        String ativo = aporte.getAtivo();
+        String nome = aporte.getName();
+        String categoria = aporte.getCategoria();
+        String tipo = aporte.getTipo();
+        String recorrencia = aporte.getRecorrencia();
 
+        // Ícone com a primeira letra do ativo.
         holder.txtIconAtivo.setText(
-                ativo != null && !ativo.isEmpty()
+                ativo != null && !ativo.trim().isEmpty()
                         ? ativo.substring(0, 1).toUpperCase(Locale.ROOT)
                         : "?"
         );
 
-        String nome = aportes.getName();
-        holder.txtNomeAtivo.setText(nome != null && !nome.isEmpty() ? nome : ativo);
-        holder.txtSubtituloAtivo.setText(aportes.getName() + " - " + aportes.getCategoria());
+        // Nome e subtítulo.
+        holder.txtNomeAtivo.setText(
+                nome != null && !nome.trim().isEmpty()
+                        ? nome
+                        : ativo != null ? ativo : "Ativo"
+        );
 
-        String tipo = aportes.getTipo();
-        String recorrencia = aportes.getRecorrencia();
-        String informacao = tipo != null ? tipo : "";
+        holder.txtSubtituloAtivo.setText(
+                (ativo != null ? ativo : "")
+                        + (categoria != null && !categoria.isEmpty()
+                        ? " • " + categoria
+                        : "")
+        );
 
-        if (recorrencia != null && !recorrencia.isEmpty()) {
-            informacao += informacao.isEmpty() ? recorrencia : " • " + recorrencia;
-        }
+        // Valor principal.
+        holder.txtValorAtivo.setText(
+                formato.format(aporte.getPreco())
+        );
 
-        if(informacao.equals("Compra • Único")){
-            holder.txtVariacaoAtivo.setText(informacao);
-        }
-        else{
-            holder.txtVariacaoAtivo.setText("15");
-            if(15 > 0){
+        String tipoNormalizado = tipo == null
+                ? ""
+                : tipo.trim();
+
+        String recorrenciaNormalizada = recorrencia == null
+                ? ""
+                : recorrencia.trim();
+
+        boolean compraUnica =
+                tipoNormalizado.equalsIgnoreCase("Compra")
+                        && (
+                        recorrenciaNormalizada.equalsIgnoreCase("Único")
+                                || recorrenciaNormalizada.equalsIgnoreCase("Única")
+                                || recorrenciaNormalizada.equalsIgnoreCase("Unico")
+                                || recorrenciaNormalizada.equalsIgnoreCase("Unica")
+                );
+
+        boolean venda = tipoNormalizado.equalsIgnoreCase("Venda");
+
+        holder.txtVariacaoAtivo.setVisibility(View.VISIBLE);
+
+// Compra única: mostra o texto em vez da porcentagem.
+        if (compraUnica) {
+            holder.txtVariacaoAtivo.setText("Compra única");
             holder.txtVariacaoAtivo.setTextColor(
-                    ContextCompat.getColor(holder.itemView.getContext(),R.color.green_positive));
-        }
-        else{
-            holder.txtVariacaoAtivo.setTextColor(
-                    ContextCompat.getColor(holder.itemView.getContext(), R.color.red_negative)
+                    ContextCompat.getColor(
+                            holder.itemView.getContext(),
+                            R.color.text_secondary
+                    )
             );
-        }}
+            return;
+        }
 
-        holder.txtValorAtivo.setText(formato.format(aportes.getPreco()));
+// Venda: mostra o tipo da operação em vez da porcentagem.
+        if (venda) {
+            holder.txtVariacaoAtivo.setText("Venda");
+            holder.txtVariacaoAtivo.setTextColor(
+                    ContextCompat.getColor(
+                            holder.itemView.getContext(),
+                            R.color.text_secondary
+                    )
+            );
+            return;
+        }
+
+// Para os investimentos com lucro ou perda, mostra o percentual.
+        Double rendimento = aporte.getRendimentoPercentual();
+
+        if (rendimento == null
+                || rendimento.isNaN()
+                || rendimento.isInfinite()) {
+            rendimento = 0.0;
+        }
+
+        String sinal = rendimento > 0 ? "+" : "";
+
+        holder.txtVariacaoAtivo.setText(
+                sinal + String.format(
+                        Locale.forLanguageTag("pt-BR"),
+                        "%.2f%%",
+                        rendimento
+                )
+        );
+
+        int cor = rendimento > 0
+                ? R.color.green_positive
+                : rendimento < 0
+                ? R.color.red_negative
+                : R.color.text_secondary;
+
+        holder.txtVariacaoAtivo.setTextColor(
+                ContextCompat.getColor(
+                        holder.itemView.getContext(),
+                        cor
+                )
+        );
+
+        android.util.Log.d(
+                "EmphasisAdapter",
+                "Ativo=" + aporte.getAtivo()
+                        + " | Tipo=" + aporte.getTipo()
+                        + " | Recorrencia=" + aporte.getRecorrencia()
+                        + " | Rendimento=" + aporte.getRendimentoPercentual()
+        );
     }
 
     @Override
-    public int getItemCount(){
+    public int getItemCount() {
         return aportes == null ? 0 : aportes.size();
     }
-    class ViewHolder extends RecyclerView.ViewHolder{
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView txtIconAtivo;
         TextView txtNomeAtivo;
@@ -94,7 +179,7 @@ public class EmphasisAdapter  extends RecyclerView.Adapter<EmphasisAdapter.ViewH
         TextView txtValorAtivo;
         TextView txtVariacaoAtivo;
 
-        public ViewHolder(@NonNull View itemView){
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             txtIconAtivo = itemView.findViewById(R.id.txtIconAtivo);
@@ -103,6 +188,5 @@ public class EmphasisAdapter  extends RecyclerView.Adapter<EmphasisAdapter.ViewH
             txtValorAtivo = itemView.findViewById(R.id.txtValorAtivo);
             txtVariacaoAtivo = itemView.findViewById(R.id.txtVariacaoAtivo);
         }
-
     }
 }

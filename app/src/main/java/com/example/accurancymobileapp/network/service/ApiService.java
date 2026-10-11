@@ -36,7 +36,7 @@ public interface ApiService {
     @POST("aportes/registrar-aporte")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
 
-    // limite = quantos aportes trazer (Dashboard usa 4); null = todos
+    //TODO:remover os endpoints usados nessa função
     @GET("aportes/buscar-aportes")
     Call<ApiResponse> getAportes(
             @Query("limite") Integer limite,
