@@ -1,5 +1,7 @@
 package com.example.accurancymobileapp.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class clsAportes {
     private String name_ativo;
     private String categoria_ativo;
@@ -9,6 +11,7 @@ public class clsAportes {
     private String tipo_aporte;
     private String recorrencia_aporte;
     private int id_carteira;
+    private Double rendimento_percentual;
 
     public clsAportes(String ativo,String name,String categoria,double quantidade,double preco, String tipo, String recorrencia, int idCarteira) {
         ativo_aporte = ativo;
@@ -19,6 +22,14 @@ public class clsAportes {
         tipo_aporte = tipo;
         recorrencia_aporte = recorrencia;
         id_carteira = idCarteira;
+    }
+
+    public Double getRendimentoPercentual() {
+        return rendimento_percentual;
+    }
+
+    public void setRendimentoPercentual(Double rendimentoPercentual) {
+        this.rendimento_percentual = rendimentoPercentual;
     }
 
     public String getAtivo() {
