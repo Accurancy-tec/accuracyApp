@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,27 +20,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
-import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
-import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
-import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.common.Fill
-import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
-import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.pie.PieChart
 import com.patrykandpatrick.vico.compose.pie.PieChartHost
 import com.patrykandpatrick.vico.compose.pie.PieSize
@@ -49,8 +45,6 @@ import com.patrykandpatrick.vico.compose.pie.data.pieSeries
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 private data class PontoGrafico(
@@ -58,53 +52,14 @@ private data class PontoGrafico(
     val valor: Double
 )
 
-private data class SerieGrafico(
-    val rotulos: List<String>,
-    val valores: List<Double>,
-    val passoEixo: Int
-)
-
-private val FormatoDataGrafico =
-    DateTimeFormatter.ofPattern("dd/MM")
-
 private val NomesMeses = listOf(
-    "Jan",
-    "Fev",
-    "Mar",
-    "Abr",
-    "Mai",
-    "Jun",
-    "Jul",
-    "Ago",
-    "Set",
-    "Out",
-    "Nov",
-    "Dez"
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+    "Jul", "Ago", "Set", "Out", "Nov", "Dez"
 )
 
-private fun formatarMes(
-    data: LocalDate,
-    mostrarAno: Boolean
-): String {
-    val mes = NomesMeses[data.monthValue - 1]
-
-    return if (mostrarAno) {
-        "$mes/${data.year.toString().takeLast(2)}"
-    } else {
-        mes
-    }
-}
-
-private fun formatarMoedaGrafico(valor: Double): String {
-    val formato = NumberFormat.getCurrencyInstance(
-        Locale("pt", "BR")
-    )
-
-    formato.maximumFractionDigits = 0
-    formato.minimumFractionDigits = 0
-
-    return formato.format(valor)
-}
+private val CorFundoGrafico = Color(0xFF06101E)
+private val CorLinhaGrafico = Color(0xFF2563EB)
+private val CorTextoGrafico = Color(0xFF6F829D)
 
 private fun prepararPontosGrafico(
     datas: List<String>,
@@ -135,89 +90,31 @@ private fun prepararPontosGrafico(
         .sortedBy { it.data }
 }
 
-private fun removerZerosIniciais(
-    pontos: List<PontoGrafico>
-): List<PontoGrafico> {
+private fun rotulosDoEixo(
+    pontos: List<PontoGrafico>,
+    periodo: String
+): List<Pair<Int, String>> {
 
-    val primeiroValorReal = pontos.indexOfFirst {
-        it.valor > 0.0
-    }
-
-    if (primeiroValorReal == -1) {
+    if (periodo.equals("1M", ignoreCase = true)) {
         return emptyList()
     }
 
-    return pontos.drop(primeiroValorReal)
-}
-
-private fun criarSerieGrafico(
-    pontos: List<PontoGrafico>
-): SerieGrafico {
-
-    if (pontos.size < 2) {
-        return SerieGrafico(
-            rotulos = emptyList(),
-            valores = emptyList(),
-            passoEixo = 1
-        )
-    }
-
-    val quantidadeDias = ChronoUnit.DAYS.between(
-        pontos.first().data,
-        pontos.last().data
-    ).toInt()
-
-    if (quantidadeDias <= 45) {
-
-        val passo = (pontos.size / 6)
-            .coerceAtLeast(1)
-
-        return SerieGrafico(
-            rotulos = pontos.map {
-                it.data.format(FormatoDataGrafico)
-            },
-            valores = pontos.map {
-                it.valor
-            },
-            passoEixo = passo
-        )
-    }
-
-    val pontosPorMes = linkedMapOf<YearMonth, PontoGrafico>()
-
-    pontos.forEach { ponto ->
-        pontosPorMes[
-            YearMonth.from(ponto.data)
-        ] = ponto
-    }
-
-    val pontosMensais = pontosPorMes
-        .values
-        .toList()
-
-    val possuiMaisDeUmAno = pontosMensais
-        .map { it.data.year }
-        .distinct()
-        .size > 1
-
-    return SerieGrafico(
-        rotulos = pontosMensais.map {
-            formatarMes(
-                data = it.data,
-                mostrarAno = possuiMaisDeUmAno
-            )
-        },
-        valores = pontosMensais.map {
-            it.valor
-        },
-        passoEixo = 1
-    )
+    return pontos.indices
+        .filter { i ->
+            i == 0 ||
+                    YearMonth.from(pontos[i].data) !=
+                    YearMonth.from(pontos[i - 1].data)
+        }
+        .map { i ->
+            Pair(i, NomesMeses[pontos[i].data.monthValue - 1])
+        }
 }
 
 @Composable
 fun EvolucaoCarteiraChart(
     datas: List<String>,
-    valores: List<Double>
+    valores: List<Double>,
+    periodo: String = "6M"
 ) {
     val pontos = remember(datas, valores) {
         prepararPontosGrafico(
@@ -226,138 +123,164 @@ fun EvolucaoCarteiraChart(
         )
     }
 
-    val pontosValidos = remember(pontos) {
-        removerZerosIniciais(pontos)
-    }
-
-    if (pontosValidos.size < 2) {
-        return
-    }
-
-    if (pontosValidos.none { it.valor > 0.0 }) {
-        return
-    }
-
-    val serie = remember(pontosValidos) {
-        criarSerieGrafico(pontosValidos)
-    }
-
-    if (serie.valores.size < 2) {
-        return
-    }
-
-    val modelProducer = remember {
-        CartesianChartModelProducer()
-    }
-
-    LaunchedEffect(serie.valores) {
-        modelProducer.runTransaction {
-            lineModel {
-                series(serie.valores)
-            }
-        }
-    }
-
-    val corLinha = Color(0xFF2563EB)
-    val corFundo = Color(0xFF06101E)
-    val corTexto = Color(0xFF6F829D)
-    val corGrade = Color.White.copy(alpha = 0.07f)
-
-    val linha = LineCartesianLayer.rememberLine(
-
-        fill = LineCartesianLayer.LineFill.single(
-            Fill(corLinha)
-        ),
-
-        stroke = LineCartesianLayer.LineStroke.Continuous(
-            3.dp
-        ),
-
-        areaFill = LineCartesianLayer.AreaFill.single(
-            Fill(
-                Brush.verticalGradient(
-                    listOf(
-                        corLinha.copy(alpha = 0.30f),
-                        Color.Transparent
-                    )
-                )
-            )
-        ),
-
-        interpolator =
-            LineCartesianLayer.Interpolator.catmullRom()
-    )
-
-    val linhaGrade = rememberLineComponent(
-        fill = Fill(corGrade)
-    )
-
-    val textoEixo = rememberTextComponent(
-        TextStyle(
-            color = corTexto
-        )
-    )
-
-    val formatadorY = remember {
-        CartesianValueFormatter { _, value, _ ->
-            formatarMoedaGrafico(value)
-        }
-    }
+    val temValor = pontos.any { it.valor > 0.0 }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(corFundo)
-            .padding(12.dp)
+            .background(CorFundoGrafico)
+            .padding(horizontal = 4.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
     ) {
 
-        CartesianChartHost(
+        // Com pelo menos 2 dias o eixo é desenhado, mesmo sem nenhum valor.
+        if (pontos.size >= 2) {
+            GraficoLinha(
+                pontos = pontos,
+                periodo = periodo,
+                temValor = temValor
+            )
+        }
 
-            chart = rememberCartesianChart(
+        if (!temValor) {
+            Text(
+                text = "Sem dados para exibir ainda.\nFaça um aporte para ver a evolução da carteira.",
+                color = CorTextoGrafico,
+                fontSize = 13.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
+        }
+    }
+}
 
-                rememberLineCartesianLayer(
-                    lineProvider =
-                        LineCartesianLayer.LineProvider.series(
-                            linha
-                        )
-                ),
+@Composable
+private fun GraficoLinha(
+    pontos: List<PontoGrafico>,
+    periodo: String,
+    temValor: Boolean
+) {
+    val textMeasurer = rememberTextMeasurer()
 
-                startAxis = VerticalAxis.rememberStart(
-                    label = textoEixo,
-                    guideline = linhaGrade,
-                    valueFormatter = formatadorY
-                ),
-
-                bottomAxis = HorizontalAxis.rememberBottom(
-
-                    label = textoEixo,
-                    guideline = null,
-                    itemPlacer =
-                        HorizontalAxis.ItemPlacer.aligned(
-                            spacing = {
-                                serie.passoEixo
-                            }
-                        ),
-
-                    valueFormatter =
-                        CartesianValueFormatter {
-                                _,
-                                value,
-                                _ ->
-
-                            serie.rotulos.getOrNull(
-                                value.toInt()
-                            ) ?: ""
-                        }
-                )
-            ),
-
-            modelProducer = modelProducer,
-
-            modifier = Modifier.fillMaxSize(),
-
-            animateIn = true
+    val estiloRotulo = remember {
+        TextStyle(
+            color = CorTextoGrafico,
+            fontSize = 10.sp
         )
+    }
+
+    val rotulos = remember(pontos, periodo) {
+        rotulosDoEixo(pontos, periodo)
+    }
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+
+        val margemX = 6.dp.toPx()
+        val margemTopo = 8.dp.toPx()
+        val alturaRotulos = 24.dp.toPx()
+
+        val baseY = size.height - alturaRotulos
+        val alturaUtil = baseY - margemTopo
+
+        // A escala sempre começa no zero: sem valor, a linha fica embaixo.
+        val maximo = pontos.maxOf { it.valor }
+
+        val passoX = (size.width - 2 * margemX) / (pontos.size - 1)
+
+        val xs = pontos.indices.map { margemX + it * passoX }
+
+        val ys = pontos.map { ponto ->
+            val fracao = if (maximo > 0.0) {
+                (ponto.valor / maximo).toFloat().coerceIn(0f, 1f)
+            } else {
+                0f
+            }
+
+            margemTopo + alturaUtil * (1f - fracao)
+        }
+
+        // Linha suave + área de baixo da linha.
+        val linha = Path()
+        val area = Path()
+
+        linha.moveTo(xs[0], ys[0])
+        area.moveTo(xs[0], baseY)
+        area.lineTo(xs[0], ys[0])
+
+        for (i in 1 until pontos.size) {
+            val meioX = (xs[i - 1] + xs[i]) / 2f
+
+            linha.cubicTo(meioX, ys[i - 1], meioX, ys[i], xs[i], ys[i])
+            area.cubicTo(meioX, ys[i - 1], meioX, ys[i], xs[i], ys[i])
+        }
+
+        area.lineTo(xs.last(), baseY)
+        area.close()
+
+        if (temValor) {
+            drawPath(
+                path = area,
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        CorLinhaGrafico.copy(alpha = 0.30f),
+                        Color.Transparent
+                    ),
+                    startY = margemTopo,
+                    endY = baseY
+                )
+            )
+        }
+
+        drawLine(
+            color = Color.White.copy(alpha = 0.08f),
+            start = Offset(0f, baseY),
+            end = Offset(size.width, baseY),
+            strokeWidth = 1.dp.toPx()
+        )
+
+        drawPath(
+            path = linha,
+            color = CorLinhaGrafico,
+            style = Stroke(
+                width = 3.dp.toPx(),
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round
+            )
+        )
+
+        // Bolinha no valor mais recente.
+        if (temValor) {
+            drawCircle(
+                color = CorLinhaGrafico,
+                radius = 4.dp.toPx(),
+                center = Offset(xs.last(), ys.last())
+            )
+        }
+
+        rotulos.forEach { (indice, texto) ->
+            val medida = textMeasurer.measure(texto, estiloRotulo)
+
+            val x = xs[indice]
+                .coerceIn(0f, size.width - medida.size.width)
+
+            drawText(
+                textLayoutResult = medida,
+                topLeft = Offset(x, baseY + 8.dp.toPx())
+            )
+        }
+
+        // 1M: legenda centralizada no lugar dos rótulos (evita o espaço vazio).
+        if (periodo.equals("1M", ignoreCase = true)) {
+            val legenda = textMeasurer.measure("Últimos 31 dias", estiloRotulo)
+
+            drawText(
+                textLayoutResult = legenda,
+                topLeft = Offset(
+                    (size.width - legenda.size.width) / 2f,
+                    baseY + 8.dp.toPx()
+                )
+            )
+        }
     }
 }
 
