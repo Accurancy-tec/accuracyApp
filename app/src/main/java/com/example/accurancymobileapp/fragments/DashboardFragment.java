@@ -41,6 +41,7 @@ public class DashboardFragment extends Fragment {
     private TextView btn1M,btn6M,btn1A;
     private RecyclerView recyclerInvestimentos;
     private Spinner spFiltroDestaques;
+    private TextView tvDestaquesVazio;
 
     public DashboardFragment() {
         super(R.layout.fragment_dashboard);
@@ -62,6 +63,7 @@ public class DashboardFragment extends Fragment {
         btn1M = view.findViewById(R.id.btn1M);
         btn6M = view.findViewById(R.id.btn6M);
         btn1A = view.findViewById(R.id.btn1A);
+        tvDestaquesVazio = view.findViewById(R.id.tvDestaquesVazio);
         spFiltroDestaques = view.findViewById(R.id.spFiltroDestaques);
 
         ctvChart.setVisibility(View.GONE);
@@ -118,6 +120,16 @@ public class DashboardFragment extends Fragment {
                 }
 
                 recyclerInvestimentos.setAdapter(new EmphasisAdapter(aportes));
+
+                if (aportes.isEmpty()) {
+                    tvDestaquesVazio.setText(
+                            type.equals("Maiores perdas") ? "Sem perdas hoje."
+                                    : type.equals("Mais lucrativos") ? "Sem ganhos hoje."
+                                    : "Faça seu primeiro aporte para ver seus ativos aqui.");
+                    tvDestaquesVazio.setVisibility(View.VISIBLE);
+                } else {
+                    tvDestaquesVazio.setVisibility(View.GONE);
+                }
             }
 
             @Override
