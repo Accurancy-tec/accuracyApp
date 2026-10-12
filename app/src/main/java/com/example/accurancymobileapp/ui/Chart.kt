@@ -612,10 +612,16 @@ fun HistoricoChart(
     )
 
     val formatadorMeses = remember(meses) {
-        com.patrykandpatrick.vico.compose.cartesian.data
-            .CartesianValueFormatter { _, valor, _ ->
-                meses.getOrElse(valor.toInt()) { "" }
+        CartesianValueFormatter { _, valor, _ ->
+            if (meses.isEmpty()) {
+                valor.toInt().toString()
+            } else {
+                val indice = valor.toInt()
+                    .coerceIn(meses.indices)
+
+                meses[indice]
             }
+        }
     }
 
     val linha = LineCartesianLayer.rememberLine(
