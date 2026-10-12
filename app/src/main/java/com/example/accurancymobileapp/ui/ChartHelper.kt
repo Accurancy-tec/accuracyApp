@@ -6,16 +6,19 @@ import androidx.compose.ui.platform.ComposeView
 object ChartHelper {
 
     @JvmStatic
+    @JvmOverloads
     fun configurarGraficoEvolucao(
         composeView: ComposeView,
         datas: List<String>,
-        valores: List<Double>
+        valores: List<Double>,
+        periodo: String = "6M"
     ) {
         composeView.setContent {
             MaterialTheme {
                 EvolucaoCarteiraChart(
                     datas = datas,
-                    valores = valores
+                    valores = valores,
+                    periodo = periodo
                 )
             }
         }
