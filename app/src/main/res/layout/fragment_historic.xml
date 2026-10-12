@@ -68,7 +68,7 @@
                         android:layout_height="wrap_content"
                         android:text="TOTAL APORTADO"
                         android:textColor="@color/text_primary"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -77,7 +77,7 @@
                         android:layout_marginTop="5dp"
                         android:text="R$41.200"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -109,7 +109,7 @@
                         android:layout_height="wrap_content"
                         android:text="GANHO LÍQUIDO"
                         android:textColor="@color/text_primary"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -118,7 +118,7 @@
                         android:layout_marginTop="5dp"
                         android:text="R$3.420"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -162,7 +162,7 @@
                         android:layout_height="wrap_content"
                         android:text="GANHO REALIZADO"
                         android:textColor="@color/text_primary"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -171,7 +171,7 @@
                         android:layout_marginTop="5dp"
                         android:text="R$3.840"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -204,7 +204,7 @@
                         android:layout_height="wrap_content"
                         android:text="PERDA REALIZADA"
                         android:textColor="@color/text_primary"
-                        android:textSize="11sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -213,7 +213,7 @@
                         android:layout_marginTop="5dp"
                         android:text="R$420"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -290,7 +290,8 @@
                 <View
                     android:layout_width="7dp"
                     android:layout_height="7dp"
-                    android:background="#2F6FEB" />
+                    android:background="#2F6FEB"
+                    android:layout_gravity="center_vertical"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -298,13 +299,14 @@
                     android:layout_marginStart="4dp"
                     android:text="Ganhos"
                     android:textColor="@color/text_secondary"
-                    android:textSize="9sp" />
+                    android:textSize="11sp" />
 
                 <View
                     android:layout_width="7dp"
                     android:layout_height="7dp"
                     android:layout_marginStart="14dp"
-                    android:background="#FF7278" />
+                    android:background="#FF7278"
+                    android:layout_gravity="center_vertical"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -312,16 +314,31 @@
                     android:layout_marginStart="4dp"
                     android:text="Perdas"
                     android:textColor="@color/text_secondary"
-                    android:textSize="9sp" />
+                    android:textSize="11sp" />
 
             </LinearLayout>
 
 
-            <!-- Lugarzinho pro grafico ;)-->
-            <FrameLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:layout_marginTop="5dp" />
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:layout_weight="1"
+
+                app:cardBackgroundColor="#111A2B"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="#1E2A3F"
+                app:strokeWidth="1dp">
+
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/graficoHistorico"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_margin="15dp"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
 
 
             <!-- lugar onde vai ficar o RecyclerView -->
@@ -348,7 +365,7 @@
                     android:gravity="center"
                     android:text="Todos"
                     android:textColor="@color/text_primary"
-                    android:textSize="10sp" />
+                    android:textSize="11sp" />
 
                 <TextView
                     android:id="@+id/btnCompra"
@@ -357,7 +374,7 @@
                     android:gravity="center"
                     android:text="Compra"
                     android:textColor="@color/text_primary"
-                    android:textSize="10sp" />
+                    android:textSize="11sp" />
 
                 <TextView
                     android:id="@+id/btnVenda"
@@ -366,7 +383,7 @@
                     android:gravity="center"
                     android:text="Venda"
                     android:textColor="@color/text_primary"
-                    android:textSize="10sp" />
+                    android:textSize="11sp" />
 
             </LinearLayout>
 
@@ -377,6 +394,7 @@
                 android:layout_height="287dp"
                 android:nestedScrollingEnabled="true"
                 android:paddingHorizontal="16dp"
+                android:layout_marginTop="10dp"
                 tools:itemCount="8"
                 tools:listitem="@layout/item_investiment" />
 

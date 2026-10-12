@@ -12,6 +12,7 @@ import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Wallet;
 
 import java.util.List;
+import java.util.Locale;
 
 public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.WalletViewHolder> {
 
@@ -36,6 +37,16 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
     public void onBindViewHolder(@NonNull WalletViewHolder holder, int position) {
 
         Wallet wallet = listaWallets.get(position);
+
+        String nomeCarteira = wallet.getNome_carteira();
+
+        if (nomeCarteira != null && !nomeCarteira.isEmpty()) {
+            holder.tvIconCarteira.setText(
+                    nomeCarteira.substring(0, 1).toUpperCase(Locale.ROOT)
+            );
+        } else {
+            holder.tvIconCarteira.setText("?");
+        }
 
         holder.txtNomeWallet.setText(wallet.getNome_carteira());
         holder.txtTipoWallet.setText(wallet.getTipo_carteira());
@@ -68,10 +79,12 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
 
         TextView txtNomeWallet;
         TextView txtTipoWallet;
+        TextView tvIconCarteira;
 
         public WalletViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            tvIconCarteira = itemView.findViewById(R.id.tvIconeCarteira);
             txtNomeWallet = itemView.findViewById(R.id.txtNomeWallet);
             txtTipoWallet = itemView.findViewById(R.id.txtTipoWallet);
         }
