@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.accurancymobileapp.R;
@@ -33,6 +34,7 @@ public class WalletFragment extends Fragment {
 
     private RecyclerView recyclerInvestimentos;
     private ComposeView carteiraChart;
+    private TextView txtCarteiraVazia;
 
     public WalletFragment() {
         super(R.layout.fragment_wallet);
@@ -44,6 +46,7 @@ public class WalletFragment extends Fragment {
 
         recyclerInvestimentos = view.findViewById(R.id.recyclerInvestimentos);
         carteiraChart = view.findViewById(R.id.carteiraChart);
+        txtCarteiraVazia = view.findViewById(R.id.txtCarteiraVazia);
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
@@ -120,6 +123,11 @@ public class WalletFragment extends Fragment {
                 if (!isAdded()) {
                     return;
                 }
+                if(aportes == null){
+                    aportes = new ArrayList<>();
+                }
+
+                atualizarEstadoLista(aportes.size());
 
                 recyclerInvestimentos.setAdapter(new AporteAdapter(aportes));
             }
@@ -139,5 +147,15 @@ public class WalletFragment extends Fragment {
                 ).show();
             }
         });
+    }
+
+    private void atualizarEstadoLista(int quantidadeAportes){
+        if (quantidadeAportes == 0) {
+            recyclerInvestimentos.setVisibility(View.GONE);
+            txtCarteiraVazia.setVisibility(View.VISIBLE);
+        } else {
+            recyclerInvestimentos.setVisibility(View.VISIBLE);
+            txtCarteiraVazia.setVisibility(View.GONE);
+        }
     }
 }
