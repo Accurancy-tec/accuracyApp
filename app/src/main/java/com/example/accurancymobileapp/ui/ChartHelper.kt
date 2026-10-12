@@ -36,4 +36,22 @@ object ChartHelper {
             }
         }
     }
+
+    @JvmStatic
+    fun configurarGraficoHistorico(
+        ComposeView: ComposeView,
+        meses: List<String>,
+        compras: List<Double>,
+        vendas: List<Double>
+    ){
+        ComposeView.setContent {
+            MaterialTheme {
+                HistoricoChart(
+                    meses = meses,
+                    compras = compras,
+                    vendas = vendas
+                )
+            }
+        }
+    }
 }

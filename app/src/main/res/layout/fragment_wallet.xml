@@ -189,7 +189,6 @@
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
-
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -200,6 +199,18 @@
                 android:paddingHorizontal="16dp"
                 tools:itemCount="8"
                 tools:listitem="@layout/item_investiment" />
+
+            <TextView
+                android:id="@+id/txtCarteiraVazia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="24dp"
+                android:text="Esta carteira ainda não possui aportes.\nFaça seu primeiro aporte para começar!"
+                android:textColor="#9BAFC8"
+                android:textSize="16sp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/txtTituloGrafico"
