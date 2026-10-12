@@ -252,28 +252,32 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="6M"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="10sp" />
-
-                <TextView
+                    android:id="@+id/btnSemana"
                     android:layout_width="28dp"
                     android:layout_height="22dp"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
-                    android:text="1A"
+                    android:text="1S"
                     android:textColor="@color/text_primary"
                     android:textSize="10sp" />
 
                 <TextView
+                    android:id="@+id/btnMes"
+                    android:layout_width="28dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="8dp"
+                    android:gravity="center"
+                    android:text="1M"
+                    android:textColor="@color/text_primary"
+                    android:textSize="10sp" />
+
+                <TextView
+                    android:id="@+id/btnAno"
                     android:layout_width="28dp"
                     android:layout_height="22dp"
                     android:gravity="center"
-                    android:text="2A"
-                    android:textColor="@color/text_secondary"
+                    android:text="1A"
+                    android:textColor="@color/text_primary"
                     android:textSize="10sp" />
 
             </LinearLayout>
