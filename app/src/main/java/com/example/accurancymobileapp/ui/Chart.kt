@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.ui
 
+import android.R
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -35,7 +37,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLineComponent
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.compose.cartesian.data.columnModel
+import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
+import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.compose.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.common.Fill
+import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.pie.PieChart
 import com.patrykandpatrick.vico.compose.pie.PieChartHost
 import com.patrykandpatrick.vico.compose.pie.PieSize
@@ -487,4 +508,125 @@ fun DistribuicaoCarteiraChart(
             }
         }
     }
+}
+
+@Composable
+fun HistoricoChart(
+    meses: List<String>,
+    compras: List<Double>,
+    vendas: List<Double>
+) {
+    val azul = Color(0xFF2962FF)
+    val vermelho = Color(0xFFFF646D)
+
+    val modelProducer = remember {
+        CartesianChartModelProducer()
+    }
+
+    LaunchedEffect(meses, compras, vendas) {
+        modelProducer.runTransaction {
+            columnModel {
+                series(compras)
+                series(vendas)
+            }
+        }
+    }
+
+    val corLinha = Color(0xFF2563EB)
+    val corFundo = Color(0xFF06101E)
+    val corTexto = Color(0xFF6F829D)
+    val corGrade = Color.White.copy(alpha = 0.07f)
+
+    val barraAzul = rememberLineComponent(
+        fill = Fill(azul),
+        thickness = 12.dp
+    )
+
+    val barraVermelha = rememberLineComponent(
+        fill = Fill(vermelho),
+        thickness = 12.dp
+    )
+
+    val formatadorMeses = remember(meses) {
+        CartesianValueFormatter { _, valor, _ ->
+            if (meses.isEmpty()) {
+                valor.toInt().toString()
+            } else {
+                val indice = valor.toInt()
+                    .coerceIn(meses.indices)
+
+                meses[indice]
+            }
+        }
+    }
+
+    val linha = LineCartesianLayer.rememberLine(
+
+        fill = LineCartesianLayer.LineFill.single(
+            Fill(corLinha)
+        ),
+
+        stroke = LineCartesianLayer.LineStroke.Continuous(
+            3.dp
+        ),
+
+        areaFill = LineCartesianLayer.AreaFill.single(
+            Fill(
+                Brush.verticalGradient(
+                    listOf(
+                        corLinha.copy(alpha = 0.30f),
+                        Color.Transparent
+                    )
+                )
+            )
+        ),
+
+        interpolator =
+            LineCartesianLayer.Interpolator.catmullRom()
+    )
+
+    val linhaGrade = rememberLineComponent(
+        fill = Fill(corGrade)
+    )
+
+    val textoEixo = rememberTextComponent(
+        TextStyle(
+            color = corTexto
+        )
+    )
+
+    CartesianChartHost(
+        chart = rememberCartesianChart(
+            rememberColumnCartesianLayer(
+                columnProvider =
+                    ColumnCartesianLayer.ColumnProvider.series(
+                        barraAzul,
+                        barraVermelha
+                    ),
+                mergeMode = {
+                    ColumnCartesianLayer.MergeMode.Grouped()
+                },
+                columnCollectionSpacing = 8.dp
+            ),
+
+            startAxis = VerticalAxis.rememberStart(
+                label = textoEixo,
+                line = linhaGrade,
+                guideline = linhaGrade,
+                tick = null
+            ),
+
+            bottomAxis = HorizontalAxis.rememberBottom(
+                label = textoEixo,
+                line = linhaGrade,
+                valueFormatter = formatadorMeses,
+                guideline = null,
+                tick = null
+            )
+        ),
+        modelProducer = modelProducer,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(220.dp)
+    )
 }
