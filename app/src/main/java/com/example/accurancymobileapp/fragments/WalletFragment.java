@@ -33,7 +33,6 @@ import retrofit2.Response;
 public class WalletFragment extends Fragment {
 
     private RecyclerView recyclerInvestimentos;
-    private ComposeView carteiraChart;
     private TextView txtCarteiraVazia;
 
     public WalletFragment() {
@@ -45,16 +44,15 @@ public class WalletFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         recyclerInvestimentos = view.findViewById(R.id.recyclerInvestimentos);
-        carteiraChart = view.findViewById(R.id.carteiraChart);
+
         txtCarteiraVazia = view.findViewById(R.id.txtCarteiraVazia);
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         carregarInvestimentos();
-        carregarGraficoDistribuicao();
     }
 
-    private void carregarGraficoDistribuicao() {
+    /*private void carregarGraficoDistribuicao() {
         VicoService vico = RetrofitClient.getClient(requireContext()).create(VicoService.class);
 
         vico.getDistribuicao(null).enqueue(new Callback<VicoResponse>() {
@@ -105,7 +103,7 @@ public class WalletFragment extends Fragment {
                 Log.e("GRAFICO_CARTEIRA", "Erro ao carregar distribuição", t);
             }
         });
-    }
+    }*/
 
     private void carregarInvestimentos() {
         AporteRepository aporteRepository = new AporteRepository(requireContext());

@@ -328,8 +328,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:layout_weight="1"
-
-                app:cardBackgroundColor="#111A2B"
+                app:cardBackgroundColor="#0D1D30"
                 app:cardCornerRadius="16dp"
                 app:strokeColor="#1E2A3F"
                 app:strokeWidth="1dp">
