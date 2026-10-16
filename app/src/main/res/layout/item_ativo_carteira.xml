@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/bg_carteira_card"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <!-- Identificação do ativo -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txtIconAtivo"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_item_icon"
+            android:gravity="center"
+            android:text="P4"
+            android:textColor="#42D8B0"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="11dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTickerAtivo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PETR4"
+                android:textColor="#F1F5FC"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtNomeAtivo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ações · Petrobras"
+                android:textColor="#9BAAC0"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtValorAtivo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="R$ 56,07"
+            android:textColor="#F1F5FC"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="12dp"
+        android:background="#24344A" />
+
+    <!-- Quantidade -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Quantidade"
+            android:textColor="#9BAAC0"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvQuantidadeAtivo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textColor="#F1F5FC"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Preço atual -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Preço atual"
+            android:textColor="#9BAAC0"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvVariacaoPreco"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_tag_positivo"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="▲ 0,00%"
+            android:textColor="#35D7B0"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvPrecoAtual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="R$ 56,07"
+            android:textColor="#F1F5FC"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Rentabilidade -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rentabilidade"
+            android:textColor="#9BAAC0"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvVariacaoRentabilidade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_tag_negativo"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="▼ 0,08%"
+            android:textColor="#FF626B"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvRentabilidadeAtivo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="R$ -0,04"
+            android:textColor="#F1F5FC"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Botões de ação -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnVenderAtivo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_vender"
+            android:gravity="center"
+            android:text="Vender"
+            android:textColor="#FF626B"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnComprarAtivo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="9dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_comprar"
+            android:gravity="center"
+            android:text="Comprar"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>
