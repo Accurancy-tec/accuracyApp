@@ -1,523 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fillViewport="true"
-    tools:context=".activities.MainPageActivity"
-    android:background="@color/bg_deep">
+    android:background="#081426">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent">
 
-        <!-- Toolbar -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                app:cardBackgroundColor="#111A2B"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#1E2A3F"
-                app:strokeWidth="1dp">
-
-                <ImageView
-                    android:id="@+id/btnVoltar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_arrow_back"
-                    app:tint="#FFFFFF" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="Aportes"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Resumo -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="#111A2B"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#1E2A3F"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="APORTADO ESTE MÊS"
-                        android:textColor="#8A94A6"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:id="@+id/txtAportadoMes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="R$2.300"
-                        android:textColor="#FFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="#1422C55E"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="2dp"
-                        android:text="▲ +15%"
-                        android:textColor="#22C55E"
-                        android:textSize="11sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="#111A2B"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#1E2A3F"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="MÉDIA MENSAL"
-                        android:textColor="#8A94A6"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:id="@+id/txtMediaMensal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="R$1.960"
-                        android:textColor="#FFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="#1A3B82F6"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="2dp"
-                        android:text="6 meses"
-                        android:textColor="#60A5FA"
-                        android:textSize="11sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-
-        <!-- Novo aporte -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="#0F1829"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:strokeColor="#1E2A3F"
-            app:strokeWidth="1dp">
+        <ScrollView
+            android:id="@+id/scrollProdutos"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:paddingStart="17dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="17dp"
+                android:paddingBottom="20dp">
 
+                <!-- Título -->
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Novo aporte"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
+                    android:text="Produtos"
+                    android:textColor="#F1F5FC"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    style="@style/AporteLabel"
-                    android:layout_marginTop="12dp"
-                    android:text="CARTEIRA" />
-
-                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardBackgroundColor="#111A2B"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="#1E2A3F"
-                    app:strokeWidth="1dp">
+                    android:text="Prateleira completa de investimentos"
+                    android:textColor="#9BAAC0"
+                    android:textSize="12sp" />
 
-                    <Spinner
-                        android:id="@+id/spnCarteiras"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@null"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="40dp"
-                        android:popupBackground="#111A2B"
-                        android:spinnerMode="dropdown" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginEnd="14dp"
-                        android:src="@drawable/ic_expand_more"
-                        app:tint="#8A94A6" />
-                </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    style="@style/AporteLabel"
-                    android:text="ATIVO" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="#111A2B"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="#1E2A3F"
-                    app:strokeWidth="1dp">
-
-                    <Spinner
-                        android:id="@+id/spnAtivo"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@null"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="40dp"
-                        android:popupBackground="#111A2B"
-                        android:spinnerMode="dropdown" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginEnd="14dp"
-                        android:src="@drawable/ic_expand_more"
-                        app:tint="#8A94A6" />
-                </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    style="@style/AporteLabel"
-                    android:text="Categoria" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="#111A2B"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="#1E2A3F"
-                    app:strokeWidth="1dp">
-
-                    <Spinner
-                        android:id="@+id/spnCategoria"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@null"
-                        android:paddingStart="6dp"
-                        android:paddingEnd="40dp"
-                        android:popupBackground="#111A2B"
-                        android:spinnerMode="dropdown" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginEnd="14dp"
-                        android:src="@drawable/ic_expand_more"
-                        app:tint="#8A94A6" />
-                </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    style="@style/AporteLabel"
-                    android:text="VALOR" />
-
+                <!-- Primeira linha -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:layout_marginTop="12dp"
                     android:orientation="horizontal">
+
+                    <!-- Renda fixa -->
+                    <LinearLayout
+                        android:id="@+id/cardRendaFixa"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/bg_carteira_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="13dp">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icone_renda_fixa"
+                            android:gravity="center"
+                            android:text="CDB"
+                            android:textColor="#31D9C0"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="Renda Fixa"
+                            android:textColor="#F1F5FC"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="CDB, LCI e LCA"
+                            android:textColor="#9BAAC0"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                    <!-- Tesouro direto -->
+                    <LinearLayout
+                        android:id="@+id/cardTesouroDireto"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/bg_carteira_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="13dp">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icone_tesouro"
+                            android:gravity="center"
+                            android:text="TD"
+                            android:textColor="#57A6FF"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="Tesouro Direto"
+                            android:textColor="#F1F5FC"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Títulos públicos nacionais"
+                            android:textColor="#9BAAC0"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Segunda linha -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <!-- Bolsa de valores -->
+                    <LinearLayout
+                        android:id="@+id/cardBolsaValores"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/bg_carteira_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="13dp">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icone_renda_variavel"
+                            android:gravity="center"
+                            android:text="B3"
+                            android:textColor="#31D9A5"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="Bolsa de Valores"
+                            android:textColor="#F1F5FC"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Ações, FIIs e BDRs"
+                            android:textColor="#9BAAC0"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Renda variável -->
+                <LinearLayout
+                    android:id="@+id/cardRendaVariavel"
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_carteira_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="R$"
-                        android:textColor="#8A94A6"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-
-                    <EditText
-                        android:id="@+id/txtPreco"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@null"
-                        android:digits="0123456789,."
-                        android:ems="6"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_icone_renda_variavel"
                         android:gravity="center"
-                        android:hint="0,00"
-                        android:importantForAutofill="no"
-                        android:inputType="numberDecimal"
-                        android:maxLength="12"
-                        android:text="500,00"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#5B6577"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <!-- Valores rápidos: linha 1 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnValor100"
-                        style="@style/AporteChip"
-                        android:text="R$100" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnValor250"
-                        style="@style/AporteChip"
-                        android:text="R$250" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnValor500"
-                        style="@style/AporteChip.Selected"
-                        android:text="R$500" />
-                </LinearLayout>
-
-                <!-- Valores rápidos: linha 2 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnValor750"
-                        style="@style/AporteChip"
-                        android:text="R$750" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnValor1k"
-                        style="@style/AporteChip"
-                        android:text="R$1k" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnValorOutro"
-                        style="@style/AporteChip"
-                        android:text="Outro" />
-                </LinearLayout>
-
-                <!-- Tipo / Recorrência -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                        android:text="⌁"
+                        android:textColor="#57A6FF"
+                        android:textSize="24sp" />
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
+                        android:layout_marginStart="11dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
                         <TextView
-                            style="@style/AporteLabel"
-                            android:text="TIPO" />
-
-                        <com.google.android.material.card.MaterialCardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:cardBackgroundColor="#111A2B"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="0dp"
-                            app:strokeColor="#1E2A3F"
-                            app:strokeWidth="1dp">
-
-                            <Spinner
-                                android:id="@+id/spnTipo"
-                                android:layout_width="match_parent"
-                                android:layout_height="48dp"
-                                android:background="@null"
-                                android:paddingStart="6dp"
-                                android:paddingEnd="40dp"
-                                android:popupBackground="#111A2B"
-                                android:spinnerMode="dropdown" />
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="end|center_vertical"
-                                android:layout_marginEnd="14dp"
-                                android:src="@drawable/ic_expand_more"
-                                app:tint="#8A94A6" />
-                        </com.google.android.material.card.MaterialCardView>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                            android:text="Renda variável"
+                            android:textColor="#F1F5FC"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
 
                         <TextView
-                            style="@style/AporteLabel"
-                            android:text="RECORRÊNCIA" />
-
-                        <com.google.android.material.card.MaterialCardView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:cardBackgroundColor="#111A2B"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="0dp"
-                            app:strokeColor="#1E2A3F"
-                            app:strokeWidth="1dp">
+                            android:layout_marginTop="2dp"
+                            android:text="Monitore e negocie ativos em tempo real"
+                            android:textColor="#9BAAC0"
+                            android:textSize="11sp" />
 
-                            <Spinner
-                                android:id="@+id/spnRecorrencia"
-                                android:layout_width="match_parent"
-                                android:layout_height="48dp"
-                                android:background="@null"
-                                android:paddingStart="6dp"
-                                android:paddingEnd="40dp"
-                                android:popupBackground="#111A2B"
-                                android:spinnerMode="dropdown" />
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="end|center_vertical"
-                                android:layout_marginEnd="14dp"
-                                android:src="@drawable/ic_expand_more"
-                                app:tint="#8A94A6" />
-                        </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_arrow_back"
+                        app:tint="#9BAAC0" />
+
                 </LinearLayout>
 
-                <TextView
-                    style="@style/AporteLabel"
-                    android:text="Quantidade" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="#111A2B"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="#1E2A3F"
-                    app:strokeWidth="1dp">
-
-                    <EditText
-                        android:id="@+id/txtQuantidade"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:inputType="text"
-                        android:padding="14dp"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#5B6577"
-                        android:textSize="14sp" />
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnEnviar"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginTop="16dp"
-                    android:text="Confirmar aporte"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    app:backgroundTint="#2563EB"
-                    app:cornerRadius="12dp" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Recorrentes ativos -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
+        </ScrollView>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Recorrentes ativos"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/txtQtdAtivos"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="4 ativos"
-                android:textColor="#8A94A6"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvRecorrentes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:nestedScrollingEnabled="false"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="4"
-            tools:listitem="@layout/item_investiment" />
-    </LinearLayout>
-
-</ScrollView>
+</FrameLayout>
