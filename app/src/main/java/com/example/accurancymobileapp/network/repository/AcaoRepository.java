@@ -1,13 +1,11 @@
+
 package com.example.accurancymobileapp.network.repository;
 
 import android.content.Context;
 
-import com.example.accurancymobileapp.model.Acao;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.AcaoResponse;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -16,47 +14,71 @@ import retrofit2.Retrofit;
 
 public class AcaoRepository {
 
-    private ApiService apiService;
+    private final ApiService apiService;
 
-    public AcaoRepository(Context context){
+    public AcaoRepository(Context context) {
         Retrofit retrofit = RetrofitClient.getClient(context);
-
         apiService = retrofit.create(ApiService.class);
     }
 
-    public void listarAcoesNacionais(int pagina, int limiteDePaginas, acaoCallback callback){
-        apiService.listarAcoesNacionais(pagina, limiteDePaginas).enqueue(new Callback<AcaoResponse>() {
-            @Override
-            public void onResponse(Call<AcaoResponse> call, Response<AcaoResponse> response) {
-                if(!response.isSuccessful() && response.body() == null){
-                    callback.onError("Erro HTTP: " + response.code());
-                    return;
-                }
+    public void listarAcoesNacionais(
+            int pagina,
+            int limite,
+            acaoCallback callback
+    ) {
+        apiService.listarAcoesNacionais(pagina, limite)
+                .enqueue(new Callback<AcaoResponse>() {
 
-                AcaoResponse resultado = response.body();
+                    @Override
+                    public void onResponse(
+                            Call<AcaoResponse> call,
+                            Response<AcaoResponse> response
+                    ) {
+                        if (!response.isSuccessful()) {
+                            callback.onError(
+                                    "Erro HTTP: " + response.code()
+                            );
+                            return;
+                        }
 
-                if(resultado == null){
-                    callback.onError("Reposta da API vazia");
-                    return;
-                }
+                        AcaoResponse resultado = response.body();
 
-                if(resultado.getAcoes() == null){
-                    callback.onError("Lista de ações vazia");
-                    return;
-                }
+                        if (resultado == null) {
+                            callback.onError("Resposta da API vazia");
+                            return;
+                        }
 
-                callback.onSuccess(resultado.getAcoes());
-            }
+                        if (resultado.getAcoes() == null) {
+                            callback.onError(
+                                    "A lista de ações não foi retornada"
+                            );
+                            return;
+                        }
 
-            @Override
-            public void onFailure(Call<AcaoResponse> call, Throwable t) {
-                callback.onError("Erro de conxão: " + t.getMessage());
-            }
-        });
+                        if (resultado.getPaginacao() == null) {
+                            callback.onError(
+                                    "Os dados de paginação não foram retornados"
+                            );
+                            return;
+                        }
+
+                        callback.onSuccess(resultado);
+                    }
+
+                    @Override
+                    public void onFailure(
+                            Call<AcaoResponse> call,
+                            Throwable t
+                    ) {
+                        callback.onError(
+                                "Erro de conexão: " + t.getMessage()
+                        );
+                    }
+                });
     }
 
-    public interface acaoCallback{
-        void onSuccess(List<Acao> acoes);
+    public interface acaoCallback {
+        void onSuccess(AcaoResponse resultado);
         void onError(String message);
     }
 }

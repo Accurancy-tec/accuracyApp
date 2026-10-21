@@ -6,55 +6,43 @@ public class Acao {
     @SerializedName("stock")
     private String stock;
 
-    @SerializedName("symbol")
-    private String symbol;
-
-    @SerializedName("shortName")
-    private String shortName;
+    @SerializedName("name")
+    private String name;
 
     @SerializedName("close")
     private Double close;
 
-    @SerializedName("regularMarketPrice")
-    private Double regularMarketPrice;
-    @SerializedName("regularMarketChangePercent")
-    private Double regularMarketChangePercent;
+    @SerializedName("change")
+    private Double change;
 
-    @SerializedName("regularMarketVolume")
-    private Long regularMarketVolume;
+    @SerializedName("volume")
+    private Long volume;
 
-    @SerializedName("logourl")
-    private String logourl;
+    @SerializedName("logo")
+    private String logo;
 
     public String getStock() {
         return stock;
     }
 
-    public String getSymbol(){
-        return symbol;
+    public String getName() {
+        return name;
     }
 
-    public String getShortName() {
-        return shortName;
+    public Double getChange(){
+        return change;
     }
 
     public Double getClose() {
         return close;
     }
 
-    public Double getRegularMarketChangePercent() {
-        return regularMarketChangePercent;
+    public Long getVolume() {
+        return volume;
     }
 
-    public Long getRegularMarketVolume() {
-        return regularMarketVolume;
+    public String getLogo(){
+        return logo;
     }
 
-    public String getLogourl(){
-        return logourl;
-    }
-
-    public Double getRegularMarketPrice(){
-        return regularMarketPrice;
-    }
 }

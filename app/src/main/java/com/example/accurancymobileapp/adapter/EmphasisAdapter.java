@@ -36,7 +36,7 @@ public class EmphasisAdapter
             int viewType) {
 
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_investiment, parent, false);
+                .inflate(R.layout.item_ativo_destaque, parent, false);
 
         return new ViewHolder(view);
     }
