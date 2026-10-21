@@ -74,7 +74,7 @@ public class AportesFragment extends Fragment {
             startActivity(it);
         });
 
-        cardBolsaDeValores.setOnClickListener(v -> {
+        cardRendaFixa.setOnClickListener(v -> {
             Intent it = new Intent(requireContext(), OpcoesRendaFixaActivity.class);
             startActivity(it);
         });

@@ -10,18 +10,20 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.model.Acao;
 import com.example.accurancymobileapp.model.QuoteData;
 
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
-public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
-    private List<QuoteData> quoteData;
+public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
+
+    private List<Acao> acao;
     NumberFormat formato = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
-    public QuoteAdapter(List<QuoteData> quoteData){
-        this.quoteData = quoteData;
+    public AcoesAdapter(List<Acao> acao){
+        this.acao = acao;
     }
 
     @NonNull
@@ -40,16 +42,14 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
             @NonNull ViewHolder holder,
             int position) {
 
-        QuoteData quoteData = this.quoteData.get(position);
+        Acao acao = this.acao.get(position);
 
-        holder.txtIconAtivo.setText(quoteData.getSymbol());
-        holder.txtNomeAtivo.setText(quoteData.getShortName());
-        holder.txtSubtituloAtivo.setText(
-                String.valueOf(quoteData.getRegularMarketVolume())
-        );
-        holder.txtVariacaoAtivo.setText(quoteData.getRegularMarketChangePercent() + "%");
+        holder.txtIconAtivo.setText(acao.getLogourl());
+        holder.txtNomeAtivo.setText(acao.getSymbol());
+        holder.txtSubtituloAtivo.setText(acao.getShortName());
+        holder.txtVariacaoAtivo.setText(acao.getRegularMarketChangePercent() + "%");
 
-        if(quoteData.getRegularMarketChangePercent() > 0){
+        if(acao.getRegularMarketChangePercent() > 0){
             holder.txtVariacaoAtivo.setTextColor(
                     ContextCompat.getColor(holder.itemView.getContext(),R.color.green_positive));
         }
@@ -58,12 +58,12 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
                     ContextCompat.getColor(holder.itemView.getContext(), R.color.red_negative)
             );
         }
-        holder.txtValorAtivo.setText(formato.format(quoteData.getRegularMarketPrice()));
+        holder.txtValorAtivo.setText(formato.format(acao.getRegularMarketPrice()));
     }
 
     @Override
     public int getItemCount(){
-        return quoteData == null ? 0 : quoteData.size();
+        return acao == null ? 0 : acao.size();
     }
     class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -82,6 +82,5 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
             txtValorAtivo = itemView.findViewById(R.id.txtValorAtivo);
             txtVariacaoAtivo = itemView.findViewById(R.id.txtVariacaoAtivo);
         }
-
     }
 }

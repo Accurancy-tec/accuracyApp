@@ -1,6 +1,7 @@
 package com.example.accurancymobileapp.network.service;
 
 import com.example.accurancymobileapp.model.Wallet;
+import com.example.accurancymobileapp.response.AcaoResponse;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.AporteResponse;
 //import com.example.accurancymobileapp.response.BuscarWalletsResponse;
@@ -71,4 +72,10 @@ public interface ApiService {
 
     @POST("aportes/listar-aportes")
     Call<ApiResponse> buscarLista(@Query("Choise") String Choise);
+
+    @GET("brapi/listar-acoes-nacionais")
+    Call<AcaoResponse> listarAcoesNacionais(
+            @Query("page") int page,
+            @Query("limit") int limit
+    );
 }
