@@ -1,21 +1,35 @@
 package com.example.accurancymobileapp.adapter;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Picture;
+import android.os.Looper;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.caverock.androidsvg.SVG;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Acao;
 import com.example.accurancymobileapp.model.QuoteData;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Handler;
 
 public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
 
@@ -25,6 +39,14 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
     public AcoesAdapter(List<Acao> acao){
         this.acao = acao;
     }
+
+
+    public void atualizarLista(List<Acao> novasAcoes) {
+        this.acao.clear();
+        this.acao.addAll(novasAcoes);
+        notifyDataSetChanged();
+    }
+
 
     @NonNull
     @Override
@@ -44,12 +66,11 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
 
         Acao acao = this.acao.get(position);
 
-        holder.txtIconAtivo.setText(acao.getLogourl());
-        holder.txtNomeAtivo.setText(acao.getSymbol());
-        holder.txtSubtituloAtivo.setText(acao.getShortName());
-        holder.txtVariacaoAtivo.setText(acao.getRegularMarketChangePercent() + "%");
+        holder.txtNomeAtivo.setText(acao.getStock());
+        holder.txtSubtituloAtivo.setText(acao.getName());
+        holder.txtVariacaoAtivo.setText(acao.getChange() + "%");
 
-        if(acao.getRegularMarketChangePercent() > 0){
+        if(acao.getChange() > 0){
             holder.txtVariacaoAtivo.setTextColor(
                     ContextCompat.getColor(holder.itemView.getContext(),R.color.green_positive));
         }
@@ -58,7 +79,9 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
                     ContextCompat.getColor(holder.itemView.getContext(), R.color.red_negative)
             );
         }
-        holder.txtValorAtivo.setText(formato.format(acao.getRegularMarketPrice()));
+        holder.txtValorAtivo.setText(formato.format(acao.getClose()));
+
+        SvgLogoLoader.carregar(acao.getLogo(), holder.txtIconAtivo);
     }
 
     @Override
@@ -67,7 +90,7 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
     }
     class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView txtIconAtivo;
+        ImageView txtIconAtivo;
         TextView txtNomeAtivo;
         TextView txtSubtituloAtivo;
         TextView txtValorAtivo;
@@ -84,3 +107,4 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
         }
     }
 }
+

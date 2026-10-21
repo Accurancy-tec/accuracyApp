@@ -6,10 +6,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class AcaoResponse {
-    @SerializedName("sucesso")
+    @SerializedName("success")
     private boolean sucesso;
 
-    @SerializedName("acoes")
+    @SerializedName("stocks")
     private List<Acao> acoes;
 
     @SerializedName("paginacao")
