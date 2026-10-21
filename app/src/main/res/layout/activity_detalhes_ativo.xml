@@ -410,7 +410,7 @@
                         android:id="@+id/filtro3M"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background=""
+                        android:background="@color/btn_primary"
                         android:paddingHorizontal="9dp"
                         android:paddingVertical="6dp"
                         android:text="3M"
