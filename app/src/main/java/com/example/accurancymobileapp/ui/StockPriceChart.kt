@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.NumberFormat
@@ -42,11 +43,6 @@ private val TextoGrafico = Color(0xFF91A4BD)
 private val GradeGrafico = Color(0x1FFFFFFF)
 private val MoedaBR = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"))
 
-/**
- * Gráfico de preços do ativo no tema escuro do Accurancy.
- * A animação é refeita quando a série ou o período muda.
- * Values e labels devem ter o mesmo tamanho e estar ordenados por data crescente.
- */
 @Composable
 fun StockPriceChart(
     labels: List<String>,

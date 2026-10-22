@@ -7,65 +7,94 @@ import com.example.accurancymobileapp.model.QuoteResult;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.example.accurancymobileapp.response.StockHistoryResponse;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 public class QuoteRepository {
-    private ApiService apiService;
+    private final ApiService apiService;
 
-    public QuoteRepository(Context context){
+    public QuoteRepository(Context context) {
         apiService = RetrofitClient.getClient(context).create(ApiService.class);
     }
 
-    public void buscarCotacoes(String ticker, QuoteCallback callback){
+    public void buscarCotacoes(String ticker, QuoteCallback callback) {
         apiService.getQuote(ticker).enqueue(new Callback<QuoteResponse>() {
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
-
-                if(!response.isSuccessful()){
-                    callback.onErro("Erro ao buscar a cotação. Código: " + response.code());
+                if (!response.isSuccessful()) {
+                    callback.onErro("Erro ao buscar a cotação. Código HTTP: " + response.code());
                     return;
                 }
-
-                QuoteResponse quoteResponse = response.body();
-
-                if(quoteResponse.getResults() == null){
-                    callback.onErro("A lista de resultado está vazia.");
+                QuoteResponse body = response.body();
+                if (body == null || body.getResults() == null || body.getResults().isEmpty()) {
+                    callback.onErro("A Brapi não retornou dados para " + ticker + ".");
                     return;
                 }
 
                 List<QuoteData> quotes = new ArrayList<>();
-
-                for(QuoteResult result : quoteResponse.getResults()){
-                    if(result != null && result.getData() != null){
-                        quotes.add(result.getData());
-                    }
+                for (QuoteResult result : body.getResults()) {
+                    if (result != null && result.getData() != null) quotes.add(result.getData());
                 }
-
+                if (quotes.isEmpty()) {
+                    callback.onErro("Não há cotação disponível para " + ticker + ".");
+                    return;
+                }
                 callback.onSucesso(quotes);
-
             }
 
             @Override
             public void onFailure(Call<QuoteResponse> call, Throwable t) {
-                String mensagem = t.getMessage();
-
-                if(mensagem == null || mensagem.isEmpty()){
-                    mensagem = "Não foi possível conectar ao servidor.";
-                }
-
-                callback.onErro(mensagem);
+                callback.onErro(mensagemErro(t, "Não foi possível conectar ao servidor."));
             }
         });
     }
 
+    public void buscarHistorico(String ticker, String range, HistoricoCallback callback) {
+        apiService.historicoAcoes(ticker, range).enqueue(new Callback<StockHistoryResponse>() {
+            @Override
+            public void onResponse(Call<StockHistoryResponse> call, Response<StockHistoryResponse> response) {
+                if (!response.isSuccessful()) {
+                    callback.onErro("Erro ao buscar histórico. Código HTTP: " + response.code());
+                    return;
+                }
+                StockHistoryResponse body = response.body();
+                if (body == null || body.getResults() == null || body.getResults().isEmpty()) {
+                    callback.onSucesso(Collections.emptyList());
+                    return;
+                }
+
+                StockHistoryResponse.Result first = body.getResults().get(0);
+                if (first == null || first.getData() == null || first.getData().getHistoricalDataPrice() == null) {
+                    callback.onSucesso(Collections.emptyList());
+                    return;
+                }
+                callback.onSucesso(first.getData().getHistoricalDataPrice());
+            }
+
+            @Override
+            public void onFailure(Call<StockHistoryResponse> call, Throwable t) {
+                callback.onErro(mensagemErro(t, "Não foi possível carregar o histórico de preços."));
+            }
+        });
+    }
+
+    private String mensagemErro(Throwable t, String padrao) {
+        return t.getMessage() == null || t.getMessage().trim().isEmpty() ? padrao : t.getMessage();
+    }
+
     public interface QuoteCallback {
         void onSucesso(List<QuoteData> quotes);
+        void onErro(String mensagem);
+    }
+
+    public interface HistoricoCallback {
+        void onSucesso(List<StockHistoryResponse.Point> pontos);
         void onErro(String mensagem);
     }
 }

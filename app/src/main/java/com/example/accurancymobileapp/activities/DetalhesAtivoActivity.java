@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Detalhes de um ativo. Usa as rotas PHP existentes/nova rota histórica e registra ordens simuladas. */
 public class DetalhesAtivoActivity extends AppCompatActivity {
 
     public static final String EXTRA_TICKER = "ticker";
