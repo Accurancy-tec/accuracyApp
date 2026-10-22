@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.Zoom
 import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
@@ -54,6 +55,8 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesian
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.Fill
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
@@ -560,29 +563,12 @@ fun HistoricoChart(
         }
     }
 
-    val linha = LineCartesianLayer.rememberLine(
+    val scrollState = rememberVicoScrollState(
+        scrollEnabled = meses.size < 12
+    )
 
-        fill = LineCartesianLayer.LineFill.single(
-            Fill(corLinha)
-        ),
-
-        stroke = LineCartesianLayer.LineStroke.Continuous(
-            3.dp
-        ),
-
-        areaFill = LineCartesianLayer.AreaFill.single(
-            Fill(
-                Brush.verticalGradient(
-                    listOf(
-                        corLinha.copy(alpha = 0.30f),
-                        Color.Transparent
-                    )
-                )
-            )
-        ),
-
-        interpolator =
-            LineCartesianLayer.Interpolator.catmullRom()
+    val zoomState = rememberVicoZoomState(
+        initialZoom = Zoom.fixed(1f)
     )
 
     val linhaGrade = rememberLineComponent(
@@ -625,6 +611,7 @@ fun HistoricoChart(
             )
         ),
         modelProducer = modelProducer,
+        zoomState = zoomState,
         modifier = Modifier
             .fillMaxWidth()
             .height(220.dp)
