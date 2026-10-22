@@ -13,56 +13,46 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-
 public class HistoricRepository {
-    private ApiService apiService;
+    private final ApiService apiService;
 
-    public HistoricRepository(Context context){
-        Retrofit retrofit = RetrofitClient.getClient(context);
-
-        apiService = retrofit.create(ApiService.class);
+    public HistoricRepository(Context context) {
+        apiService = RetrofitClient.getClient(context).create(ApiService.class);
     }
 
-    public void buscarHistorico(HistoricCallback callback){
+    public void buscarHistorico(HistoricCallback callback) {
         apiService.buscarHistorico().enqueue(new Callback<AporteResponse>() {
             @Override
             public void onResponse(Call<AporteResponse> call, Response<AporteResponse> response) {
-                if(!response.isSuccessful()){
-
-                    callback.onError("Erro HTTP" + response.code());
-
+                if (!response.isSuccessful()) {
+                    callback.onError("Erro HTTP ao buscar histórico: " + response.code());
                     return;
                 }
-
                 AporteResponse resultado = response.body();
-
-                if(resultado == null){
-                    callback.onError("Resposta da API vazia");
+                if (resultado == null) {
+                    callback.onError("Resposta da API vazia.");
                     return;
                 }
-
-                if(resultado.getAtivos() == null){
-                    callback.onError("Lista de histórico vazia.");
+                if (!resultado.isSucesso()) {
+                    callback.onError("A API não conseguiu buscar o histórico.");
                     return;
                 }
-
+                if (resultado.getAtivos() == null) {
+                    callback.OnSuccess(java.util.Collections.emptyList());
+                    return;
+                }
                 callback.OnSuccess(resultado.getAtivos());
-
             }
 
             @Override
             public void onFailure(Call<AporteResponse> call, Throwable t) {
-                Log.e(
-                        "Teste Historico:",
-                        "Falha" + t.getMessage()
-                );
+                Log.e("HISTORICO_APORTES", "Falha ao buscar histórico", t);
+                callback.onError(t.getMessage() == null ? "Falha de conexão ao buscar histórico." : t.getMessage());
             }
         });
-
     }
 
-    public interface HistoricCallback{
+    public interface HistoricCallback {
         void OnSuccess(List<Aporte> historico);
         void onError(String message);
     }
