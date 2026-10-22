@@ -1,28 +1,52 @@
 package com.example.accurancymobileapp.adapter;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Picture;
+import android.os.Looper;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.caverock.androidsvg.SVG;
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.model.Acao;
 import com.example.accurancymobileapp.model.QuoteData;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Handler;
 
-public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
-    private List<QuoteData> quoteData;
+public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
+
+    private List<Acao> acao;
     NumberFormat formato = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
-    public QuoteAdapter(List<QuoteData> quoteData){
-        this.quoteData = quoteData;
+    public AcoesAdapter(List<Acao> acao){
+        this.acao = acao;
     }
+
+
+    public void atualizarLista(List<Acao> novasAcoes) {
+        this.acao.clear();
+        this.acao.addAll(novasAcoes);
+        notifyDataSetChanged();
+    }
+
 
     @NonNull
     @Override
@@ -40,16 +64,13 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
             @NonNull ViewHolder holder,
             int position) {
 
-        QuoteData quoteData = this.quoteData.get(position);
+        Acao acao = this.acao.get(position);
 
-        holder.txtIconAtivo.setText(quoteData.getSymbol());
-        holder.txtNomeAtivo.setText(quoteData.getShortName());
-        holder.txtSubtituloAtivo.setText(
-                String.valueOf(quoteData.getRegularMarketVolume())
-        );
-        holder.txtVariacaoAtivo.setText(quoteData.getRegularMarketChangePercent() + "%");
+        holder.txtNomeAtivo.setText(acao.getStock());
+        holder.txtSubtituloAtivo.setText(acao.getName());
+        holder.txtVariacaoAtivo.setText(acao.getChange() + "%");
 
-        if(quoteData.getRegularMarketChangePercent() > 0){
+        if(acao.getChange() > 0){
             holder.txtVariacaoAtivo.setTextColor(
                     ContextCompat.getColor(holder.itemView.getContext(),R.color.green_positive));
         }
@@ -58,16 +79,18 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
                     ContextCompat.getColor(holder.itemView.getContext(), R.color.red_negative)
             );
         }
-        holder.txtValorAtivo.setText(formato.format(quoteData.getRegularMarketPrice()));
+        holder.txtValorAtivo.setText(formato.format(acao.getClose()));
+
+        SvgLogoLoader.carregar(acao.getLogo(), holder.txtIconAtivo);
     }
 
     @Override
     public int getItemCount(){
-        return quoteData == null ? 0 : quoteData.size();
+        return acao == null ? 0 : acao.size();
     }
     class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView txtIconAtivo;
+        ImageView txtIconAtivo;
         TextView txtNomeAtivo;
         TextView txtSubtituloAtivo;
         TextView txtValorAtivo;
@@ -82,6 +105,6 @@ public class QuoteAdapter extends RecyclerView.Adapter<QuoteAdapter.ViewHolder>{
             txtValorAtivo = itemView.findViewById(R.id.txtValorAtivo);
             txtVariacaoAtivo = itemView.findViewById(R.id.txtVariacaoAtivo);
         }
-
     }
 }
+

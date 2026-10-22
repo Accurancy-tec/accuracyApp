@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#081426">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Cabeçalho -->
+        <LinearLayout
+            android:id="@+id/cabecalhoRendaFixa"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginTop="30dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/btnVoltarRendaFixa"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_btn_icone"
+                android:contentDescription="Voltar"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="#9BAAC0" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Renda fixa"
+                android:textColor="#F1F5FC"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="36dp"
+                android:layout_height="36dp" />
+
+        </LinearLayout>
+
+        <!-- Campo de pesquisa -->
+        <LinearLayout
+            android:id="@+id/containerBuscaTitulo"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="17dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="17dp"
+            android:background="@drawable/bg_carteira_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            app:layout_constraintTop_toBottomOf="@id/cabecalhoRendaFixa"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_busca"
+                app:tint="#9BAAC0" />
+
+            <EditText
+                android:id="@+id/edtBuscarTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:background="@android:color/transparent"
+                android:hint="Buscar título"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:padding="0dp"
+                android:singleLine="true"
+                android:textColor="#F1F5FC"
+                android:textColorHint="#8291A8"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Lista de títulos -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTitulosRendaFixa"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:paddingStart="17dp"
+            android:paddingTop="13dp"
+            android:paddingEnd="17dp"
+            android:paddingBottom="16dp"
+            android:overScrollMode="never"
+            app:layout_constraintTop_toBottomOf="@id/containerBuscaTitulo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>
