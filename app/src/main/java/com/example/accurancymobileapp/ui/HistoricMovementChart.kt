@@ -39,7 +39,6 @@ private val VermelhoVenda = Color(0xFFFF7278)
 private val TextoHistorico = Color(0xFF91A4BD)
 private val GradeHistorico = Color(0x1FFFFFFF)
 
-/** Gráfico animado de volume de compras e vendas por data/período. */
 @Composable
 fun HistoricMovementChart(
     labels: List<String>,

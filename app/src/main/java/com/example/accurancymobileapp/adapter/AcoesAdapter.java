@@ -1,10 +1,5 @@
 package com.example.accurancymobileapp.adapter;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Picture;
-import android.os.Looper;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,90 +10,91 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.caverock.androidsvg.SVG;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Acao;
-import com.example.accurancymobileapp.model.QuoteData;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Handler;
 
-public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
+public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> {
 
-    private List<Acao> acao;
-    NumberFormat formato = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-
-    public AcoesAdapter(List<Acao> acao){
-        this.acao = acao;
+    public interface OnAcaoClickListener {
+        void onAcaoClick(Acao acao);
     }
 
+    private final List<Acao> acoes = new ArrayList<>();
+    private final NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
+    private final OnAcaoClickListener listener;
+
+    public AcoesAdapter(List<Acao> acoes) {
+        this(acoes, null);
+    }
+
+    public AcoesAdapter(List<Acao> acoes, OnAcaoClickListener listener) {
+        if (acoes != null) this.acoes.addAll(acoes);
+        this.listener = listener;
+    }
 
     public void atualizarLista(List<Acao> novasAcoes) {
-        this.acao.clear();
-        this.acao.addAll(novasAcoes);
+        acoes.clear();
+        if (novasAcoes != null) acoes.addAll(novasAcoes);
         notifyDataSetChanged();
     }
 
-
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(
-            @NonNull ViewGroup parent,
-            int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_investiment,parent,false);
-
+                .inflate(R.layout.item_investiment, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(
-            @NonNull ViewHolder holder,
-            int position) {
-
-        Acao acao = this.acao.get(position);
-
-        holder.txtNomeAtivo.setText(acao.getStock());
-        holder.txtSubtituloAtivo.setText(acao.getName());
-        holder.txtVariacaoAtivo.setText(acao.getChange() + "%");
-
-        if(acao.getChange() > 0){
-            holder.txtVariacaoAtivo.setTextColor(
-                    ContextCompat.getColor(holder.itemView.getContext(),R.color.green_positive));
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Acao acao = acoes.get(position);
+        String ticker = textoOuPadrao(acao.getStock(), "—");
+        holder.txtNomeAtivo.setText(ticker);
+        holder.txtSubtituloAtivo.setText(textoOuPadrao(acao.getName(), "Nome não informado"));
+        holder.txtIconAtivo.setImageResource(R.drawable.ic_ativo_placeholder);
+        if (acao.getLogo() != null && !acao.getLogo().trim().isEmpty()) {
+            SvgLogoLoader.carregar(acao.getLogo(), holder.txtIconAtivo);
         }
-        else{
-            holder.txtVariacaoAtivo.setTextColor(
-                    ContextCompat.getColor(holder.itemView.getContext(), R.color.red_negative)
-            );
-        }
-        holder.txtValorAtivo.setText(formato.format(acao.getClose()));
 
-        SvgLogoLoader.carregar(acao.getLogo(), holder.txtIconAtivo);
+        Double variacao = acao.getChange();
+        double valorVariacao = variacao == null ? 0.0 : variacao;
+        holder.txtVariacaoAtivo.setText(String.format(Locale.forLanguageTag("pt-BR"), "%s %.2f%%", valorVariacao >= 0 ? "▲" : "▼", Math.abs(valorVariacao)));
+        holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(
+                holder.itemView.getContext(), valorVariacao >= 0 ? R.color.green_positive : R.color.red_negative
+        ));
+        Double fechamento = acao.getClose();
+        holder.txtValorAtivo.setText(fechamento == null ? "—" : formatoMoeda.format(fechamento));
+
+        holder.itemView.setOnClickListener(v -> {
+            int posicaoAtual = holder.getBindingAdapterPosition();
+            if (listener != null && posicaoAtual != RecyclerView.NO_POSITION) listener.onAcaoClick(acoes.get(posicaoAtual));
+        });
+    }
+
+    private String textoOuPadrao(String valor, String padrao) {
+        return valor == null || valor.trim().isEmpty() ? padrao : valor;
     }
 
     @Override
-    public int getItemCount(){
-        return acao == null ? 0 : acao.size();
+    public int getItemCount() {
+        return acoes.size();
     }
-    class ViewHolder extends RecyclerView.ViewHolder{
 
-        ImageView txtIconAtivo;
-        TextView txtNomeAtivo;
-        TextView txtSubtituloAtivo;
-        TextView txtValorAtivo;
-        TextView txtVariacaoAtivo;
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        final ImageView txtIconAtivo;
+        final TextView txtNomeAtivo;
+        final TextView txtSubtituloAtivo;
+        final TextView txtValorAtivo;
+        final TextView txtVariacaoAtivo;
 
-        public ViewHolder(@NonNull View itemView){
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             txtIconAtivo = itemView.findViewById(R.id.txtIconAtivo);
             txtNomeAtivo = itemView.findViewById(R.id.txtNomeAtivo);
             txtSubtituloAtivo = itemView.findViewById(R.id.txtSubtituloAtivo);
@@ -107,4 +103,3 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder>{
         }
     }
 }
-

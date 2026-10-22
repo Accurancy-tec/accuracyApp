@@ -25,6 +25,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activities.DetalhesAtivoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".activities.AportesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

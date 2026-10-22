@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/** Modelo para GET /brapi/historico-acoes. A API PHP encaminha o envelope v2 da brapi. */
 public class StockHistoryResponse {
     @SerializedName("results")
     private List<Result> results;

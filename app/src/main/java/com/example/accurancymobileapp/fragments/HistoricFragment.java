@@ -1,6 +1,10 @@
 package com.example.accurancymobileapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,58 +13,48 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.adapter.AporteAdapter;
 import com.example.accurancymobileapp.adapter.HistoricAdapter;
 import com.example.accurancymobileapp.model.Aporte;
-import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.HistoricRepository;
-import com.example.accurancymobileapp.network.repository.QuoteRepository;
 import com.example.accurancymobileapp.ui.ChartHelper;
-
-import org.w3c.dom.Text;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class HistoricFragment extends Fragment {
-    RecyclerView recyclerHistorico;
-    TextView btnCompra, btnVenda, btnTodos;
-    TextView btnSemana, btnMes, btnAno;
-    ComposeView graficoHistorico;
-    private List<Aporte> listaHistorico = new ArrayList<>();
-    private List<Aporte> historicoCompleto = new ArrayList<>();
+
+    private RecyclerView recyclerHistorico;
+    private TextView btnCompra, btnVenda, btnTodos;
+    private TextView btnSemana, btnMes, btnAno;
+    private ComposeView graficoHistorico;
+    private final List<Aporte> listaHistorico = new ArrayList<>();
     private HistoricAdapter adapter;
-    private enum PeriodoHistorico {
-        SEMANA, MES, ANO
-    }
+
+    private enum PeriodoHistorico { SEMANA, MES, ANO }
     private PeriodoHistorico periodoSelecionado = PeriodoHistorico.SEMANA;
+    private String tipoSelecionado = "Todos";
+    private final Locale ptBR = Locale.forLanguageTag("pt-BR");
 
-    public HistoricFragment(){
-        super(R.layout.fragment_historic);
-    }
+    public HistoricFragment() { super(R.layout.fragment_historic); }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
 
         recyclerHistorico = view.findViewById(R.id.recyclerHistorico);
         recyclerHistorico.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerHistorico.setNestedScrollingEnabled(false);
+        adapter = new HistoricAdapter(requireContext(), new ArrayList<>());
+        recyclerHistorico.setAdapter(adapter);
+
         btnTodos = view.findViewById(R.id.btnTodos);
         btnCompra = view.findViewById(R.id.btnCompra);
         btnVenda = view.findViewById(R.id.btnVenda);
@@ -69,293 +63,147 @@ public class HistoricFragment extends Fragment {
         btnAno = view.findViewById(R.id.btnAno);
         graficoHistorico = view.findViewById(R.id.graficoHistorico);
 
-        //filtro grafico
-        btnSemana.setOnClickListener(v -> {
-            periodoSelecionado = PeriodoHistorico.SEMANA;
-            aplicarFiltroHistorico();
+        btnSemana.setOnClickListener(v -> selecionarPeriodo(PeriodoHistorico.SEMANA, btnSemana));
+        btnMes.setOnClickListener(v -> selecionarPeriodo(PeriodoHistorico.MES, btnMes));
+        btnAno.setOnClickListener(v -> selecionarPeriodo(PeriodoHistorico.ANO, btnAno));
+        btnTodos.setOnClickListener(v -> selecionarTipo("Todos", btnTodos));
+        btnCompra.setOnClickListener(v -> selecionarTipo("Compra", btnCompra));
+        btnVenda.setOnClickListener(v -> selecionarTipo("Venda", btnVenda));
 
-            selecionarFiltroGrafico(btnSemana);
-        });
-
-        btnMes.setOnClickListener(v -> {
-            periodoSelecionado = PeriodoHistorico.MES;
-            aplicarFiltroHistorico();
-
-            selecionarFiltroGrafico(btnMes);
-        });
-
-        btnAno.setOnClickListener(v -> {
-            periodoSelecionado = PeriodoHistorico.ANO;
-            aplicarFiltroHistorico();
-
-            selecionarFiltroGrafico(btnAno);
-        });
-
-        //filtro historico
-        btnTodos.setOnClickListener(v -> {
-            filtrarPorTipo("Todos");
-
-            selecionarFiltro(btnTodos);
-        });
-
-        btnCompra.setOnClickListener(v -> {
-            filtrarPorTipo("Compra");
-
-            selecionarFiltro(btnCompra);
-        });
-
-        btnVenda.setOnClickListener(v -> {
-            filtrarPorTipo("Venda");
-
-            selecionarFiltro(btnVenda);
-        });
-
+        selecionarFiltroGrafico(btnSemana);
+        selecionarFiltro(btnTodos);
         carregarHistorico();
     }
 
-    public void carregarHistorico(){
-        HistoricRepository historicRepository = new HistoricRepository(requireContext());
-
-        historicRepository.buscarHistorico(new HistoricRepository.HistoricCallback() {
+    private void carregarHistorico() {
+        new HistoricRepository(requireContext()).buscarHistorico(new HistoricRepository.HistoricCallback() {
             @Override
             public void OnSuccess(List<Aporte> historico) {
-                listaHistorico = historico;
-
-                aplicarFiltroHistorico();
-
-                adapter = new HistoricAdapter(requireContext(), listaHistorico);
-
-                recyclerHistorico.setAdapter(adapter);
+                if (!isAdded()) return;
+                listaHistorico.clear();
+                if (historico != null) listaHistorico.addAll(historico);
+                aplicarFiltros();
             }
 
             @Override
             public void onError(String message) {
-
-                if(message == null || message.trim().isEmpty()){
-                    message = "Não foi possível buscar o histórico";
-                }
-
-                Toast.makeText(requireContext(), "Erro ao buscar o histórico", Toast.LENGTH_SHORT).show();
+                if (!isAdded()) return;
+                Log.e("HISTORICO_APORTES", message == null ? "Erro sem mensagem" : message);
+                Toast.makeText(requireContext(), "Não foi possível carregar o histórico.", Toast.LENGTH_SHORT).show();
+                aplicarFiltros();
             }
         });
-
     }
 
-    public void filtrarPorTipo(String tipo){
-        List<Aporte> listaFiltrada = new ArrayList<>();
-
-        if(tipo.equals("Todos")){
-            listaFiltrada.addAll(listaHistorico);
-        }
-        else{
-            for(Aporte aporte : listaHistorico){
-                if(aporte.getTipoAporte() != null && aporte.getTipoAporte().equalsIgnoreCase(tipo)){
-                    listaFiltrada.add(aporte);
-                }
-            }
-        }
-
-        adapter.atualizarLista(listaFiltrada);
+    private void selecionarPeriodo(PeriodoHistorico periodo, TextView selecionado) {
+        periodoSelecionado = periodo;
+        selecionarFiltroGrafico(selecionado);
+        aplicarFiltros();
     }
 
-    private void selecionarFiltro(TextView selecionado){
-        selecionado.setBackgroundResource(R.drawable.bg_btn_primary);
+    private void selecionarTipo(String tipo, TextView selecionado) {
+        tipoSelecionado = tipo;
+        selecionarFiltro(selecionado);
+        aplicarFiltros();
+    }
 
-        TextView[] filtrosHistorico = {
-                btnTodos,
-                btnCompra,
-                btnVenda
-        };
-
-        for(TextView filtro : filtrosHistorico){
-            if (filtro == selecionado) {
-                filtro.setBackgroundResource(R.drawable.bg_btn_primary);
-            } else {
-                filtro.setBackgroundResource(R.drawable.bg_icon_sair);
+    private void aplicarFiltros() {
+        List<Aporte> doPeriodo = filtrarHistoricoPorPeriodo(listaHistorico, periodoSelecionado);
+        List<Aporte> paraLista = new ArrayList<>();
+        for (Aporte aporte : doPeriodo) {
+            if ("Todos".equalsIgnoreCase(tipoSelecionado)
+                    || (aporte.getTipoAporte() != null && aporte.getTipoAporte().equalsIgnoreCase(tipoSelecionado))) {
+                paraLista.add(aporte);
             }
+        }
+        adapter.atualizarLista(paraLista);
+        atualizarGrafico(doPeriodo);
+    }
+
+    private List<Aporte> filtrarHistoricoPorPeriodo(List<Aporte> historico, PeriodoHistorico periodo) {
+        LocalDate hoje = LocalDate.now();
+        LocalDate inicio;
+        switch (periodo) {
+            case SEMANA: inicio = hoje.minusDays(6); break;
+            case ANO: inicio = LocalDate.of(hoje.getYear(), 1, 1); break;
+            case MES:
+            default: inicio = hoje.withDayOfMonth(1); break;
+        }
+        List<Aporte> filtrados = new ArrayList<>();
+        for (Aporte aporte : historico) {
+            try {
+                if (aporte.getData_aporte() == null) continue;
+                LocalDate data = LocalDate.parse(aporte.getData_aporte(), DateTimeFormatter.ISO_LOCAL_DATE);
+                if (!data.isBefore(inicio) && !data.isAfter(hoje)) filtrados.add(aporte);
+            } catch (Exception erro) {
+                Log.w("HISTORICO_DATA", "Data de aporte inválida; registro ignorado.");
+            }
+        }
+        return filtrados;
+    }
+
+    private void selecionarFiltro(TextView selecionado) {
+        TextView[] filtros = {btnTodos, btnCompra, btnVenda};
+        for (TextView filtro : filtros) {
+            filtro.setBackgroundResource(filtro == selecionado ? R.drawable.bg_btn_primary : R.drawable.bg_icon_sair);
         }
     }
 
-    private void selecionarFiltroGrafico(TextView selecionado){
-        selecionado.setBackgroundResource(R.drawable.bg_btn_primary);
-
-        TextView[] filtroGrafico = {
-                btnSemana,
-                btnMes,
-                btnAno
-        };
-
-        for(TextView filtro : filtroGrafico){
-            if(filtro == selecionado){
-                filtro.setBackgroundResource(R.drawable.bg_btn_primary);
-            }
-            else {
-                filtro.setBackgroundResource(R.drawable.bg_icon_sair);
-            }
+    private void selecionarFiltroGrafico(TextView selecionado) {
+        TextView[] filtros = {btnSemana, btnMes, btnAno};
+        for (TextView filtro : filtros) {
+            filtro.setBackgroundResource(filtro == selecionado ? R.drawable.bg_btn_primary : R.drawable.bg_icon_sair);
         }
     }
 
     private void atualizarGrafico(List<Aporte> aportes) {
         LocalDate hoje = LocalDate.now();
-
         List<String> rotulos = new ArrayList<>();
         List<Double> compras = new ArrayList<>();
         List<Double> vendas = new ArrayList<>();
-
         Map<String, double[]> valoresPorPeriodo = new LinkedHashMap<>();
+        DateTimeFormatter formatoMes = DateTimeFormatter.ofPattern("MMM", ptBR);
 
-        DateTimeFormatter formatoData =
-                DateTimeFormatter.ISO_LOCAL_DATE;
-
-        DateTimeFormatter formatoMes =
-                DateTimeFormatter.ofPattern(
-                        "MMM", new Locale("pt", "BR")
-                );
-
-        // Define os períodos que aparecerão no eixo X.
         if (periodoSelecionado == PeriodoHistorico.SEMANA) {
             for (int i = 6; i >= 0; i--) {
                 LocalDate dia = hoje.minusDays(i);
-                String chave = dia.toString();
-
-                String diaSemana = dia.getDayOfWeek()
-                        .getDisplayName(
-                                java.time.format.TextStyle.SHORT,
-                                new Locale("pt", "BR")
-                        )
-                        .replace(".", "");
-
-                rotulos.add(diaSemana + ".");
-                valoresPorPeriodo.put(chave, new double[2]);
+                rotulos.add(dia.getDayOfWeek().getDisplayName(TextStyle.SHORT, ptBR).replace(".", ""));
+                valoresPorPeriodo.put(dia.toString(), new double[2]);
             }
-
         } else if (periodoSelecionado == PeriodoHistorico.MES) {
             LocalDate primeiroDia = hoje.withDayOfMonth(1);
-
-            for (LocalDate dia = primeiroDia;
-                 !dia.isAfter(hoje);
-                 dia = dia.plusDays(1)) {
-
+            for (LocalDate dia = primeiroDia; !dia.isAfter(hoje); dia = dia.plusDays(1)) {
                 rotulos.add(String.valueOf(dia.getDayOfMonth()));
                 valoresPorPeriodo.put(dia.toString(), new double[2]);
             }
-
         } else {
-            for (int mes = 1; mes <= hoje.getMonthValue(); mes++) {
-                YearMonth periodo = YearMonth.of(hoje.getYear(), mes);
-
-                rotulos.add(
-                        periodo.atDay(1).format(formatoMes)
-                );
-
-                valoresPorPeriodo.put(
-                        periodo.toString(), new double[2]
-                );
+            for (int mes = 1; mes <= 12; mes++) {
+                YearMonth ym = YearMonth.of(hoje.getYear(), mes);
+                rotulos.add(ym.format(formatoMes));
+                valoresPorPeriodo.put(ym.toString(), new double[2]);
             }
         }
 
-        // Soma compras e vendas em cada período.
         for (Aporte aporte : aportes) {
             try {
-                LocalDate data = LocalDate.parse(
-                        aporte.getData_aporte(), formatoData
-                );
-
-                if (data.isAfter(hoje)) {
-                    continue;
-                }
-
-                String chave;
-
-                if (periodoSelecionado == PeriodoHistorico.ANO) {
-                    chave = YearMonth.from(data).toString();
-                } else {
-                    chave = data.toString();
-                }
-
+                LocalDate data = LocalDate.parse(aporte.getData_aporte());
+                String chave = periodoSelecionado == PeriodoHistorico.ANO ? YearMonth.from(data).toString() : data.toString();
                 double[] valores = valoresPorPeriodo.get(chave);
-
-                if (valores == null) {
-                    continue;
-                }
-
+                if (valores == null) continue;
                 double valor = aporte.getValorAporte();
-
-                if ("Compra".equalsIgnoreCase(
-                        aporte.getTipoAporte())) {
-                    valores[0] += valor;
-
-                } else if ("Venda".equalsIgnoreCase(
-                        aporte.getTipoAporte())) {
-                    valores[1] -= valor;
-                }
-
-            } catch (Exception e) {
-                Log.e("HistoricoGrafico",
-                        "Erro ao processar aporte", e);
+                String tipo = aporte.getTipoAporte();
+                if ("Compra".equalsIgnoreCase(tipo)) valores[0] += valor;
+                else if ("Venda".equalsIgnoreCase(tipo)) valores[1] += valor;
+            } catch (Exception erro) {
+                Log.w("HISTORICO_GRAFICO", "Não foi possível agregar uma transação ao gráfico.");
             }
         }
 
-        // Monta as séries na mesma ordem dos rótulos.
         for (double[] valores : valoresPorPeriodo.values()) {
             compras.add(valores[0]);
             vendas.add(valores[1]);
         }
-
-        ComposeView grafico =
-                requireView().findViewById(R.id.graficoHistorico);
-
-        ChartHelper.configurarGraficoHistorico(
-                grafico, rotulos, compras, vendas
-        );
+        ChartHelper.configurarGraficoHistorico(graficoHistorico, rotulos, compras, vendas);
     }
 
-    private List<Aporte> filtrarHistorico(List<Aporte> historico, PeriodoHistorico periodo){
-        LocalDate hoje = LocalDate.now();
-
-        LocalDate inicio;
-
-        switch(periodo){
-            case SEMANA:
-                inicio = hoje.minusDays(6);
-                break;
-            case ANO:
-                inicio = LocalDate.of(hoje.getYear(), 1, 1);
-                break;
-
-            case MES:
-            default:
-                inicio = hoje.withDayOfMonth(1);
-                break;
-
-        }
-
-        List<Aporte> filtrados = new ArrayList<>();
-
-        for (Aporte aportes : historico){
-            try {
-                LocalDate data = LocalDate.parse(aportes.getData_aporte());
-
-                if(!data.isBefore(inicio) && !data.isAfter(hoje)){
-                    filtrados.add(aportes);
-                }
-            }
-            catch(Exception e){
-                Log.e("Historico filtrado", "Erro ao interpretar a data do aporte");
-            }
-        }
-
-        return filtrados;
-    }
-
-    private void aplicarFiltroHistorico(){
-        List<Aporte> filtrados = filtrarHistorico(listaHistorico, periodoSelecionado);
-        historicoCompleto = filtrados;
-
-        adapter = new HistoricAdapter(requireContext(), historicoCompleto);
-
-        recyclerHistorico.setAdapter(adapter);
-
-        atualizarGrafico(historicoCompleto);
-    }
 }
