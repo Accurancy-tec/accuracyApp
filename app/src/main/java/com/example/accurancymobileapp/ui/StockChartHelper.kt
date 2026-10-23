@@ -3,7 +3,6 @@ package com.example.accurancymobileapp.ui
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.platform.ComposeView
 
-/** Ponte Java/Kotlin no mesmo padrão do ChartHelper já existente no projeto. */
 object StockChartHelper {
     @JvmStatic
     fun configurar(

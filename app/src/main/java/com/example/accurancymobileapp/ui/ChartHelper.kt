@@ -15,11 +15,7 @@ object ChartHelper {
     ) {
         composeView.setContent {
             MaterialTheme {
-                EvolucaoCarteiraChart(
-                    datas = datas,
-                    valores = valores,
-                    periodo = periodo
-                )
+                EvolucaoCarteiraChart(datas = datas, valores = valores, periodo = periodo)
             }
         }
     }
@@ -32,28 +28,21 @@ object ChartHelper {
     ) {
         composeView.setContent {
             MaterialTheme {
-                DistribuicaoCarteiraChart(
-                    categorias = categorias,
-                    valores = valores
-                )
+                DistribuicaoCarteiraChart(categorias = categorias, valores = valores)
             }
         }
     }
 
     @JvmStatic
     fun configurarGraficoHistorico(
-        ComposeView: ComposeView,
+        composeView: ComposeView,
         meses: List<String>,
         compras: List<Double>,
         vendas: List<Double>
-    ){
-        ComposeView.setContent {
+    ) {
+        composeView.setContent {
             MaterialTheme {
-                HistoricoChart(
-                    meses = meses,
-                    compras = compras,
-                    vendas = vendas
-                )
+                HistoricMovementChart(labels = meses, compras = compras, vendas = vendas)
             }
         }
     }
