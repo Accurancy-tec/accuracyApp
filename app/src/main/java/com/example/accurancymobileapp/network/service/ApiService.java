@@ -11,6 +11,7 @@ import com.example.accurancymobileapp.response.CriarWalletResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
+import com.example.accurancymobileapp.response.TitulosRendaFixaResponse;
 
 import java.util.Map;
 
@@ -65,4 +66,7 @@ public interface ApiService {
             @Query("symbol") String symbol,
             @Query("range") String range
     );
+
+    @GET("aportes/listar-titulosRF")
+    Call<TitulosRendaFixaResponse> listarTitulosRendaFixa();
 }
