@@ -11,6 +11,7 @@ import com.example.accurancymobileapp.response.CriarWalletResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
+import com.example.accurancymobileapp.response.TitulosRendaFixaResponse;
 
 import java.util.Map;
 
