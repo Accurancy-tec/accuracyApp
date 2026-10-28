@@ -6,6 +6,7 @@ import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.response.AcaoResponse;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.AporteResponse;
+import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
@@ -78,5 +79,9 @@ public interface ApiService {
     Call<StockHistoryResponse> historicoFIIs(
             @Query("symbol") String symbol,
             @Query("range") String range
+    );
+    @GET("carteiras/posicao-ativo")
+    Call<AssetPositionResponse> getAssetPosition(
+            @Query("symbol") String symbol
     );
 }
