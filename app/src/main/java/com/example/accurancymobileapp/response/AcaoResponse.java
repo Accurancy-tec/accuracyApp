@@ -8,8 +8,7 @@ import java.util.List;
 public class AcaoResponse {
     @SerializedName("success")
     private boolean sucesso;
-
-    @SerializedName("stocks")
+    @SerializedName(value = "stocks", alternate = {"fiis"})
     private List<Acao> acoes;
 
     @SerializedName("paginacao")
@@ -27,9 +26,7 @@ public class AcaoResponse {
         return paginacao;
     }
 
-
     public static class Paginacao {
-
         @SerializedName("paginaAtual")
         private int paginaAtual;
 

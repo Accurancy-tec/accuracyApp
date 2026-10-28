@@ -1,6 +1,7 @@
 package com.example.accurancymobileapp.adapter;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Picture;
@@ -13,6 +14,8 @@ import android.widget.ImageView;
 
 import com.caverock.androidsvg.SVG;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -24,90 +27,104 @@ public final class SvgLogoLoader {
     private static final int TAMANHO = 120;
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(4);
     private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
-
     private static final LruCache<String, Bitmap> CACHE = new LruCache<String, Bitmap>(4 * 1024 * 1024) {
-        @Override
-        protected int sizeOf(String key, Bitmap bitmap) {
-            return bitmap.getByteCount();
-        }
+        @Override protected int sizeOf(String key, Bitmap bitmap) { return bitmap.getByteCount(); }
     };
 
     private SvgLogoLoader() { }
 
     public static void carregar(String url, ImageView imageView) {
         if (imageView == null) return;
-        imageView.setTag(url);
-        if (url == null || url.trim().isEmpty()) {
-            imageView.setImageDrawable(null);
+        String limpa = url == null ? null : url.trim();
+        imageView.setTag(limpa);
+        if (limpa == null || limpa.isEmpty()) return; // o adapter já definiu o placeholder
+
+        Bitmap guardado = CACHE.get(limpa);
+        if (guardado != null) {
+            if (limpa.equals(imageView.getTag())) imageView.setImageBitmap(guardado);
             return;
         }
 
-        Bitmap cached = CACHE.get(url);
-        if (cached != null) {
-            // O RecyclerView pode reutilizar o mesmo ImageView entre chamadas.
-            if (url.equals(imageView.getTag())) imageView.setImageBitmap(cached);
-            return;
-        }
-
-        imageView.setImageDrawable(null);
         EXECUTOR.execute(() -> {
-            Bitmap bitmap = baixarSvg(url);
-            if (bitmap != null) CACHE.put(url, bitmap);
+            Bitmap bitmap = baixarImagem(limpa);
+            if (bitmap != null) CACHE.put(limpa, bitmap);
             MAIN_HANDLER.post(() -> {
-                if (url.equals(imageView.getTag()) && bitmap != null) imageView.setImageBitmap(bitmap);
+                if (limpa.equals(imageView.getTag()) && bitmap != null) imageView.setImageBitmap(bitmap);
             });
         });
     }
 
-    private static Bitmap baixarSvg(String urlString) {
+    private static Bitmap baixarImagem(String urlString) {
         HttpURLConnection conexao = null;
         try {
             URL url = new URL(urlString);
-            if (!"https".equalsIgnoreCase(url.getProtocol()) && !"http".equalsIgnoreCase(url.getProtocol())) {
-                return null;
-            }
+            String protocolo = url.getProtocol();
+            if (!"https".equalsIgnoreCase(protocolo) && !"http".equalsIgnoreCase(protocolo)) return null;
+
             conexao = (HttpURLConnection) url.openConnection();
-            conexao.setConnectTimeout(10000);
-            conexao.setReadTimeout(15000);
+            conexao.setConnectTimeout(8000);
+            conexao.setReadTimeout(12000);
             conexao.setRequestMethod("GET");
+            conexao.setInstanceFollowRedirects(true);
+            conexao.setRequestProperty("Accept", "image/svg+xml,image/*,*/*;q=0.8");
 
             int status = conexao.getResponseCode();
-            if (status < 200 || status >= 300) return null;
-
-            try (InputStream input = conexao.getInputStream()) {
-                SVG svg = SVG.getFromInputStream(input);
-                Picture picture = svg.renderToPicture();
-
-                int larguraPicture = picture.getWidth();
-                int alturaPicture = picture.getHeight();
-                if (larguraPicture <= 0 || alturaPicture <= 0) {
-                    Log.w(TAG, "SVG sem dimensões renderizáveis: " + urlString);
-                    return null;
-                }
-
-                Bitmap bitmap = Bitmap.createBitmap(TAMANHO, TAMANHO, Bitmap.Config.ARGB_8888);
-                Canvas canvas = new Canvas(bitmap);
-                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-
-                float escala = Math.min(
-                        (float) TAMANHO / larguraPicture,
-                        (float) TAMANHO / alturaPicture
-                );
-                float deslocamentoX = (TAMANHO - larguraPicture * escala) / 2f;
-                float deslocamentoY = (TAMANHO - alturaPicture * escala) / 2f;
-
-                canvas.save();
-                canvas.translate(deslocamentoX, deslocamentoY);
-                canvas.scale(escala, escala);
-                canvas.drawPicture(picture);
-                canvas.restore();
-                return bitmap;
+            if (status < 200 || status >= 300) {
+                Log.w(TAG, "Logo indisponível HTTP " + status + ": " + urlString);
+                return null;
             }
+
+            byte[] bytes;
+            try (InputStream input = conexao.getInputStream(); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[8192];
+                int lidos;
+                while ((lidos = input.read(buffer)) != -1) output.write(buffer, 0, lidos);
+                bytes = output.toByteArray();
+            }
+            if (bytes.length == 0) return null;
+
+            Bitmap raster = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            if (raster != null) return ajustarTamanho(raster);
+
+            SVG svg = SVG.getFromInputStream(new ByteArrayInputStream(bytes));
+            Picture picture = svg.renderToPicture();
+            int largura = picture.getWidth();
+            int altura = picture.getHeight();
+            if (largura <= 0 || altura <= 0) {
+                Log.w(TAG, "SVG sem dimensões renderizáveis: " + urlString);
+                return null;
+            }
+
+            Bitmap bitmap = Bitmap.createBitmap(TAMANHO, TAMANHO, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            float escala = Math.min((float) TAMANHO / largura, (float) TAMANHO / altura);
+            float dx = (TAMANHO - largura * escala) / 2f;
+            float dy = (TAMANHO - altura * escala) / 2f;
+            canvas.save();
+            canvas.translate(dx, dy);
+            canvas.scale(escala, escala);
+            canvas.drawPicture(picture);
+            canvas.restore();
+            return bitmap;
         } catch (Exception erro) {
-            Log.e(TAG, "Erro ao carregar logo SVG: " + urlString, erro);
+            Log.w(TAG, "Falha ao carregar logo (placeholder será mantido): " + urlString, erro);
             return null;
         } finally {
             if (conexao != null) conexao.disconnect();
         }
+    }
+
+    private static Bitmap ajustarTamanho(Bitmap original) {
+        int largura = original.getWidth();
+        int altura = original.getHeight();
+        if (largura <= 0 || altura <= 0) return original;
+        float escala = Math.min((float) TAMANHO / largura, (float) TAMANHO / altura);
+        int novaLargura = Math.max(1, Math.round(largura * escala));
+        int novaAltura = Math.max(1, Math.round(altura * escala));
+        if (novaLargura == largura && novaAltura == altura) return original;
+        Bitmap ajustada = Bitmap.createScaledBitmap(original, novaLargura, novaAltura, true);
+        if (ajustada != original) original.recycle();
+        return ajustada;
     }
 }
