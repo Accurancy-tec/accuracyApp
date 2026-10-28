@@ -3,22 +3,23 @@ package com.example.accurancymobileapp.model;
 import com.google.gson.annotations.SerializedName;
 
 public class Acao {
-    @SerializedName("stock")
+    @SerializedName(value = "stock", alternate = {"symbol"})
     private String stock;
 
-    @SerializedName("name")
+    @SerializedName(value = "name", alternate = {"longName", "shortName"})
     private String name;
 
-    @SerializedName("close")
+    @SerializedName(value = "close", alternate = {"price", "regularMarketPrice"})
     private Double close;
 
-    @SerializedName("change")
+
+    @SerializedName(value = "change", alternate = {"regularMarketChangePercent"})
     private Double change;
 
-    @SerializedName("volume")
+    @SerializedName(value = "volume", alternate = {"regularMarketVolume"})
     private Long volume;
 
-    @SerializedName("logo")
+    @SerializedName(value = "logo", alternate = {"logourl", "logoUrl"})
     private String logo;
 
     public String getStock() {
@@ -29,7 +30,7 @@ public class Acao {
         return name;
     }
 
-    public Double getChange(){
+    public Double getChange() {
         return change;
     }
 
@@ -41,7 +42,7 @@ public class Acao {
         return volume;
     }
 
-    public String getLogo(){
+    public String getLogo() {
         return logo;
     }
 

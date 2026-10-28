@@ -39,6 +39,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Ações Nacionais"
+                android:id="@+id/tvTituloListaAtivos"
                 android:textColor="#F1F5FC"
                 android:textSize="16sp"
                 android:textStyle="bold" />

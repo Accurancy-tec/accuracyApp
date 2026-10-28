@@ -66,7 +66,17 @@ public interface ApiService {
             @Query("symbol") String symbol,
             @Query("range") String range
     );
+    @GET("brapi/listar-fiis")
+    Call<AcaoResponse> listarFIIs(
+            @Query("page") int page,
+            @Query("limit") int limit
+    );
+    @GET("brapi/get-fii-quote")
+    Call<QuoteResponse> getFiiQuote(@Query("symbol") String symbol);
 
-    @GET("aportes/listar-titulosRF")
-    Call<TitulosRendaFixaResponse> listarTitulosRendaFixa();
+    @GET("brapi/historico-fiis")
+    Call<StockHistoryResponse> historicoFIIs(
+            @Query("symbol") String symbol,
+            @Query("range") String range
+    );
 }

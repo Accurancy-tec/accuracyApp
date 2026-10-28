@@ -57,23 +57,40 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
         String ticker = textoOuPadrao(acao.getStock(), "—");
         holder.txtNomeAtivo.setText(ticker);
         holder.txtSubtituloAtivo.setText(textoOuPadrao(acao.getName(), "Nome não informado"));
+
         holder.txtIconAtivo.setImageResource(R.drawable.ic_ativo_placeholder);
-        if (acao.getLogo() != null && !acao.getLogo().trim().isEmpty()) {
-            SvgLogoLoader.carregar(acao.getLogo(), holder.txtIconAtivo);
-        }
+        SvgLogoLoader.carregar(acao.getLogo(), holder.txtIconAtivo);
 
         Double variacao = acao.getChange();
-        double valorVariacao = variacao == null ? 0.0 : variacao;
-        holder.txtVariacaoAtivo.setText(String.format(Locale.forLanguageTag("pt-BR"), "%s %.2f%%", valorVariacao >= 0 ? "▲" : "▼", Math.abs(valorVariacao)));
-        holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(
-                holder.itemView.getContext(), valorVariacao >= 0 ? R.color.green_positive : R.color.red_negative
-        ));
+        if (variacao == null || !Double.isFinite(variacao)) {
+            holder.txtVariacaoAtivo.setText("—");
+            holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(
+                    holder.itemView.getContext(), R.color.text_secondary
+            ));
+        } else {
+            double valorVariacao = variacao;
+            String seta = valorVariacao > 0 ? "▲" : valorVariacao < 0 ? "▼" : "•";
+            holder.txtVariacaoAtivo.setText(String.format(
+                    Locale.forLanguageTag("pt-BR"), "%s %.2f%%", seta, Math.abs(valorVariacao)
+            ));
+            int cor = valorVariacao < 0 ? R.color.red_negative
+                    : valorVariacao > 0 ? R.color.green_positive
+                    : R.color.text_secondary;
+            holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), cor));
+        }
+
         Double fechamento = acao.getClose();
-        holder.txtValorAtivo.setText(fechamento == null ? "—" : formatoMoeda.format(fechamento));
+        holder.txtValorAtivo.setText(
+                fechamento == null || !Double.isFinite(fechamento) || fechamento <= 0
+                        ? "—"
+                        : formatoMoeda.format(fechamento)
+        );
 
         holder.itemView.setOnClickListener(v -> {
             int posicaoAtual = holder.getBindingAdapterPosition();
-            if (listener != null && posicaoAtual != RecyclerView.NO_POSITION) listener.onAcaoClick(acoes.get(posicaoAtual));
+            if (listener != null && posicaoAtual != RecyclerView.NO_POSITION) {
+                listener.onAcaoClick(acoes.get(posicaoAtual));
+            }
         });
     }
 
