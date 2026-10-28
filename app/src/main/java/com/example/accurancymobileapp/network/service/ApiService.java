@@ -84,4 +84,6 @@ public interface ApiService {
     Call<AssetPositionResponse> getAssetPosition(
             @Query("symbol") String symbol
     );
+    @GET("aportes/listar-titulosRF")
+    Call<TitulosRendaFixaResponse> listarTitulosRendaFixa();
 }
