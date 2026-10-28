@@ -2,6 +2,7 @@ package com.example.accurancymobileapp.model;
 
 import com.google.gson.annotations.SerializedName;
 
+/** Aceita os dois formatos usados pela brapi: results[].data ou campos diretamente em results[]. */
 public class QuoteResult {
     @SerializedName("requestedSymbol") private String requestedSymbol;
     @SerializedName("symbol") private String symbol;
