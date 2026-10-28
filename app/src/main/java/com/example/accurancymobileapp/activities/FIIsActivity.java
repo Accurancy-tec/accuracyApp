@@ -3,6 +3,7 @@ package com.example.accurancymobileapp.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -11,16 +12,12 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.AcoesAdapter;
 import com.example.accurancymobileapp.model.Acao;
-import com.example.accurancymobileapp.network.repository.AcaoRepository;
 import com.example.accurancymobileapp.network.repository.FIIsRepository;
 import com.example.accurancymobileapp.response.AcaoResponse;
 
@@ -33,11 +30,12 @@ public class FIIsActivity extends AppCompatActivity {
 
     private int paginaAtual = 1;
     private int totalPaginas = 1;
-    private boolean carregando = false;
-    private boolean temProximaPagina = false;
+    private boolean carregando;
+    private boolean temProximaPagina;
 
     private FIIsRepository fiisRepository;
     private AcoesAdapter adapter;
+
     private Button btnPaginaAnterior;
     private Button btnProximaPagina;
     private TextView tvPaginaAnterior;
@@ -53,6 +51,8 @@ public class FIIsActivity extends AppCompatActivity {
 
         ImageButton btnVoltar = findViewById(R.id.btnVoltarAtivosNacionais);
         TextView tvTitulo = findViewById(R.id.tvTituloListaAtivos);
+        View containerBusca = findViewById(R.id.containerBuscaTitulo);
+
         btnPaginaAnterior = findViewById(R.id.btnPaginaAnterior);
         btnProximaPagina = findViewById(R.id.btnProximaPagina);
         tvPaginaAnterior = findViewById(R.id.tvPaginaAnterior);
@@ -60,19 +60,33 @@ public class FIIsActivity extends AppCompatActivity {
         tvProximaPagina = findViewById(R.id.tvProximaPagina);
         rvFiis = findViewById(R.id.rvTitulosAcoesNacionais);
 
-        if (tvTitulo != null) tvTitulo.setText("Fundos Imobiliários");
+        if (tvTitulo != null) {
+            tvTitulo.setText("Fundos Imobiliários");
+        }
+
+        if (containerBusca != null) {
+            containerBusca.setVisibility(View.GONE);
+        }
 
         rvFiis.setLayoutManager(new LinearLayoutManager(this));
+
         adapter = new AcoesAdapter(new ArrayList<>(), this::abrirDetalhes);
         rvFiis.setAdapter(adapter);
+
         fiisRepository = new FIIsRepository(this);
 
         btnVoltar.setOnClickListener(v -> finish());
+
         btnPaginaAnterior.setOnClickListener(v -> {
-            if (!carregando && paginaAtual > 1) carregarPagina(paginaAtual - 1);
+            if (!carregando && paginaAtual > 1) {
+                carregarPagina(paginaAtual - 1);
+            }
         });
+
         btnProximaPagina.setOnClickListener(v -> {
-            if (!carregando && temProximaPagina) carregarPagina(paginaAtual + 1);
+            if (!carregando && temProximaPagina) {
+                carregarPagina(paginaAtual + 1);
+            }
         });
 
         atualizarControles();
@@ -89,53 +103,92 @@ public class FIIsActivity extends AppCompatActivity {
     }
 
     private void carregarPagina(int pagina) {
-        if (carregando) return;
+        if (carregando) {
+            return;
+        }
+
         carregando = true;
         atualizarControles();
 
-        fiisRepository.listarFIIs(pagina, LIMITE_POR_PAGINA, new FIIsRepository.FiiCallback() {
-            @Override
-            public void onSuccess(AcaoResponse resultado) {
-                carregando = false;
-                if (isFinishing() || isDestroyed()) return;
+        fiisRepository.listarFIIs(
+                pagina,
+                LIMITE_POR_PAGINA,
+                new FIIsRepository.FiiCallback() {
+                    @Override
+                    public void onSuccess(AcaoResponse resultado) {
+                        carregando = false;
 
-                AcaoResponse.Paginacao paginacao = resultado.getPaginacao();
-                if (paginacao == null || resultado.getAcoes() == null) {
-                    Toast.makeText(FIIsActivity.this,
-                            "A API retornou dados incompletos dos FIIs.", Toast.LENGTH_LONG).show();
-                    atualizarControles();
-                    return;
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+
+                        if (resultado == null
+                                || resultado.getPaginacao() == null
+                                || resultado.getAcoes() == null) {
+                            Toast.makeText(
+                                    FIIsActivity.this,
+                                    "A API retornou dados incompletos dos FIIs.",
+                                    Toast.LENGTH_LONG
+                            ).show();
+
+                            atualizarControles();
+                            return;
+                        }
+
+                        AcaoResponse.Paginacao paginacao = resultado.getPaginacao();
+
+                        paginaAtual = Math.max(1, paginacao.getPaginaAtual());
+                        totalPaginas = Math.max(
+                                paginaAtual,
+                                paginacao.getTotalPaginas()
+                        );
+
+                        temProximaPagina = paginacao.isTemProximaPagina()
+                                || paginaAtual < totalPaginas;
+
+                        adapter.atualizarLista(resultado.getAcoes());
+                        atualizarControles();
+                    }
+
+                    @Override
+                    public void onError(String mensagem) {
+                        carregando = false;
+                        Log.e(TAG, mensagem);
+
+                        if (!isFinishing() && !isDestroyed()) {
+                            Toast.makeText(
+                                    FIIsActivity.this,
+                                    mensagem,
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
+
+                        atualizarControles();
+                    }
                 }
-
-                paginaAtual = Math.max(1, paginacao.getPaginaAtual());
-                totalPaginas = Math.max(paginaAtual, paginacao.getTotalPaginas());
-                temProximaPagina = paginacao.isTemProximaPagina() || paginaAtual < totalPaginas;
-                adapter.atualizarLista(resultado.getAcoes());
-                atualizarControles();
-            }
-
-            @Override
-            public void onError(String mensagem) {
-                carregando = false;
-                Log.e(TAG, mensagem);
-                if (!isFinishing() && !isDestroyed()) {
-                    Toast.makeText(FIIsActivity.this, mensagem, Toast.LENGTH_LONG).show();
-                }
-                atualizarControles();
-            }
-        });
+        );
     }
 
     private void atualizarControles() {
-        if (btnPaginaAnterior == null) return;
+        if (btnPaginaAnterior == null || btnProximaPagina == null) {
+            return;
+        }
+
         btnPaginaAnterior.setEnabled(!carregando && paginaAtual > 1);
         btnProximaPagina.setEnabled(!carregando && temProximaPagina);
+
         tvPaginaAtual.setText(String.valueOf(paginaAtual));
+
         if (tvPaginaAnterior != null) {
-            tvPaginaAnterior.setText(paginaAtual > 1 ? String.valueOf(paginaAtual - 1) : "");
+            tvPaginaAnterior.setText(
+                    paginaAtual > 1 ? String.valueOf(paginaAtual - 1) : ""
+            );
         }
+
         if (tvProximaPagina != null) {
-            tvProximaPagina.setText(temProximaPagina ? String.valueOf(paginaAtual + 1) : "");
+            tvProximaPagina.setText(
+                    temProximaPagina ? String.valueOf(paginaAtual + 1) : ""
+            );
         }
     }
 }

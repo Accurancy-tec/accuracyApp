@@ -37,7 +37,12 @@ public class QuoteRepository {
             @Override
             public void onResponse(Call<QuoteResponse> call, Response<QuoteResponse> response) {
                 if (!response.isSuccessful()) {
-                    callback.onErro("Erro ao buscar a cotação. Código HTTP: " + response.code());
+                    int codigo = response.code();
+                    if (ehFii(categoria) && (codigo == 403 || codigo == 404)) {
+                        callback.onErro("A brapi não disponibilizou cotação para este FII (HTTP " + codigo + ").");
+                    } else {
+                        callback.onErro("Erro ao buscar a cotação. Código HTTP: " + codigo);
+                    }
                     return;
                 }
 
@@ -86,7 +91,12 @@ public class QuoteRepository {
             @Override
             public void onResponse(Call<StockHistoryResponse> call, Response<StockHistoryResponse> response) {
                 if (!response.isSuccessful()) {
-                    callback.onErro("Erro ao buscar histórico. Código HTTP: " + response.code());
+                    int codigo = response.code();
+                    if (ehFii(categoria) && (codigo == 403 || codigo == 404)) {
+                        callback.onErro("Histórico diário indisponível para este FII (HTTP " + codigo + "). A cotação e a posição continuam independentes do gráfico.");
+                    } else {
+                        callback.onErro("Erro ao buscar histórico. Código HTTP: " + codigo);
+                    }
                     return;
                 }
 
