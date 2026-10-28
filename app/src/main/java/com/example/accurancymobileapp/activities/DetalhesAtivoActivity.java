@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -36,6 +37,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import com.example.accurancymobileapp.model.Aporte;
+import java.util.Comparator;
 
 public class DetalhesAtivoActivity extends AppCompatActivity {
 
@@ -100,6 +103,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
         quoteRepository = new QuoteRepository(this);
         desenharGrafico(true, null);
+        carregarPosicaoInicial();
         carregarCotacao();
         carregarHistorico(periodoSelecionado, etiquetaPeriodo);
     }
@@ -191,13 +195,25 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         if (carregandoCotacao) return;
         carregandoCotacao = true;
         tvStatusMercado.setText("Atualizando cotação…");
-        quoteRepository.buscarCotacoes(ticker, new QuoteRepository.QuoteCallback() {
+
+        quoteRepository.buscarCotacoes(ticker, categoriaAtivo, new QuoteRepository.QuoteCallback() {
             @Override
             public void onSucesso(List<QuoteData> quotes) {
                 carregandoCotacao = false;
                 if (isFinishing() || isDestroyed() || quotes == null || quotes.isEmpty()) return;
+
                 QuoteData quote = quotes.get(0);
-                precoAtual = quote.getRegularMarketPrice();
+                Double preco = quote.getRegularMarketPrice();
+                if (preco == null || !Double.isFinite(preco) || preco <= 0) {
+                    tvStatusMercado.setText("Cotação indisponível");
+                    tvPrecoAtualAtivo.setText("—");
+                    tvVariacaoPrecoAtivo.setText("—");
+                    tvUltimaAtualizacao.setText("Última atualização: cotação não fornecida pela API");
+                    atualizarResumoPosicao();
+                    return;
+                }
+
+                precoAtual = preco;
                 String nomeDaBrapi = quote.getLongName() != null && !quote.getLongName().trim().isEmpty()
                         ? quote.getLongName() : quote.getShortName();
                 if (nomeDaBrapi != null && !nomeDaBrapi.trim().isEmpty()) {
@@ -207,13 +223,18 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 tvTickerAtivo.setText(quote.getSymbol() == null ? ticker : quote.getSymbol());
                 tvPrecoAtualAtivo.setText(formatoMoeda.format(precoAtual));
 
-                double variacao = quote.getRegularMarketChangePercent();
-                String seta = variacao > 0 ? "▲ " : variacao < 0 ? "▼ " : "• ";
-                tvVariacaoPrecoAtivo.setText(seta + String.format(ptBR, "%.2f%%", Math.abs(variacao)));
-                tvVariacaoPrecoAtivo.setTextColor(ContextCompat.getColor(
-                        DetalhesAtivoActivity.this,
-                        variacao >= 0 ? R.color.green_positive : R.color.red_negative
-                ));
+                Double variacao = quote.getRegularMarketChangePercent();
+                if (variacao == null || !Double.isFinite(variacao)) {
+                    tvVariacaoPrecoAtivo.setText("—");
+                    tvVariacaoPrecoAtivo.setTextColor(ContextCompat.getColor(DetalhesAtivoActivity.this, R.color.text_secondary));
+                } else {
+                    String seta = variacao > 0 ? "▲ " : variacao < 0 ? "▼ " : "• ";
+                    tvVariacaoPrecoAtivo.setText(seta + String.format(ptBR, "%.2f%%", Math.abs(variacao)));
+                    tvVariacaoPrecoAtivo.setTextColor(ContextCompat.getColor(
+                            DetalhesAtivoActivity.this, variacao < 0 ? R.color.red_negative
+                                    : variacao > 0 ? R.color.green_positive : R.color.text_secondary));
+                }
+
                 tvStatusMercado.setText("Cotação recebida");
                 tvUltimaAtualizacao.setText("Última atualização: " + formatarHorario(quote.getRegularMarketTime()));
                 atualizarResumoPosicao();
@@ -224,6 +245,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 carregandoCotacao = false;
                 if (isFinishing() || isDestroyed()) return;
                 tvStatusMercado.setText("Cotação indisponível");
+                tvPrecoAtualAtivo.setText("—");
+                tvVariacaoPrecoAtivo.setText("—");
+                tvUltimaAtualizacao.setText("Última atualização: sem cotação disponível");
+                atualizarResumoPosicao();
                 Toast.makeText(DetalhesAtivoActivity.this, mensagem, Toast.LENGTH_LONG).show();
             }
         });
@@ -252,7 +277,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         carregandoHistorico = true;
         erroHistorico = null;
         desenharGrafico(true, null);
-        quoteRepository.buscarHistorico(ticker, range, new QuoteRepository.HistoricoCallback() {
+        quoteRepository.buscarHistorico(ticker, range, categoriaAtivo, new QuoteRepository.HistoricoCallback() {
             @Override
             public void onSucesso(List<StockHistoryResponse.Point> pontos) {
                 carregandoHistorico = false;
@@ -260,7 +285,6 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 labelsGrafico.clear();
                 valoresGrafico.clear();
                 if (pontos != null) {
-                    // A brapi normalmente retorna do mais recente para o mais antigo; o gráfico usa crescente.
                     List<StockHistoryResponse.Point> ordenados = new ArrayList<>(pontos);
                     ordenados.sort((a, b) -> Long.compare(a.getDate(), b.getDate()));
                     for (StockHistoryResponse.Point ponto : ordenados) {
@@ -417,5 +441,111 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
     private String formatarQuantidade(double quantidade) {
         return String.format(ptBR, quantidade == Math.rint(quantidade) ? "%.0f" : "%.4f", quantidade);
+    }
+    private void carregarPosicaoInicial() {
+        // Se a tela já recebeu a posição por Intent, mantém esses valores.
+        if (idCarteira > 0 && quantidadePosicao > 0 && precoMedio > 0) {
+            atualizarResumoPosicao();
+            return;
+        }
+
+        if (idCarteira > 0) {
+            carregarPosicaoDaCarteira(idCarteira);
+            return;
+        }
+
+        new WalletRepository(this).buscarWallets(new WalletRepository.WalletListCallback() {
+            @Override
+            public void onSuccess(List<Wallet> wallets) {
+                if (isFinishing() || isDestroyed() || wallets == null || wallets.isEmpty()) return;
+                if (wallets.size() == 1) {
+                    idCarteira = wallets.get(0).getId_carteira();
+                    carregarPosicaoDaCarteira(idCarteira);
+                    return;
+                }
+
+                String[] opcoes = new String[wallets.size()];
+                for (int i = 0; i < wallets.size(); i++) {
+                    Wallet wallet = wallets.get(i);
+                    opcoes[i] = wallet.getNome_carteira() + " · " + wallet.getTipo_carteira();
+                }
+                new AlertDialog.Builder(DetalhesAtivoActivity.this)
+                        .setTitle("Calcular minha posição em qual carteira?")
+                        .setItems(opcoes, (dialog, which) -> {
+                            idCarteira = wallets.get(which).getId_carteira();
+                            carregarPosicaoDaCarteira(idCarteira);
+                        })
+                        .setNegativeButton("Agora não", (dialog, which) -> limparResumoPosicao())
+                        .show();
+            }
+
+            @Override
+            public void onError(String message) {
+                if (!isFinishing() && !isDestroyed()) {
+                    Log.w("POSICAO_ATIVO", "Não foi possível buscar carteiras: " + message);
+                    limparResumoPosicao();
+                }
+            }
+        });
+    }
+
+    private void carregarPosicaoDaCarteira(int carteiraId) {
+        new AporteRepository(this).buscarAportes(carteiraId, new AporteRepository.aporteCallback() {
+            @Override
+            public void onSucesso(List<Aporte> aportes) {
+                if (isFinishing() || isDestroyed()) return;
+                List<Aporte> ordenados = aportes == null ? new ArrayList<>() : new ArrayList<>(aportes);
+
+                ordenados.sort(Comparator.comparing(
+                        a -> (a == null || a.getData_aporte() == null) ? "" : a.getData_aporte()));
+
+                double quantidade = 0.0;
+                double custoRestante = 0.0;
+                for (Aporte aporte : ordenados) {
+                    if (aporte == null || aporte.getAtivoAporte() == null
+                            || !ticker.equalsIgnoreCase(aporte.getAtivoAporte().trim())) continue;
+
+                    String tipo = aporte.getTipoAporte() == null ? "" : aporte.getTipoAporte().trim();
+                    double qtd = Math.max(0.0, aporte.getQuantidadeAporte());
+                    double valor = Math.max(0.0, aporte.getValorAporte());
+                    if (qtd <= 0) continue;
+
+                    if ("Compra".equalsIgnoreCase(tipo)) {
+                        quantidade += qtd;
+                        custoRestante += valor;
+                    } else if ("Venda".equalsIgnoreCase(tipo) && quantidade > 0) {
+                        double custoMedioAtual = custoRestante / quantidade;
+                        double qtdVendida = Math.min(qtd, quantidade);
+                        custoRestante = Math.max(0.0, custoRestante - custoMedioAtual * qtdVendida);
+                        quantidade = Math.max(0.0, quantidade - qtdVendida);
+                    }
+                }
+
+                if (quantidade < 0.0000001) {
+                    quantidade = 0.0;
+                    custoRestante = 0.0;
+                }
+                quantidadePosicao = quantidade;
+                precoMedio = quantidade > 0 ? custoRestante / quantidade : 0.0;
+                atualizarResumoPosicao();
+            }
+
+            @Override
+            public void onErro(String mensagem) {
+                if (isFinishing() || isDestroyed()) return;
+                Log.w("POSICAO_ATIVO", "Não foi possível calcular a posição: " + mensagem);
+                limparResumoPosicao();
+            }
+        });
+    }
+
+    private void limparResumoPosicao() {
+        quantidadePosicao = 0.0;
+        precoMedio = 0.0;
+        tvPrecoMedio.setText("—");
+        tvQuantidadeAtivo.setText("—");
+        tvValorPosicao.setText("—");
+        tvVariacaoRentabilidade.setText("—");
+        tvValorRentabilidade.setText("—");
     }
 }
