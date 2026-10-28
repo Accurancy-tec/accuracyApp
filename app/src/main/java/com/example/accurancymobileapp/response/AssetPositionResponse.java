@@ -1,8 +1,8 @@
-package com.example.accurancymobileapp.model;
+package com.example.accurancymobileapp.response;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AssetPosition{
+public class AssetPositionResponse {
 
     @SerializedName(value = "success", alternate = {"sucesso"})
     private boolean success;

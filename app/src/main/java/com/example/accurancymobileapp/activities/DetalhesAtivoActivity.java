@@ -20,10 +20,12 @@ import androidx.compose.ui.platform.ComposeView;
 import androidx.core.content.ContextCompat;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
+import com.example.accurancymobileapp.network.repository.AssetPositionRepository;
 import com.example.accurancymobileapp.network.repository.QuoteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
@@ -37,8 +39,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import com.example.accurancymobileapp.model.Aporte;
-import java.util.Comparator;
 
 public class DetalhesAtivoActivity extends AppCompatActivity {
 
@@ -46,8 +46,6 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     public static final String EXTRA_NOME = "nome_ativo";
     public static final String EXTRA_CATEGORIA = "categoria_ativo";
     public static final String EXTRA_ID_CARTEIRA = "id_carteira";
-    public static final String EXTRA_QUANTIDADE = "quantidade_posicao";
-    public static final String EXTRA_PRECO_MEDIO = "preco_medio_posicao";
     public static final String EXTRA_SALDO = "saldo_disponivel";
 
     private final Locale ptBR = Locale.forLanguageTag("pt-BR");
@@ -63,6 +61,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private TextView filtro1S, filtro1M, filtro3M, filtro6M;
     private ComposeView graficoAtivo;
 
+    private AssetPositionRepository assetPositionRepository;
+    private int assetPositionRequestId;
     private QuoteRepository quoteRepository;
     private String ticker;
     private String nomeAtivo;
@@ -78,6 +78,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private String erroHistorico;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        loadAssetPosition();
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalhes_ativo);
@@ -86,8 +92,6 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         nomeAtivo = getIntent().getStringExtra(EXTRA_NOME);
         categoriaAtivo = getIntent().getStringExtra(EXTRA_CATEGORIA);
         idCarteira = getIntent().getIntExtra(EXTRA_ID_CARTEIRA, -1);
-        quantidadePosicao = getIntent().getDoubleExtra(EXTRA_QUANTIDADE, 0.0);
-        precoMedio = getIntent().getDoubleExtra(EXTRA_PRECO_MEDIO, 0.0);
 
         if (ticker == null || ticker.trim().isEmpty()) {
             Toast.makeText(this, "Não foi informado qual ativo abrir.", Toast.LENGTH_LONG).show();
@@ -102,8 +106,9 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         configurarEventos();
 
         quoteRepository = new QuoteRepository(this);
+        assetPositionRepository = new AssetPositionRepository(this);
+
         desenharGrafico(true, null);
-        carregarPosicaoInicial();
         carregarCotacao();
         carregarHistorico(periodoSelecionado, etiquetaPeriodo);
     }
@@ -413,10 +418,20 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 btnComprarAtivo.setEnabled(true);
                 btnVenderAtivo.setEnabled(true);
                 if (isFinishing() || isDestroyed()) return;
-                Toast.makeText(DetalhesAtivoActivity.this, mensagem + " (operação simulada)", Toast.LENGTH_LONG).show();
-                setResult(Activity.RESULT_OK, new Intent().putExtra(EXTRA_ID_CARTEIRA, carteira));
-                // Recarrega a cotação; posição/preço médio só são recalculados quando a API da carteira fornece esses campos.
+
+                Toast.makeText(
+                        DetalhesAtivoActivity.this,
+                        mensagem + " (operação simulada)",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                setResult(
+                        Activity.RESULT_OK,
+                        new Intent().putExtra(EXTRA_ID_CARTEIRA, carteira)
+                );
+
                 carregarCotacao();
+                loadAssetPosition();
             }
 
             @Override
@@ -442,102 +457,6 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private String formatarQuantidade(double quantidade) {
         return String.format(ptBR, quantidade == Math.rint(quantidade) ? "%.0f" : "%.4f", quantidade);
     }
-    private void carregarPosicaoInicial() {
-        // Se a tela já recebeu a posição por Intent, mantém esses valores.
-        if (idCarteira > 0 && quantidadePosicao > 0 && precoMedio > 0) {
-            atualizarResumoPosicao();
-            return;
-        }
-
-        if (idCarteira > 0) {
-            carregarPosicaoDaCarteira(idCarteira);
-            return;
-        }
-
-        new WalletRepository(this).buscarWallets(new WalletRepository.WalletListCallback() {
-            @Override
-            public void onSuccess(List<Wallet> wallets) {
-                if (isFinishing() || isDestroyed() || wallets == null || wallets.isEmpty()) return;
-                if (wallets.size() == 1) {
-                    idCarteira = wallets.get(0).getId_carteira();
-                    carregarPosicaoDaCarteira(idCarteira);
-                    return;
-                }
-
-                String[] opcoes = new String[wallets.size()];
-                for (int i = 0; i < wallets.size(); i++) {
-                    Wallet wallet = wallets.get(i);
-                    opcoes[i] = wallet.getNome_carteira() + " · " + wallet.getTipo_carteira();
-                }
-                new AlertDialog.Builder(DetalhesAtivoActivity.this)
-                        .setTitle("Calcular minha posição em qual carteira?")
-                        .setItems(opcoes, (dialog, which) -> {
-                            idCarteira = wallets.get(which).getId_carteira();
-                            carregarPosicaoDaCarteira(idCarteira);
-                        })
-                        .setNegativeButton("Agora não", (dialog, which) -> limparResumoPosicao())
-                        .show();
-            }
-
-            @Override
-            public void onError(String message) {
-                if (!isFinishing() && !isDestroyed()) {
-                    Log.w("POSICAO_ATIVO", "Não foi possível buscar carteiras: " + message);
-                    limparResumoPosicao();
-                }
-            }
-        });
-    }
-
-    private void carregarPosicaoDaCarteira(int carteiraId) {
-        new AporteRepository(this).buscarAportes(carteiraId, new AporteRepository.aporteCallback() {
-            @Override
-            public void onSucesso(List<Aporte> aportes) {
-                if (isFinishing() || isDestroyed()) return;
-                List<Aporte> ordenados = aportes == null ? new ArrayList<>() : new ArrayList<>(aportes);
-
-                ordenados.sort(Comparator.comparing(
-                        a -> (a == null || a.getData_aporte() == null) ? "" : a.getData_aporte()));
-
-                double quantidade = 0.0;
-                double custoRestante = 0.0;
-                for (Aporte aporte : ordenados) {
-                    if (aporte == null || aporte.getAtivoAporte() == null
-                            || !ticker.equalsIgnoreCase(aporte.getAtivoAporte().trim())) continue;
-
-                    String tipo = aporte.getTipoAporte() == null ? "" : aporte.getTipoAporte().trim();
-                    double qtd = Math.max(0.0, aporte.getQuantidadeAporte());
-                    double valor = Math.max(0.0, aporte.getValorAporte());
-                    if (qtd <= 0) continue;
-
-                    if ("Compra".equalsIgnoreCase(tipo)) {
-                        quantidade += qtd;
-                        custoRestante += valor;
-                    } else if ("Venda".equalsIgnoreCase(tipo) && quantidade > 0) {
-                        double custoMedioAtual = custoRestante / quantidade;
-                        double qtdVendida = Math.min(qtd, quantidade);
-                        custoRestante = Math.max(0.0, custoRestante - custoMedioAtual * qtdVendida);
-                        quantidade = Math.max(0.0, quantidade - qtdVendida);
-                    }
-                }
-
-                if (quantidade < 0.0000001) {
-                    quantidade = 0.0;
-                    custoRestante = 0.0;
-                }
-                quantidadePosicao = quantidade;
-                precoMedio = quantidade > 0 ? custoRestante / quantidade : 0.0;
-                atualizarResumoPosicao();
-            }
-
-            @Override
-            public void onErro(String mensagem) {
-                if (isFinishing() || isDestroyed()) return;
-                Log.w("POSICAO_ATIVO", "Não foi possível calcular a posição: " + mensagem);
-                limparResumoPosicao();
-            }
-        });
-    }
 
     private void limparResumoPosicao() {
         quantidadePosicao = 0.0;
@@ -547,5 +466,68 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         tvValorPosicao.setText("—");
         tvVariacaoRentabilidade.setText("—");
         tvValorRentabilidade.setText("—");
+    }
+
+    private void loadAssetPosition() {
+        if (ticker == null
+                || ticker.trim().isEmpty()
+                || assetPositionRepository == null) {
+            return;
+        }
+
+        int requestId = ++assetPositionRequestId;
+
+        assetPositionRepository.getAssetPosition(
+                ticker,
+                new AssetPositionRepository.PositionCallback() {
+                    @Override
+                    public void onSuccess(AssetPositionResponse position) {
+                        if (requestId != assetPositionRequestId
+                                || isFinishing()
+                                || isDestroyed()) {
+                            return;
+                        }
+
+                        Double quantity = position.getQuantity();
+                        Double averagePrice = position.getAveragePrice();
+
+                        quantidadePosicao = quantity != null
+                                && Double.isFinite(quantity)
+                                && quantity > 0
+                                ? quantity
+                                : 0.0;
+
+                        precoMedio = averagePrice != null
+                                && Double.isFinite(averagePrice)
+                                && averagePrice > 0
+                                ? averagePrice
+                                : 0.0;
+
+                        atualizarResumoPosicao();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        if (requestId != assetPositionRequestId
+                                || isFinishing()
+                                || isDestroyed()) {
+                            return;
+                        }
+
+                        Log.w(
+                                "ASSET_POSITION",
+                                "Unable to load position for " + ticker + ": " + message
+                        );
+
+                        limparResumoPosicao();
+
+                        Toast.makeText(
+                                DetalhesAtivoActivity.this,
+                                "Não foi possível consultar sua posição.",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                }
+        );
     }
 }
