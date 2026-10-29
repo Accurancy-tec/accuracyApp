@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,10 +15,13 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.CriarWalletAdapter;
+import com.example.accurancymobileapp.adapter.EspacamentoCarteiras;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.google.android.material.button.MaterialButton;
@@ -31,9 +35,10 @@ import java.util.List;
 public class CriarWalletFragment extends Fragment {
 
     private WalletRepository walletRepository;
-    private RecyclerView minhasWallets;
-    private MaterialButton btnCriarWallet;
+    private RecyclerView rvMinhasWallets;
+    private TextView btnCriarWallet;
     private CriarWalletAdapter walletAdapter;
+    private ImageButton btnVoltar;
     private List<Wallet> listaWallets = new ArrayList<>();
 
     public CriarWalletFragment() {
@@ -44,8 +49,9 @@ public class CriarWalletFragment extends Fragment {
    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
      super.onViewCreated(view, savedInstanceState);
 
-     minhasWallets = view.findViewById(R.id.minhasWallets);
+     rvMinhasWallets = view.findViewById(R.id.rvMinhasWallets);
      btnCriarWallet = view.findViewById(R.id.btnCriarWallet);
+     btnVoltar = view.findViewById(R.id.btnVoltar);
      walletRepository = new WalletRepository(requireContext());
 
 
@@ -53,17 +59,20 @@ public class CriarWalletFragment extends Fragment {
      carregarWallets();
 
      btnCriarWallet.setOnClickListener(v -> {abrirDialogoCriarWallet();});
+
    }
 
    private void configurarRecyclerView(){
-        minhasWallets.setLayoutManager( new LinearLayoutManager(requireContext()));
+        rvMinhasWallets.setLayoutManager( new LinearLayoutManager(requireContext()));
 
-        minhasWallets.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvMinhasWallets.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+
+        rvMinhasWallets.addItemDecoration(new EspacamentoCarteiras(dpParaPx(12), dpParaPx(12)));
         walletAdapter = new CriarWalletAdapter(
                 listaWallets,
                 wallet -> abrirWallet(wallet));
 
-        minhasWallets.setAdapter(walletAdapter);
+        rvMinhasWallets.setAdapter(walletAdapter);
 
    }
 
@@ -190,5 +199,9 @@ public class CriarWalletFragment extends Fragment {
                 .addToBackStack(null)
                 .commit();
 
+   }
+
+   private int dpParaPx(int dp){
+        return (int) (dp * getResources().getDisplayMetrics().density + 0.5f);
    }
 }
