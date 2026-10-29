@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Wallet;
 
+import org.w3c.dom.Text;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,19 +41,10 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
     public void onBindViewHolder(@NonNull WalletViewHolder holder, int position) {
 
         Wallet wallet = listaWallets.get(position);
+        BigDecimal total = wallet.getTotalAportado();
 
-        String nomeCarteira = wallet.getNome_carteira();
-
-        if (nomeCarteira != null && !nomeCarteira.isEmpty()) {
-            holder.tvIconCarteira.setText(
-                    nomeCarteira.substring(0, 1).toUpperCase(Locale.ROOT)
-            );
-        } else {
-            holder.tvIconCarteira.setText("?");
-        }
-
-        holder.txtNomeWallet.setText(wallet.getNome_carteira());
-        holder.txtTipoWallet.setText(wallet.getTipo_carteira());
+        holder.tvSaldoCarteira.setText(formatadorMoeda(total));
+        holder.tvNomeCarteira.setText(wallet.getNome_carteira());
 
         holder.itemView.setOnClickListener(v -> {
 
@@ -71,22 +66,32 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
         notifyDataSetChanged();
     }
 
+    public String formatadorMoeda(BigDecimal valor){
+        NumberFormat formato = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+
+        return formato.format(valor);
+    }
+
     public interface OnWalletClickListener {
         void onWalletClick(Wallet wallet);
     }
 
     public static class WalletViewHolder extends RecyclerView.ViewHolder {
 
-        TextView txtNomeWallet;
-        TextView txtTipoWallet;
-        TextView tvIconCarteira;
+        TextView tvNomeCarteira;
+        TextView tvSaldoCarteira;
+        TextView tvRendimentoCarteira;
+        //TextView tvMetaCarteira;
+        //TextView tvProgressoCarteira;
 
         public WalletViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            tvIconCarteira = itemView.findViewById(R.id.tvIconeCarteira);
-            txtNomeWallet = itemView.findViewById(R.id.txtNomeWallet);
-            txtTipoWallet = itemView.findViewById(R.id.txtTipoWallet);
+            tvNomeCarteira = itemView.findViewById(R.id.tvNomeCarteira);
+            tvSaldoCarteira = itemView.findViewById(R.id.tvSaldoCarteira);
+            tvRendimentoCarteira = itemView.findViewById(R.id.tvRendimentoCarteira);
+            //tvMetaCarteira = itemView.findViewById(R.id.tvMetaCarteira);
+            //tvProgressoCarteira = itemView.findViewById(R.id.tvProgressoCarteira);
         }
     }
 }
