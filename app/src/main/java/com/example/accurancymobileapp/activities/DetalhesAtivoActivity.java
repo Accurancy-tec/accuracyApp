@@ -47,6 +47,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     public static final String EXTRA_CATEGORIA = "categoria_ativo";
     public static final String EXTRA_ID_CARTEIRA = "id_carteira";
     public static final String EXTRA_SALDO = "saldo_disponivel";
+    public static final String EXTRA_PRECO_ATUAL_COMPRA = "preco_atual_compra";
+    public static final String EXTRA_VARIACAO_DIARIA_COMPRA = "variacao_diaria_compra";
+    public static final String EXTRA_ULTIMA_ATUALIZACAO_COMPRA = "ultima_atualizacao_compra";
+    public static final String EXTRA_QUANTIDADE_DISPONIVEL_COMPRA = "quantidade_disponivel_compra";
 
     private final Locale ptBR = Locale.forLanguageTag("pt-BR");
     private final NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(ptBR);
@@ -72,6 +76,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private double precoAtual = 0.0;
     private double quantidadePosicao = 0.0;
     private double precoMedio = 0.0;
+    private double variacaoDiaria = Double.NaN;
     private int idCarteira = -1;
     private boolean carregandoCotacao = false;
     private boolean carregandoHistorico = false;
@@ -154,16 +159,16 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         tvTickerAtivo.setText(ticker);
         tvNomeAtivo.setText(nomeAtivo);
         tvStatusMercado.setText("Buscando cotação");
-        tvPrecoAtualAtivo.setText("—");
-        tvVariacaoPrecoAtivo.setText("—");
+        tvPrecoAtualAtivo.setText("R$ 0");
+        tvVariacaoPrecoAtivo.setText("0%");
         tvUltimaAtualizacao.setText("Última atualização: aguardando dados");
-        tvPrecoMedio.setText(precoMedio > 0 ? formatoMoeda.format(precoMedio) : "—");
-        tvQuantidadeAtivo.setText(quantidadePosicao > 0 ? formatarQuantidade(quantidadePosicao) : "—");
+        tvPrecoMedio.setText(precoMedio > 0 ? formatoMoeda.format(precoMedio) : "R$ 0");
+        tvQuantidadeAtivo.setText(quantidadePosicao > 0 ? formatarQuantidade(quantidadePosicao) : "0");
         tvValorPosicao.setText(precoAtual > 0 && quantidadePosicao > 0 ? formatoMoeda.format(precoAtual * quantidadePosicao) : "—");
-        tvVariacaoRentabilidade.setText("—");
-        tvValorRentabilidade.setText("—");
+        tvVariacaoRentabilidade.setText("0%");
+        tvValorRentabilidade.setText("0%");
         double saldo = getIntent().getDoubleExtra(EXTRA_SALDO, -1.0);
-        tvSaldoInvestir.setText(saldo >= 0 ? formatoMoeda.format(saldo) : "—");
+        tvSaldoInvestir.setText(saldo >= 0 ? formatoMoeda.format(saldo) : "R$ 0");
         selecionarFiltroVisual(filtro3M);
     }
 
@@ -172,8 +177,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
             carregarCotacao();
             carregarHistorico(periodoSelecionado, etiquetaPeriodo);
         });
-        btnComprarAtivo.setOnClickListener(v -> mostrarDialogoQuantidade("Compra"));
-        btnVenderAtivo.setOnClickListener(v -> mostrarDialogoQuantidade("Venda"));
+
+        btnComprarAtivo.setOnClickListener(v -> abrirTelaOperacao("Compra"));
+        btnVenderAtivo.setOnClickListener(v -> abrirTelaOperacao("Venda"));
+
         filtro1S.setOnClickListener(v -> selecionarPeriodo("7d", "1S", filtro1S));
         filtro1M.setOnClickListener(v -> selecionarPeriodo("1mo", "1M", filtro1M));
         filtro3M.setOnClickListener(v -> selecionarPeriodo("3mo", "3M", filtro3M));
@@ -211,8 +218,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 Double preco = quote.getRegularMarketPrice();
                 if (preco == null || !Double.isFinite(preco) || preco <= 0) {
                     tvStatusMercado.setText("Cotação indisponível");
-                    tvPrecoAtualAtivo.setText("—");
-                    tvVariacaoPrecoAtivo.setText("—");
+                    tvPrecoAtualAtivo.setText("R$ 0");
+                    tvVariacaoPrecoAtivo.setText("0%");
                     tvUltimaAtualizacao.setText("Última atualização: cotação não fornecida pela API");
                     atualizarResumoPosicao();
                     return;
@@ -229,8 +236,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 tvPrecoAtualAtivo.setText(formatoMoeda.format(precoAtual));
 
                 Double variacao = quote.getRegularMarketChangePercent();
+                variacaoDiaria = variacao != null && Double.isFinite(variacao)
+                        ? variacao
+                        : Double.NaN;
+
                 if (variacao == null || !Double.isFinite(variacao)) {
-                    tvVariacaoPrecoAtivo.setText("—");
+                    tvVariacaoPrecoAtivo.setText("0%");
                     tvVariacaoPrecoAtivo.setTextColor(ContextCompat.getColor(DetalhesAtivoActivity.this, R.color.text_secondary));
                 } else {
                     String seta = variacao > 0 ? "▲ " : variacao < 0 ? "▼ " : "• ";
@@ -250,8 +261,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 carregandoCotacao = false;
                 if (isFinishing() || isDestroyed()) return;
                 tvStatusMercado.setText("Cotação indisponível");
-                tvPrecoAtualAtivo.setText("—");
-                tvVariacaoPrecoAtivo.setText("—");
+                tvPrecoAtualAtivo.setText("R$ 0");
+                tvVariacaoPrecoAtivo.setText("0%");
                 tvUltimaAtualizacao.setText("Última atualização: sem cotação disponível");
                 atualizarResumoPosicao();
                 Toast.makeText(DetalhesAtivoActivity.this, mensagem, Toast.LENGTH_LONG).show();
@@ -260,12 +271,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     }
 
     private void atualizarResumoPosicao() {
-        tvPrecoMedio.setText(precoMedio > 0 ? formatoMoeda.format(precoMedio) : "—");
+        tvPrecoMedio.setText(precoMedio > 0 ? formatoMoeda.format(precoMedio) : "R$ 0");
         tvQuantidadeAtivo.setText(quantidadePosicao > 0 ? formatarQuantidade(quantidadePosicao) : "—");
         if (quantidadePosicao <= 0 || precoMedio <= 0 || precoAtual <= 0) {
             tvValorPosicao.setText(quantidadePosicao > 0 && precoAtual > 0 ? formatoMoeda.format(quantidadePosicao * precoAtual) : "—");
-            tvVariacaoRentabilidade.setText("—");
-            tvValorRentabilidade.setText("—");
+            tvVariacaoRentabilidade.setText("0%");
+            tvValorRentabilidade.setText("0%");
             return;
         }
         double valorPosicao = quantidadePosicao * precoAtual;
@@ -327,120 +338,43 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         );
     }
 
-    private void mostrarDialogoQuantidade(String tipo) {
-        if (precoAtual <= 0) {
-            Toast.makeText(this, "Aguarde uma cotação válida antes de registrar a operação.", Toast.LENGTH_LONG).show();
+    private void abrirTelaOperacao(String tipo) {
+        if (!Double.isFinite(precoAtual) || precoAtual <= 0.0) {
+            Toast.makeText(
+                    this,
+                    "Aguarde uma cotação válida antes de registrar a operação.",
+                    Toast.LENGTH_LONG
+            ).show();
             carregarCotacao();
             return;
         }
 
-        EditText input = new EditText(this);
-        input.setSingleLine(true);
-        input.setHint("Ex.: 2 ou 0,5");
-        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
-        int padding = (int) (20 * getResources().getDisplayMetrics().density);
-        input.setPadding(padding, padding / 2, padding, padding / 2);
-
-        new AlertDialog.Builder(this)
-                .setTitle(tipo + " " + ticker)
-                .setMessage("Preço de referência: " + formatoMoeda.format(precoAtual) + "\nInforme a quantidade de unidades. A operação será registrada na carteira selecionada.")
-                .setView(input)
-                .setNegativeButton("Cancelar", null)
-                .setPositiveButton("Continuar", (dialog, which) -> {
-                    String valorTexto = input.getText().toString().trim().replace(',', '.');
-                    double quantidade;
-                    try {
-                        quantidade = Double.parseDouble(valorTexto);
-                    } catch (Exception e) {
-                        Toast.makeText(this, "Digite uma quantidade válida.", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    if (!Double.isFinite(quantidade) || quantidade <= 0) {
-                        Toast.makeText(this, "A quantidade precisa ser maior que zero.", Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    confirmarOperacao(tipo, quantidade);
-                })
-                .show();
-    }
-
-    private void confirmarOperacao(String tipo, double quantidade) {
-        if (idCarteira > 0) {
-            registrarOperacao(tipo, quantidade, idCarteira);
+        if ("Venda".equals(tipo) && quantidadePosicao <= 0.0) {
+            Toast.makeText(
+                    this,
+                    "Você não possui unidades deste ativo disponíveis para venda.",
+                    Toast.LENGTH_LONG
+            ).show();
+            loadAssetPosition();
             return;
         }
 
-        new WalletRepository(this).buscarWallets(new WalletRepository.WalletListCallback() {
-            @Override
-            public void onSuccess(List<Wallet> wallets) {
-                if (isFinishing() || isDestroyed()) return;
-                if (wallets == null || wallets.isEmpty()) {
-                    Toast.makeText(DetalhesAtivoActivity.this, "Crie uma carteira antes de registrar uma operação.", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                Wallet[] opcoes = wallets.toArray(new Wallet[0]);
-                CharSequence[] nomesCarteiras = new CharSequence[opcoes.length];
-                for (int i = 0; i < opcoes.length; i++) {
-                    nomesCarteiras[i] = opcoes[i].getNome_carteira() + " · " + opcoes[i].getTipo_carteira();
-                }
-                new AlertDialog.Builder(DetalhesAtivoActivity.this)
-                        .setTitle("Escolha a carteira")
-                        .setItems(nomesCarteiras, (dialog, which) -> registrarOperacao(tipo, quantidade, opcoes[which].getId_carteira()))
-                        .setNegativeButton("Cancelar", null)
-                        .show();
-            }
-
-            @Override
-            public void onError(String message) {
-                if (!isFinishing() && !isDestroyed()) Toast.makeText(DetalhesAtivoActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void registrarOperacao(String tipo, double quantidade, int carteira) {
-        String nome = nomeAtivo == null || nomeAtivo.trim().isEmpty() ? ticker : nomeAtivo;
-        clsAportes aporte = new clsAportes(
-                ticker,
-                nome,
-                categoriaAtivo,
-                quantidade,
-                quantidade * precoAtual,
-                tipo,
-                "Único",
-                carteira
+        Intent asset = new Intent(DetalhesAtivoActivity.this, BuyAssetActivity.class);
+        asset.putExtra(EXTRA_TICKER, ticker);
+        asset.putExtra(EXTRA_NOME, nomeAtivo);
+        asset.putExtra(EXTRA_CATEGORIA, categoriaAtivo);
+        asset.putExtra(EXTRA_ID_CARTEIRA, idCarteira);
+        asset.putExtra(EXTRA_SALDO, getIntent().getDoubleExtra(EXTRA_SALDO, -1.0));
+        asset.putExtra(EXTRA_PRECO_ATUAL_COMPRA, precoAtual);
+        asset.putExtra(EXTRA_VARIACAO_DIARIA_COMPRA, variacaoDiaria);
+        asset.putExtra(
+                EXTRA_ULTIMA_ATUALIZACAO_COMPRA,
+                tvUltimaAtualizacao.getText().toString()
         );
+        asset.putExtra(EXTRA_QUANTIDADE_DISPONIVEL_COMPRA, quantidadePosicao);
+        asset.putExtra(BuyAssetActivity.EXTRA_TIPO_OPERACAO, tipo);
 
-        btnComprarAtivo.setEnabled(false);
-        btnVenderAtivo.setEnabled(false);
-        new AporteRepository(this).registrarAporte(aporte, new AporteRepository.RegistroCallback() {
-            @Override
-            public void onSucesso(String mensagem) {
-                btnComprarAtivo.setEnabled(true);
-                btnVenderAtivo.setEnabled(true);
-                if (isFinishing() || isDestroyed()) return;
-
-                Toast.makeText(
-                        DetalhesAtivoActivity.this,
-                        mensagem + " (operação simulada)",
-                        Toast.LENGTH_LONG
-                ).show();
-
-                setResult(
-                        Activity.RESULT_OK,
-                        new Intent().putExtra(EXTRA_ID_CARTEIRA, carteira)
-                );
-
-                carregarCotacao();
-                loadAssetPosition();
-            }
-
-            @Override
-            public void onErro(String mensagem) {
-                btnComprarAtivo.setEnabled(true);
-                btnVenderAtivo.setEnabled(true);
-                if (!isFinishing() && !isDestroyed()) Toast.makeText(DetalhesAtivoActivity.this, mensagem, Toast.LENGTH_LONG).show();
-            }
-        });
+        startActivity(asset);
     }
 
     private String formatarHorario(String valor) {
