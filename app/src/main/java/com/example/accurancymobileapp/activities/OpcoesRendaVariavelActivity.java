@@ -34,16 +34,17 @@ public class OpcoesRendaVariavelActivity extends AppCompatActivity {
         btnVoltarRendaVariavel.setOnClickListener(v -> finish());
 
         //Abrir telas dos cards
-        cardAcoesNacionais.setOnClickListener(v -> abrirTela(AcoesNacionaisActivity.class));
+        cardAcoesNacionais.setOnClickListener(v -> abrirTela(MarketListActivity.class,"ACOES_NACIONAIS"));
 
-        cardFundosImobiliarios.setOnClickListener(v -> abrirTela(FIIsActivity.class));
+        cardFundosImobiliarios.setOnClickListener(v -> abrirTela(MarketListActivity.class,"FIIS"));
 
         //cardContratosFuturos.setOnClickListener(v -> abrirTela(ContratosFuturosActivity.class));
 
     }
 
-    private void abrirTela(Class<?> activityClass){
+    private void abrirTela(Class<?> activityClass,String screen){
         Intent it = new Intent(this, activityClass);
+        it.putExtra("TAG",screen);
         startActivity(it);
     }
 }
