@@ -2,6 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/detalhesAtivoRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#081426">
@@ -11,7 +12,7 @@
         android:layout_height="match_parent"
         android:background="#081426">
 
-        <!-- Cabeçalho -->
+        <!-- HEADER -->
         <LinearLayout
             android:id="@+id/cabecalhoDetalhes"
             android:layout_width="0dp"
@@ -48,20 +49,19 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:background="@drawable/bg_btn_icone"
+                android:contentDescription="Favoritar ativo"
                 android:gravity="center"
-                android:text=""
                 android:textColor="#FFC400"
-                android:textSize="20sp"
-                android:contentDescription="Favoritar ativo" />
+                android:textSize="20sp" />
 
         </LinearLayout>
 
-        <!-- Conteúdo principal rolável -->
+        <!-- CONTEÚDO ROLÁVEL -->
         <ScrollView
             android:id="@+id/scrollDetalhesAtivo"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:fillViewport="true"
+            android:fillViewport="false"
             android:clipToPadding="false"
             android:overScrollMode="never"
             app:layout_constraintTop_toBottomOf="@id/cabecalhoDetalhes"
@@ -76,18 +76,18 @@
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="20dp">
+                android:paddingBottom="16dp">
 
-                <!-- Card de cotação -->
+                <!-- CARD DA COTAÇÃO -->
                 <LinearLayout
                     android:id="@+id/cardCotacaoAtivo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_card_patrimonio"
                     android:orientation="vertical"
-                    android:padding="17dp">
+                    android:padding="16dp">
 
-                    <!-- Identificação do ativo -->
+                    <!-- IDENTIFICAÇÃO -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -108,13 +108,13 @@
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="11dp"
                             android:layout_weight="1"
+                            android:layout_marginStart="11dp"
                             android:orientation="vertical">
 
                             <TextView
                                 android:id="@+id/tvTickerAtivo"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="PETR4"
                                 android:textColor="#FFFFFF"
@@ -123,8 +123,10 @@
 
                             <TextView
                                 android:id="@+id/tvNomeAtivo"
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:maxLines="2"
+                                android:ellipsize="end"
                                 android:text="PETROBRAS · PN · N2"
                                 android:textColor="#D1DEFF"
                                 android:textSize="10sp" />
@@ -135,12 +137,14 @@
                             android:id="@+id/tvStatusMercado"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:maxWidth="105dp"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:background="@drawable/bg_tag_negativo"
-                            android:paddingStart="8dp"
-                            android:paddingTop="5dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="5dp"
-                            android:text="● Mercado fechado"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="5dp"
+                            android:text="Cotação recebida"
                             android:textColor="#FFD0D4"
                             android:textSize="10sp"
                             android:textStyle="bold" />
@@ -154,7 +158,7 @@
                         android:layout_marginBottom="11dp"
                         android:background="#4267D5" />
 
-                    <!-- Preço atual -->
+                    <!-- PREÇO ATUAL -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -175,10 +179,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_tag_positivo"
-                            android:paddingStart="8dp"
-                            android:paddingTop="4dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="4dp"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="4dp"
                             android:text="▲ 0,00%"
                             android:textColor="#35D7B0"
                             android:textSize="10sp"
@@ -198,28 +200,30 @@
 
                 </LinearLayout>
 
-                <!-- Última atualização -->
+                <!-- ÚLTIMA ATUALIZAÇÃO -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="13dp"
-                    android:gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/tvUltimaAtualizacao"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Última atualização: 22h51 ·"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Última atualização: aguardando dados"
                         android:textColor="#9BAAC0"
-                        android:textSize="11sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/btnAtualizarCotacao"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:padding="3dp"
+                        android:padding="5dp"
                         android:text="Atualizar"
                         android:textColor="#57A6FF"
                         android:textSize="11sp"
@@ -227,12 +231,12 @@
 
                 </LinearLayout>
 
-                <!-- Minha posição -->
+                <!-- MINHA POSIÇÃO -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:layout_marginBottom="11dp"
+                    android:layout_marginBottom="9dp"
                     android:text="Minha posição"
                     android:textColor="#9BAAC0"
                     android:textSize="13sp"
@@ -244,9 +248,9 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_carteira_card"
                     android:orientation="vertical"
-                    android:padding="14dp">
+                    android:padding="13dp">
 
-                    <!-- Preço médio -->
+                    <!-- PREÇO MÉDIO -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -272,11 +276,11 @@
 
                     </LinearLayout>
 
-                    <!-- Quantidade -->
+                    <!-- QUANTIDADE -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp"
+                        android:layout_marginTop="8dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -298,11 +302,11 @@
 
                     </LinearLayout>
 
-                    <!-- Posição -->
+                    <!-- POSIÇÃO -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp"
+                        android:layout_marginTop="8dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -325,11 +329,11 @@
 
                     </LinearLayout>
 
-                    <!-- Rentabilidade -->
+                    <!-- RENTABILIDADE -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="9dp"
+                        android:layout_marginTop="8dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
@@ -346,10 +350,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_tag_negativo"
-                            android:paddingStart="8dp"
-                            android:paddingTop="4dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="4dp"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="4dp"
                             android:text="▼ 0,08%"
                             android:textColor="#FF626B"
                             android:textSize="10sp"
@@ -369,79 +371,83 @@
 
                 </LinearLayout>
 
-                <!-- Estatísticas e filtros -->
+                <!-- ESTATÍSTICAS E FILTROS -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="17dp"
+                    android:layout_marginTop="15dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/tvTituloEstatisticas"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:text="Estatísticas de PETR4"
                         android:textColor="#9BAAC0"
-                        android:textSize="13sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/filtro1S"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingHorizontal="8dp"
+                        android:paddingHorizontal="7dp"
                         android:paddingVertical="6dp"
                         android:text="1S"
                         android:textColor="#9BAAC0"
-                        android:textSize="11sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/filtro1M"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingHorizontal="8dp"
+                        android:paddingHorizontal="7dp"
                         android:paddingVertical="6dp"
                         android:text="1M"
                         android:textColor="#9BAAC0"
-                        android:textSize="11sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/filtro3M"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@color/btn_primary"
-                        android:paddingHorizontal="9dp"
+                        android:paddingHorizontal="8dp"
                         android:paddingVertical="6dp"
                         android:text="3M"
                         android:textColor="#57A6FF"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/filtro6M"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingHorizontal="8dp"
+                        android:paddingHorizontal="7dp"
                         android:paddingVertical="6dp"
                         android:text="6M"
                         android:textColor="#9BAAC0"
-                        android:textSize="11sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
-                <!-- Gráfico: adicionar o Vico posteriormente -->
+                <!-- GRÁFICO RESPONSIVO -->
                 <FrameLayout
                     android:id="@+id/containerGraficoAtivo"
                     android:layout_width="match_parent"
                     android:layout_height="190dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="7dp"
                     android:background="@android:color/transparent" />
 
             </LinearLayout>
+
         </ScrollView>
 
-        <!-- Rodapé fixo com saldo e operações -->
+        <!-- RODAPÉ FIXO -->
         <LinearLayout
             android:id="@+id/rodapeOperacoes"
             android:layout_width="0dp"
@@ -451,11 +457,12 @@
             android:paddingStart="16dp"
             android:paddingTop="10dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="16dp"
+            android:paddingBottom="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <!-- SALDO -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -481,10 +488,11 @@
 
             </LinearLayout>
 
+            <!-- BOTÕES -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="9dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -503,8 +511,8 @@
                     android:id="@+id/btnComprarAtivo"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="9dp"
                     android:layout_weight="1"
+                    android:layout_marginStart="9dp"
                     android:background="@drawable/bg_btn_comprar"
                     android:gravity="center"
                     android:text="Comprar"
