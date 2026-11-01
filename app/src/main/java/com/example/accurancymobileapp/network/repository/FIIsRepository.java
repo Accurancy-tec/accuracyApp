@@ -13,33 +13,70 @@ import retrofit2.Response;
 public class FIIsRepository {
 
     private final ApiService apiService;
+    private Call<AcaoResponse> chamadaAtual;
 
     public FIIsRepository(Context context) {
         apiService = RetrofitClient.getClient(context).create(ApiService.class);
     }
 
     public void listarFIIs(int pagina, int limite, FiiCallback callback) {
-        apiService.listarFIIs(pagina, limite).enqueue(new Callback<AcaoResponse>() {
+        listarFIIs(
+                pagina,
+                limite,
+                null,
+                null,
+                "totalInvestors",
+                "desc",
+                callback
+        );
+    }
+
+    public void listarFIIs(
+            int pagina,
+            int limite,
+            String search,
+            String segmentType,
+            String sortBy,
+            String sortOrder,
+            FiiCallback callback
+    ) {
+        if (chamadaAtual != null && !chamadaAtual.isCanceled()) {
+            chamadaAtual.cancel();
+        }
+
+        Call<AcaoResponse> call = apiService.listarFIIs(
+                pagina,
+                limite,
+                search,
+                segmentType,
+                sortBy,
+                sortOrder
+        );
+        chamadaAtual = call;
+
+        call.enqueue(new Callback<AcaoResponse>() {
             @Override
             public void onResponse(
-                    Call<AcaoResponse> call,
+                    Call<AcaoResponse> currentCall,
                     Response<AcaoResponse> response
             ) {
+                if (currentCall.isCanceled()) {
+                    return;
+                }
+                if (chamadaAtual == currentCall) {
+                    chamadaAtual = null;
+                }
+
                 if (!response.isSuccessful()) {
-                    callback.onError(
-                            "Erro HTTP ao listar FIIs: " + response.code()
-                    );
+                    callback.onError("Erro HTTP ao listar FIIs: " + response.code());
                     return;
                 }
 
                 AcaoResponse resultado = response.body();
-
                 if (resultado == null
                         || resultado.getAcoes() == null
                         || resultado.getPaginacao() == null) {
-                    callback.onError(
-                            "A API retornou dados incompletos dos FIIs."
-                    );
+                    callback.onError("A API retornou dados incompletos dos FIIs.");
                     return;
                 }
 
@@ -47,9 +84,15 @@ public class FIIsRepository {
             }
 
             @Override
-            public void onFailure(Call<AcaoResponse> call, Throwable erro) {
-                String mensagem = erro.getMessage();
+            public void onFailure(Call<AcaoResponse> currentCall, Throwable erro) {
+                if (currentCall.isCanceled()) {
+                    return;
+                }
+                if (chamadaAtual == currentCall) {
+                    chamadaAtual = null;
+                }
 
+                String mensagem = erro.getMessage();
                 callback.onError(
                         mensagem == null || mensagem.trim().isEmpty()
                                 ? "Não foi possível conectar à API para carregar os FIIs."
@@ -61,7 +104,6 @@ public class FIIsRepository {
 
     public interface FiiCallback {
         void onSuccess(AcaoResponse resultado);
-
         void onError(String mensagem);
     }
 }
