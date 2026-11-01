@@ -27,51 +27,70 @@ public interface ApiService {
 
     @POST("auth/registrarNovoUsuario")
     Call<ResponseBody> registerNewUser(@Body User user);
+
     @POST("auth/login")
     Call<LoginResponse> loginVerification(@Body User user);
+
     @POST("auth/refresh")
     Call<LoginResponse> refreshToken(@Body Map<String, String> body);
+
     @POST("aportes/registrar-aporte")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);
 
-    //TODO:remover os endpoints usados nessa função
     @GET("aportes/buscar-aportes")
     Call<ApiResponse> getAportes(
             @Query("limite") Integer limite,
             @Query("id_carteira") int idCarteira
     );
 
-    //Criado pra teste
     @GET("aportes/buscar-aportes")
     Call<AporteResponse> buscarAportes(@Query("id_carteira") int idCarteira);
+
     @GET("aportes/historico-aportes")
     Call<AporteResponse> buscarHistorico();
+
     @POST("aportes/listar-aportes")
     Call<ApiResponse> buscarLista(@Query("Choise") String escolha);
+
     @POST("carteiras/criar-carteira")
     Call<CriarWalletResponse> criarNovaWallet(@Body Wallet wallet);
+
     @GET("carteiras/buscar-carteiras")
     Call<BuscarWalletsResponse> buscarWallets();
+
     @GET("brapi/get-quote")
     Call<QuoteResponse> getQuote(@Query("symbol") String symbol);
 
     @GET("brapi/get-symbols")
     Call<QuoteResponse> getService();
+
     @GET("brapi/listar-acoes-nacionais")
     Call<AcaoResponse> listarAcoesNacionais(
             @Query("page") int page,
-            @Query("limit") int limit
+            @Query("limit") int limit,
+            @Query("search") String search,
+            @Query("sector") String sector,
+            @Query("subsector") String subsector,
+            @Query("sortBy") String sortBy,
+            @Query("sortOrder") String sortOrder
     );
+
     @GET("brapi/historico-acoes")
     Call<StockHistoryResponse> historicoAcoes(
             @Query("symbol") String symbol,
             @Query("range") String range
     );
+
     @GET("brapi/listar-fiis")
     Call<AcaoResponse> listarFIIs(
             @Query("page") int page,
-            @Query("limit") int limit
+            @Query("limit") int limit,
+            @Query("search") String search,
+            @Query("segmentType") String segmentType,
+            @Query("sortBy") String sortBy,
+            @Query("sortOrder") String sortOrder
     );
+
     @GET("brapi/get-fii-quote")
     Call<QuoteResponse> getFiiQuote(@Query("symbol") String symbol);
 
@@ -80,10 +99,12 @@ public interface ApiService {
             @Query("symbol") String symbol,
             @Query("range") String range
     );
+
     @GET("carteiras/posicao-ativo")
     Call<AssetPositionResponse> getAssetPosition(
             @Query("symbol") String symbol
     );
+
     @GET("aportes/listar-titulosRF")
     Call<TitulosRendaFixaResponse> listarTitulosRendaFixa();
 }

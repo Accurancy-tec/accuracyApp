@@ -1,4 +1,3 @@
-
 package com.example.accurancymobileapp.network.repository;
 
 import android.content.Context;
@@ -15,6 +14,7 @@ import retrofit2.Retrofit;
 public class AcaoRepository {
 
     private final ApiService apiService;
+    private Call<AcaoResponse> chamadaAtual;
 
     public AcaoRepository(Context context) {
         Retrofit retrofit = RetrofitClient.getClient(context);
@@ -26,55 +26,88 @@ public class AcaoRepository {
             int limite,
             acaoCallback callback
     ) {
-        apiService.listarAcoesNacionais(pagina, limite)
-                .enqueue(new Callback<AcaoResponse>() {
+        listarAcoesNacionais(
+                pagina,
+                limite,
+                null,
+                null,
+                null,
+                "volume",
+                "desc",
+                callback
+        );
+    }
 
-                    @Override
-                    public void onResponse(
-                            Call<AcaoResponse> call,
-                            Response<AcaoResponse> response
-                    ) {
-                        if (!response.isSuccessful()) {
-                            callback.onError(
-                                    "Erro HTTP: " + response.code()
-                            );
-                            return;
-                        }
+    public void listarAcoesNacionais(
+            int pagina,
+            int limite,
+            String search,
+            String sector,
+            String subsector,
+            String sortBy,
+            String sortOrder,
+            acaoCallback callback
+    ) {
+        if (chamadaAtual != null && !chamadaAtual.isCanceled()) {
+            chamadaAtual.cancel();
+        }
 
-                        AcaoResponse resultado = response.body();
+        Call<AcaoResponse> call = apiService.listarAcoesNacionais(
+                pagina,
+                limite,
+                search,
+                sector,
+                subsector,
+                sortBy,
+                sortOrder
+        );
+        chamadaAtual = call;
 
-                        if (resultado == null) {
-                            callback.onError("Resposta da API vazia");
-                            return;
-                        }
+        call.enqueue(new Callback<AcaoResponse>() {
+            @Override
+            public void onResponse(
+                    Call<AcaoResponse> currentCall,
+                    Response<AcaoResponse> response
+            ) {
+                if (currentCall.isCanceled()) {
+                    return;
+                }
+                if (chamadaAtual == currentCall) {
+                    chamadaAtual = null;
+                }
 
-                        if (resultado.getAcoes() == null) {
-                            callback.onError(
-                                    "A lista de ações não foi retornada"
-                            );
-                            return;
-                        }
+                if (!response.isSuccessful()) {
+                    callback.onError("Erro HTTP ao listar ações: " + response.code());
+                    return;
+                }
 
-                        if (resultado.getPaginacao() == null) {
-                            callback.onError(
-                                    "Os dados de paginação não foram retornados"
-                            );
-                            return;
-                        }
+                AcaoResponse resultado = response.body();
+                if (resultado == null
+                        || resultado.getAcoes() == null
+                        || resultado.getPaginacao() == null) {
+                    callback.onError("A API retornou dados incompletos das ações.");
+                    return;
+                }
 
-                        callback.onSuccess(resultado);
-                    }
+                callback.onSuccess(resultado);
+            }
 
-                    @Override
-                    public void onFailure(
-                            Call<AcaoResponse> call,
-                            Throwable t
-                    ) {
-                        callback.onError(
-                                "Erro de conexão: " + t.getMessage()
-                        );
-                    }
-                });
+            @Override
+            public void onFailure(Call<AcaoResponse> currentCall, Throwable erro) {
+                if (currentCall.isCanceled()) {
+                    return;
+                }
+                if (chamadaAtual == currentCall) {
+                    chamadaAtual = null;
+                }
+
+                callback.onError(
+                        erro.getMessage() == null
+                                ? "Erro de conexão ao listar ações."
+                                : "Erro de conexão: " + erro.getMessage()
+                );
+            }
+        });
     }
 
     public interface acaoCallback {
