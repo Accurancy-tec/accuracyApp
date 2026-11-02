@@ -14,11 +14,19 @@ public class Wallet {
     @SerializedName("tipo_carteira")
     private String tipo_carteira;
 
-    //@SerializedName("meta_carteira")
-    //private double meta_carteira;
-
-    @SerializedName("total_aportado")
+    @SerializedName("total_investido")
     private BigDecimal totalAportado = BigDecimal.ZERO;
+
+    @SerializedName("patrimonio_atual")
+    private BigDecimal patrimonioAtual = BigDecimal.ZERO;
+
+    @SerializedName("lucro_prejuizo")
+    private BigDecimal lucroPrejuizo = BigDecimal.ZERO;
+
+    @SerializedName("rentabilidade_percentual")
+    private BigDecimal rentabilidadePercentual = BigDecimal.ZERO;
+
+
 
     public Wallet(){
 
@@ -52,9 +60,22 @@ public class Wallet {
         return totalAportado != null ? totalAportado : BigDecimal.ZERO;
     }
 
+    public BigDecimal getPatrimonioAtual(){
+        return patrimonioAtual;
+    }
+
+    public BigDecimal getLucroPrejuizo(){
+        return lucroPrejuizo;
+    }
+
+    public BigDecimal getRentabilidadePercentual(){
+        return rentabilidadePercentual;
+    }
     public void setTotalAportado(BigDecimal totalAportado){
         this.totalAportado = totalAportado != null ? totalAportado : BigDecimal.ZERO;
     }
+
+
     /*public double getMeta_carteira(){
         return meta_carteira;
     }*/
