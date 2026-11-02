@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
@@ -111,6 +112,7 @@ public class MarketListActivity extends AppCompatActivity {
 
         atualizarControles();
         carregarPagina(1);
+        animarPaginaAtual();
     }
 
     private void inicializarEstadoInicial() {
@@ -295,6 +297,7 @@ public class MarketListActivity extends AppCompatActivity {
 
                         adapter.atualizarLista(resultado.getAcoes());
                         atualizarControles();
+                        animarPaginaAtual();
                     }
 
                     @Override
@@ -526,5 +529,19 @@ public class MarketListActivity extends AppCompatActivity {
         requestVersion++;
         handler.removeCallbacksAndMessages(null);
         super.onDestroy();
+    }
+    private void animarPaginaAtual() {
+
+        tvPaginaAtual.animate().cancel();
+
+        tvPaginaAtual.setScaleX(0.88f);
+        tvPaginaAtual.setScaleY(0.88f);
+
+        tvPaginaAtual.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(170)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
     }
 }

@@ -113,67 +113,104 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+
         <LinearLayout
             android:id="@+id/containerPaginacao"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#081426"
-            android:gravity="center"
             android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/bg_pagination_bar"
+            android:elevation="8dp"
             android:paddingStart="8dp"
-            android:paddingTop="4dp"
             android:paddingEnd="8dp"
+            android:paddingTop="10dp"
             android:paddingBottom="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPaginaAnterior"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:layout_marginEnd="8dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="5dp"
+                android:minWidth="0dp"
+                android:minHeight="40dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingStart="7dp"
+                android:paddingEnd="9dp"
                 android:text="Anterior"
                 android:textAllCaps="false"
-                android:textColor="#FFFFFF" />
+                android:textSize="11sp"
+                android:textColor="#C6D2E2"
+                app:backgroundTint="#12243A"
+                app:cornerRadius="13dp"
+                app:strokeColor="#263B55"
+                app:strokeWidth="1dp"
+                app:icon="@drawable/ic_chevron_left"
+                app:iconGravity="textStart"
+                app:iconPadding="3dp"
+                app:iconTint="#C6D2E2"
+                app:rippleColor="#334B6A" />
 
             <TextView
                 android:id="@+id/tvPaginaAnterior"
-                android:layout_width="20dp"
-                android:layout_height="37dp"
-                android:background="@drawable/bg_btn_primary"
+                android:layout_width="27dp"
+                android:layout_height="36dp"
+                android:layout_marginHorizontal="2dp"
                 android:gravity="center"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp" />
+                android:textColor="#8193AA"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"/>
 
             <TextView
                 android:id="@+id/tvPaginaAtual"
-                android:layout_width="25dp"
-                android:layout_height="45dp"
-                android:layout_marginHorizontal="8dp"
-                android:background="@drawable/bg_btn_primary"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginHorizontal="2dp"
+                android:background="@drawable/bg_page_current"
                 android:gravity="center"
                 android:text="1"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp" />
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvProximaPagina"
-                android:layout_width="20dp"
-                android:layout_height="37dp"
-                android:background="@drawable/bg_btn_primary"
+                android:layout_width="27dp"
+                android:layout_height="36dp"
+                android:layout_marginHorizontal="2dp"
                 android:gravity="center"
-                android:textColor="@color/text_primary"
-                android:textSize="15sp" />
+                android:textColor="#8193AA"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnProximaPagina"
                 android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:layout_marginStart="8dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="5dp"
+                android:minWidth="0dp"
+                android:minHeight="40dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingStart="9dp"
+                android:paddingEnd="7dp"
                 android:text="Próxima"
                 android:textAllCaps="false"
-                android:textColor="#FFFFFF" />
+                android:textSize="11sp"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="#2563EB"
+                app:cornerRadius="13dp"
+                app:icon="@drawable/ic_chevron_right"
+                app:iconGravity="textEnd"
+                app:iconPadding="3dp"
+                app:iconTint="#FFFFFF"
+                app:rippleColor="#5585F5" />
+
         </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
