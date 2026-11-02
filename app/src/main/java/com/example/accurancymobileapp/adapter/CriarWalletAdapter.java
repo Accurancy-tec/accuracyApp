@@ -1,11 +1,13 @@
 package com.example.accurancymobileapp.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
@@ -41,10 +43,24 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
     public void onBindViewHolder(@NonNull WalletViewHolder holder, int position) {
 
         Wallet wallet = listaWallets.get(position);
-        BigDecimal total = wallet.getTotalAportado();
+        BigDecimal patrimonio = wallet.getPatrimonioAtual();
+        BigDecimal rentabilidade = wallet.getRentabilidadePercentual();
 
-        holder.tvSaldoCarteira.setText(formatadorMoeda(total));
+        if(rentabilidade != null){
+            if(rentabilidade.compareTo(BigDecimal.ZERO) > 0){
+                holder.tvRendimentoCarteira.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.green_positive));
+            }
+            else if(rentabilidade.compareTo(BigDecimal.ZERO) < 0){
+                holder.tvRendimentoCarteira.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.red_negative));
+            }
+            else{
+                holder.tvRendimentoCarteira.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.white));
+            }
+        }
+        holder.tvSaldoCarteira.setText(formatadorMoeda(patrimonio));
         holder.tvNomeCarteira.setText(wallet.getNome_carteira());
+        holder.tvRendimentoCarteira.setText(String.format(new Locale
+                ("pt", "BR"), "%.2f%%", rentabilidade));
 
         holder.itemView.setOnClickListener(v -> {
 
