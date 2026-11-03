@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.activities.FormCriarWalletActivity;
 import com.example.accurancymobileapp.adapter.CriarWalletAdapter;
 import com.example.accurancymobileapp.adapter.EspacamentoCarteiras;
 import com.example.accurancymobileapp.model.Wallet;
@@ -28,6 +30,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +61,10 @@ public class CriarWalletFragment extends Fragment {
      configurarRecyclerView();
      carregarWallets();
 
-     btnCriarWallet.setOnClickListener(v -> {abrirDialogoCriarWallet();});
+     btnCriarWallet.setOnClickListener(v -> {
+         Intent it = new Intent(requireContext(), FormCriarWalletActivity.class);
+         startActivity(it);
+     });
 
    }
 
@@ -76,7 +82,7 @@ public class CriarWalletFragment extends Fragment {
 
    }
 
-   private void abrirDialogoCriarWallet(){
+   /*private void abrirDialogoCriarWallet(){
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_criar_wallet, null);
 
        TextInputEditText nomeWallet = dialogView.findViewById(R.id.nomeWallet);
@@ -125,7 +131,7 @@ public class CriarWalletFragment extends Fragment {
                    tipoWallet.setError("Selecione um tipo");
                    return;
                }
-               criarWallet(nome, tipo);
+               criarWallet(nome, tipo, meta, estilo);
 
                Log.d("CARTEIRA", "TIPO: " + tipo);
 
@@ -135,10 +141,10 @@ public class CriarWalletFragment extends Fragment {
 
        dialog.show();
 
-   }
+   }*/
 
-   private void criarWallet(String nome, String tipo){
-       walletRepository.criarNovaWallet(nome, tipo, new WalletRepository.WalletCallback() {
+   private void criarWallet(String nome, String tipo, BigDecimal meta, String estilo){
+       walletRepository.criarNovaWallet(nome, tipo, meta, estilo, new WalletRepository.WalletCallback() {
            @Override
            public void onSuccess(String mensagem) {
                Toast.makeText(
