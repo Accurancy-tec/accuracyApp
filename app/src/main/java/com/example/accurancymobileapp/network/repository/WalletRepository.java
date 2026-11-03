@@ -9,6 +9,7 @@ import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import retrofit2.Call;
@@ -27,9 +28,9 @@ public class WalletRepository {
         apiService = retrofit.create(ApiService.class);
     }
 
-    public void criarNovaWallet(String nomeWallet, String tipoWallet, WalletCallback callback) {
+    public void criarNovaWallet(String nomeWallet, String tipoWallet, BigDecimal metaWallet, String estiloWallet, WalletCallback callback) {
 
-        Wallet wallet = new Wallet(nomeWallet, tipoWallet);
+        Wallet wallet = new Wallet(nomeWallet, tipoWallet, metaWallet, estiloWallet);
 
         apiService.criarNovaWallet(wallet).enqueue(new Callback<CriarWalletResponse>() {
 
@@ -75,7 +76,7 @@ public class WalletRepository {
                     @Override
                     public void onResponse(Call<BuscarWalletsResponse> call, Response<BuscarWalletsResponse> response) {
 
-                        if (!response.isSuccessful()) {
+                      if (!response.isSuccessful()) {
 
                             callback.onError(
                                     "Erro HTTP: " + response.code());

@@ -44,7 +44,10 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
 
         Wallet wallet = listaWallets.get(position);
         BigDecimal patrimonio = wallet.getPatrimonioAtual();
+        BigDecimal meta = wallet.getMeta_carteira();
         BigDecimal rentabilidade = wallet.getRentabilidadePercentual();
+        String texto = (rentabilidade.compareTo(BigDecimal.ZERO) > 0 ? "+" : "")
+                + rentabilidade.toPlainString() + "%";
 
         if(rentabilidade != null){
             if(rentabilidade.compareTo(BigDecimal.ZERO) > 0){
@@ -59,8 +62,8 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
         }
         holder.tvSaldoCarteira.setText(formatadorMoeda(patrimonio));
         holder.tvNomeCarteira.setText(wallet.getNome_carteira());
-        holder.tvRendimentoCarteira.setText(String.format(new Locale
-                ("pt", "BR"), "%.2f%%", rentabilidade));
+        holder.tvRendimentoCarteira.setText(texto);
+        holder.tvMetaCarteira.setText(formatadorMoeda(meta));
 
         holder.itemView.setOnClickListener(v -> {
 
@@ -85,6 +88,10 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
     public String formatadorMoeda(BigDecimal valor){
         NumberFormat formato = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
+        if (valor == null) {
+            valor = BigDecimal.ZERO;
+        }
+
         return formato.format(valor);
     }
 
@@ -97,7 +104,7 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
         TextView tvNomeCarteira;
         TextView tvSaldoCarteira;
         TextView tvRendimentoCarteira;
-        //TextView tvMetaCarteira;
+        TextView tvMetaCarteira;
         //TextView tvProgressoCarteira;
 
         public WalletViewHolder(@NonNull View itemView) {
@@ -106,7 +113,7 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
             tvNomeCarteira = itemView.findViewById(R.id.tvNomeCarteira);
             tvSaldoCarteira = itemView.findViewById(R.id.tvSaldoCarteira);
             tvRendimentoCarteira = itemView.findViewById(R.id.tvRendimentoCarteira);
-            //tvMetaCarteira = itemView.findViewById(R.id.tvMetaCarteira);
+            tvMetaCarteira = itemView.findViewById(R.id.tvMetaCarteira);
             //tvProgressoCarteira = itemView.findViewById(R.id.tvProgressoCarteira);
         }
     }
