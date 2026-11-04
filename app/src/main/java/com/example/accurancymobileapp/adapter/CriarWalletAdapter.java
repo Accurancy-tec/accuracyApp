@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.example.accurancymobileapp.model.Wallet;
 import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -48,6 +50,15 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
         BigDecimal rentabilidade = wallet.getRentabilidadePercentual();
         String texto = (rentabilidade.compareTo(BigDecimal.ZERO) > 0 ? "+" : "")
                 + rentabilidade.toPlainString() + "%";
+        int progresso = 0;
+
+        if(meta != null && meta.compareTo(BigDecimal.ZERO) > 0 && patrimonio != null){
+            progresso = patrimonio.multiply(BigDecimal.valueOf(100))
+                    .divide(meta, 0, RoundingMode.HALF_UP)
+                    .intValue();
+        }
+
+        int progressoBarra = Math.max(0, Math.min(progresso, 100));
 
         if(rentabilidade != null){
             if(rentabilidade.compareTo(BigDecimal.ZERO) > 0){
@@ -64,6 +75,10 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
         holder.tvNomeCarteira.setText(wallet.getNome_carteira());
         holder.tvRendimentoCarteira.setText(texto);
         holder.tvMetaCarteira.setText(formatadorMoeda(meta));
+        holder.tvProgressoCarteira.setText(progresso + "%");
+
+        holder.progressoMetaCarteira.setMax(100);
+        holder.progressoMetaCarteira.setProgress(progressoBarra);
 
         holder.itemView.setOnClickListener(v -> {
 
@@ -105,7 +120,8 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
         TextView tvSaldoCarteira;
         TextView tvRendimentoCarteira;
         TextView tvMetaCarteira;
-        //TextView tvProgressoCarteira;
+        TextView tvProgressoCarteira;
+        ProgressBar progressoMetaCarteira;
 
         public WalletViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -114,7 +130,8 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
             tvSaldoCarteira = itemView.findViewById(R.id.tvSaldoCarteira);
             tvRendimentoCarteira = itemView.findViewById(R.id.tvRendimentoCarteira);
             tvMetaCarteira = itemView.findViewById(R.id.tvMetaCarteira);
-            //tvProgressoCarteira = itemView.findViewById(R.id.tvProgressoCarteira);
+            tvProgressoCarteira = itemView.findViewById(R.id.tvProgressoCarteira);
+            progressoMetaCarteira = itemView.findViewById(R.id.progressoMetaCarteira);
         }
     }
 }
