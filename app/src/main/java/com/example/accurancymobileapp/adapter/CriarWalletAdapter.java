@@ -88,6 +88,19 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
             }
 
         });
+
+        if(wallet.getMeta_carteira().compareTo(BigDecimal.ZERO) == 0){
+            holder.tvMetaCarteira.setVisibility(View.GONE);
+            holder.progressoMetaCarteira.setVisibility(View.GONE);
+            holder.tvProgressoCarteira.setVisibility(View.GONE);
+            holder.tvCarteiraSemMeta.setVisibility(View.VISIBLE);
+        }
+        else{
+            holder.tvMetaCarteira.setVisibility(View.VISIBLE);
+            holder.progressoMetaCarteira.setVisibility(View.VISIBLE);
+            holder.tvProgressoCarteira.setVisibility(View.VISIBLE);
+            holder.tvCarteiraSemMeta.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -121,6 +134,7 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
         TextView tvRendimentoCarteira;
         TextView tvMetaCarteira;
         TextView tvProgressoCarteira;
+        TextView tvCarteiraSemMeta;
         ProgressBar progressoMetaCarteira;
 
         public WalletViewHolder(@NonNull View itemView) {
@@ -131,6 +145,7 @@ public class CriarWalletAdapter extends RecyclerView.Adapter<CriarWalletAdapter.
             tvRendimentoCarteira = itemView.findViewById(R.id.tvRendimentoCarteira);
             tvMetaCarteira = itemView.findViewById(R.id.tvMetaCarteira);
             tvProgressoCarteira = itemView.findViewById(R.id.tvProgressoCarteira);
+            tvCarteiraSemMeta = itemView.findViewById(R.id.tvCarteiraSemMeta);
             progressoMetaCarteira = itemView.findViewById(R.id.progressoMetaCarteira);
         }
     }
