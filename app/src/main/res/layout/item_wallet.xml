@@ -70,7 +70,18 @@
             android:textSize="12sp"
             android:textStyle="bold"/>
 
+        <TextView
+            android:id="@+id/tvCarteiraSemMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Carteira sem meta"
+            android:gravity="center"
+            android:visibility="gone"
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"/>
+
     </LinearLayout>
+
 
     <ProgressBar
         android:id="@+id/progressoMetaCarteira"

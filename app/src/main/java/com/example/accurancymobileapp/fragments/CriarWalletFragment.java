@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.View;
@@ -43,6 +44,7 @@ public class CriarWalletFragment extends Fragment {
     private CriarWalletAdapter walletAdapter;
     private ImageButton btnVoltar;
     private List<Wallet> listaWallets = new ArrayList<>();
+    private SwipeRefreshLayout swipeRefreshCarteiras;
 
     public CriarWalletFragment() {
         super(R.layout.fragment_criar_wallet);
@@ -55,6 +57,7 @@ public class CriarWalletFragment extends Fragment {
      rvMinhasWallets = view.findViewById(R.id.rvMinhasWallets);
      btnCriarWallet = view.findViewById(R.id.btnCriarWallet);
      btnVoltar = view.findViewById(R.id.btnVoltar);
+     swipeRefreshCarteiras = view.findViewById(R.id.swipeRefreshCarteiras);
      walletRepository = new WalletRepository(requireContext());
 
 
@@ -64,6 +67,10 @@ public class CriarWalletFragment extends Fragment {
      btnCriarWallet.setOnClickListener(v -> {
          Intent it = new Intent(requireContext(), FormCriarWalletActivity.class);
          startActivity(it);
+     });
+
+     swipeRefreshCarteiras.setOnRefreshListener(() -> {
+         carregarCarteiras();
      });
 
    }
@@ -209,5 +216,32 @@ public class CriarWalletFragment extends Fragment {
 
    private int dpParaPx(int dp){
         return (int) (dp * getResources().getDisplayMetrics().density + 0.5f);
+   }
+
+   private void carregarCarteiras(){
+       walletRepository.buscarWallets(new WalletRepository.WalletListCallback() {
+           @Override
+           public void onSuccess(List<Wallet> wallets) {
+               listaWallets.clear();
+               listaWallets.addAll(wallets);
+
+               walletAdapter.notifyDataSetChanged();
+
+               swipeRefreshCarteiras.setRefreshing(false);
+           }
+
+           @Override
+           public void onError(String message) {
+               Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+               swipeRefreshCarteiras.setRefreshing(false);
+           }
+       });
+   }
+
+   @Override
+    public void onResume(){
+       super.onResume();
+
+       carregarCarteiras();
    }
 }
