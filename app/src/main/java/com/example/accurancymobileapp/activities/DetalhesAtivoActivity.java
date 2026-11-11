@@ -65,6 +65,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private TextView tvPrecoMedio, tvQuantidadeAtivo, tvValorPosicao;
     private TextView tvVariacaoRentabilidade, tvValorRentabilidade, tvSaldoInvestir;
     private TextView tvTituloEstatisticas;
+    private TextView tvAberturaAtivo;
+    private TextView tvMaximaAtivo;
+    private TextView tvMaxima52Semanas;
+    private TextView tvMinima52Semanas;
 
     private View btnAtualizarCotacao;
     private View btnComprarAtivo;
@@ -99,6 +103,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
     private boolean carregandoCotacao = false;
     private boolean carregandoHistorico = false;
+    private boolean carregandoHistoricoAnual = false;
+    private boolean historicoAnualCarregado = false;
     private String erroHistorico;
 
     @Override
@@ -168,6 +174,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         tvValorRentabilidade = findViewById(R.id.tvValorRentabilidade);
         tvSaldoInvestir = findViewById(R.id.tvSaldoInvestir);
         tvTituloEstatisticas = findViewById(R.id.tvTituloEstatisticas);
+        tvAberturaAtivo = findViewById(R.id.tvAberturaAtivo);
+        tvMaximaAtivo = findViewById(R.id.tvMaximaAtivo);
+        tvMaxima52Semanas = findViewById(R.id.tvMaxima52Semanas);
+        tvMinima52Semanas = findViewById(R.id.tvMinima52Semanas);
 
         btnAtualizarCotacao = findViewById(R.id.btnAtualizarCotacao);
         btnComprarAtivo = findViewById(R.id.btnComprarAtivo);
@@ -223,6 +233,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 : "R$ 0");
 
         tvTituloEstatisticas.setText("Estatísticas de " + ticker);
+        tvAberturaAtivo.setText("—");
+        tvMaximaAtivo.setText("—");
+        tvMaxima52Semanas.setText("—");
+        tvMinima52Semanas.setText("—");
         selecionarFiltroVisual(filtro3M);
     }
 
@@ -302,6 +316,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                         }
 
                         precoAtual = preco;
+                        atualizarEstatisticasCotacao(quote);
 
                         String nomeDaBrapi = quote.getLongName() != null
                                 && !quote.getLongName().trim().isEmpty()
@@ -550,6 +565,112 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         ));
     }
 
+
+    private boolean valorEstatisticoValido(Double valor) {
+        return valor != null && Double.isFinite(valor) && valor > 0.0;
+    }
+
+    private void atualizarEstatistica(TextView view, Double valor) {
+        if (view != null && valorEstatisticoValido(valor)) {
+            view.setText(formatoMoeda.format(valor));
+        }
+    }
+
+    private void preencherEstatisticaSeIndisponivel(TextView view, Double valor) {
+        if (view == null || !"—".contentEquals(view.getText())) {
+            return;
+        }
+
+        atualizarEstatistica(view, valor);
+    }
+
+    private void atualizarEstatisticasCotacao(QuoteData quote) {
+        if (quote == null) {
+            return;
+        }
+
+        atualizarEstatistica(tvAberturaAtivo, quote.getRegularMarketOpen());
+        atualizarEstatistica(tvMaximaAtivo, quote.getRegularMarketDayHigh());
+        atualizarEstatistica(tvMaxima52Semanas, quote.getFiftyTwoWeekHigh());
+        atualizarEstatistica(tvMinima52Semanas, quote.getFiftyTwoWeekLow());
+
+        if (valorEstatisticoValido(quote.getFiftyTwoWeekHigh())
+                && valorEstatisticoValido(quote.getFiftyTwoWeekLow())) {
+            historicoAnualCarregado = true;
+        } else {
+            carregarEstatisticas52Semanas();
+        }
+    }
+
+    private void carregarEstatisticas52Semanas() {
+        if (historicoAnualCarregado || carregandoHistoricoAnual
+                || quoteRepository == null) {
+            return;
+        }
+
+        carregandoHistoricoAnual = true;
+        quoteRepository.buscarHistorico(
+                ticker,
+                "1y",
+                categoriaAtivo,
+                new QuoteRepository.HistoricoCallback() {
+                    @Override
+                    public void onSucesso(List<StockHistoryResponse.Point> pontos) {
+                        carregandoHistoricoAnual = false;
+                        historicoAnualCarregado = true;
+
+                        if (isFinishing() || isDestroyed() || pontos == null) {
+                            return;
+                        }
+
+                        double maiorValor = Double.NaN;
+                        double menorValor = Double.NaN;
+
+                        for (StockHistoryResponse.Point ponto : pontos) {
+                            if (ponto == null) {
+                                continue;
+                            }
+
+                            Double fechamento = ponto.getClose() != null
+                                    ? ponto.getClose()
+                                    : ponto.getAdjustedClose();
+                            Double maxima = ponto.getHigh() != null
+                                    ? ponto.getHigh() : fechamento;
+                            Double minima = ponto.getLow() != null
+                                    ? ponto.getLow() : fechamento;
+
+                            if (valorEstatisticoValido(maxima)) {
+                                maiorValor = Double.isNaN(maiorValor)
+                                        ? maxima : Math.max(maiorValor, maxima);
+                            }
+                            if (valorEstatisticoValido(minima)) {
+                                menorValor = Double.isNaN(menorValor)
+                                        ? minima : Math.min(menorValor, minima);
+                            }
+                        }
+
+                        preencherEstatisticaSeIndisponivel(
+                                tvMaxima52Semanas,
+                                Double.isNaN(maiorValor) ? null : maiorValor
+                        );
+                        preencherEstatisticaSeIndisponivel(
+                                tvMinima52Semanas,
+                                Double.isNaN(menorValor) ? null : menorValor
+                        );
+                    }
+
+                    @Override
+                    public void onErro(String mensagem) {
+                        carregandoHistoricoAnual = false;
+                        Log.w(
+                                "ASSET_STATISTICS",
+                                "Unable to load 52-week history for " + ticker + ": " + mensagem
+                        );
+                    }
+                }
+        );
+    }
+
     private void carregarHistorico(String range, String etiqueta) {
         carregandoHistorico = true;
         erroHistorico = null;
@@ -580,6 +701,18 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                                     a.getDate(),
                                     b.getDate()
                             ));
+
+                            if (!ordenados.isEmpty()) {
+                                StockHistoryResponse.Point ultimo = ordenados.get(
+                                        ordenados.size() - 1
+                                );
+                                preencherEstatisticaSeIndisponivel(
+                                        tvAberturaAtivo, ultimo.getOpen()
+                                );
+                                preencherEstatisticaSeIndisponivel(
+                                        tvMaximaAtivo, ultimo.getHigh()
+                                );
+                            }
 
                             for (StockHistoryResponse.Point ponto : ordenados) {
                                 if (ponto == null) {

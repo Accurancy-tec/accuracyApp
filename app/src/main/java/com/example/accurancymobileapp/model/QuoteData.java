@@ -10,6 +10,10 @@ public class QuoteData {
     @SerializedName("regularMarketPrice") private Double regularMarketPrice;
     @SerializedName("regularMarketChangePercent") private Double regularMarketChangePercent;
     @SerializedName("regularMarketTime") private String regularMarketTime;
+    @SerializedName("regularMarketOpen") private Double regularMarketOpen;
+    @SerializedName("regularMarketDayHigh") private Double regularMarketDayHigh;
+    @SerializedName("fiftyTwoWeekHigh") private Double fiftyTwoWeekHigh;
+    @SerializedName("fiftyTwoWeekLow") private Double fiftyTwoWeekLow;
     @SerializedName("logourl") private String logoUrl;
     @SerializedName("currency") private String currency;
 
@@ -18,6 +22,15 @@ public class QuoteData {
     public QuoteData(String symbol, String shortName, String longName, Long volume,
                      Double price, Double changePercent, String marketTime,
                      String logoUrl, String currency) {
+        this(symbol, shortName, longName, volume, price, changePercent, marketTime,
+                logoUrl, currency, null, null, null, null);
+    }
+
+    public QuoteData(String symbol, String shortName, String longName, Long volume,
+                     Double price, Double changePercent, String marketTime,
+                     String logoUrl, String currency, Double regularMarketOpen,
+                     Double regularMarketDayHigh, Double fiftyTwoWeekHigh,
+                     Double fiftyTwoWeekLow) {
         this.symbol = symbol;
         this.shortName = shortName;
         this.longName = longName;
@@ -27,6 +40,10 @@ public class QuoteData {
         this.regularMarketTime = marketTime;
         this.logoUrl = logoUrl;
         this.currency = currency;
+        this.regularMarketOpen = regularMarketOpen;
+        this.regularMarketDayHigh = regularMarketDayHigh;
+        this.fiftyTwoWeekHigh = fiftyTwoWeekHigh;
+        this.fiftyTwoWeekLow = fiftyTwoWeekLow;
     }
 
     public String getSymbol() { return symbol; }
@@ -38,4 +55,8 @@ public class QuoteData {
     public String getRegularMarketTime() { return regularMarketTime; }
     public String getLogoUrl() { return logoUrl; }
     public String getCurrency() { return currency; }
+    public Double getRegularMarketOpen() { return regularMarketOpen; }
+    public Double getRegularMarketDayHigh() { return regularMarketDayHigh; }
+    public Double getFiftyTwoWeekHigh() { return fiftyTwoWeekHigh; }
+    public Double getFiftyTwoWeekLow() { return fiftyTwoWeekLow; }
 }
