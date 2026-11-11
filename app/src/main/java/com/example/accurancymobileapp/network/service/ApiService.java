@@ -107,4 +107,9 @@ public interface ApiService {
 
     @GET("aportes/listar-titulosRF")
     Call<TitulosRendaFixaResponse> listarTitulosRendaFixa();
+
+    @POST("carteiras/excluir-carteira")
+    Call<ApiResponse> excluirCarteira(
+            @Query("id_carteira") int idCarteira
+    );
 }
