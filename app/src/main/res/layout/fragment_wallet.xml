@@ -44,13 +44,14 @@
                 android:textStyle="bold" />
 
             <ImageButton
-                android:id="@+id/btnPesquisar"
+                android:id="@+id/btnExcluirCarteira"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:background="@drawable/bg_btn_icone"
-                android:contentDescription="Pesquisar ativos"
-                android:src="@drawable/ic_busca"
-                app:tint="#9BAAC0" />
+                android:layout_marginLeft="12dp"
+                android:src="@drawable/ic_eye"
+                android:contentDescription="Excluir carteira"
+                app:tint="#E05252" />
         </LinearLayout>
 
 

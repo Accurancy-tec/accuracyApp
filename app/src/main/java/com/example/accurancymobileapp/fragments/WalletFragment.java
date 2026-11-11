@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import com.example.accurancymobileapp.adapter.AporteAdapter;
 import com.example.accurancymobileapp.model.Aporte;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
+import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.network.service.VicoService;
 import com.example.accurancymobileapp.response.VicoResponse;
 import com.example.accurancymobileapp.ui.ChartHelper;
@@ -34,6 +36,8 @@ public class WalletFragment extends Fragment {
 
     private RecyclerView recyclerInvestimentos;
     private TextView txtCarteiraVazia;
+    private ImageButton btnExcluirCarteira;
+    WalletRepository walletRepository;
 
     public WalletFragment() {
         super(R.layout.fragment_wallet);
@@ -44,66 +48,17 @@ public class WalletFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         recyclerInvestimentos = view.findViewById(R.id.recyclerInvestimentos);
-
+        btnExcluirCarteira = view.findViewById(R.id.btnExcluirCarteira);
         txtCarteiraVazia = view.findViewById(R.id.txtCarteiraVazia);
 
         recyclerInvestimentos.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        btnExcluirCarteira.setOnClickListener(v -> {
+            excluirCarteira();
+        });
+
         carregarInvestimentos();
     }
-
-    /*private void carregarGraficoDistribuicao() {
-        VicoService vico = RetrofitClient.getClient(requireContext()).create(VicoService.class);
-
-        vico.getDistribuicao(null).enqueue(new Callback<VicoResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<VicoResponse> call, @NonNull Response<VicoResponse> response) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                if (!response.isSuccessful() || response.body() == null) {
-                    Log.e("GRAFICO_CARTEIRA", "Erro HTTP: " + response.code());
-                    return;
-                }
-
-                VicoResponse body = response.body();
-                if (!body.isSucesso() || body.getDistribuicao() == null || body.getDistribuicao().isEmpty()) {
-                    Log.e("GRAFICO_CARTEIRA", "Sem dados: " + body.getMensagem());
-
-                    ChartHelper.configurarGraficoDistribuicao(carteiraChart, new ArrayList<String>(),
-                            new ArrayList<Double>()
-                    );
-                    return;
-                }
-
-                List<String> categorias = new ArrayList<>();
-                List<Double> valores = new ArrayList<>();
-
-                for (VicoResponse.Distribuicao item : body.getDistribuicao()) {
-                    if (item == null) {
-                        continue;
-                    }
-
-                    categorias.add(item.getCategoria());
-                    valores.add(item.getValor());
-                }
-
-                if (!valores.isEmpty()) {
-                    ChartHelper.configurarGraficoDistribuicao(
-                            carteiraChart,
-                            categorias,
-                            valores
-                    );
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<VicoResponse> call, @NonNull Throwable t) {
-                Log.e("GRAFICO_CARTEIRA", "Erro ao carregar distribuição", t);
-            }
-        });
-    }*/
 
     private void carregarInvestimentos() {
         AporteRepository aporteRepository = new AporteRepository(requireContext());
@@ -155,5 +110,43 @@ public class WalletFragment extends Fragment {
             recyclerInvestimentos.setVisibility(View.VISIBLE);
             txtCarteiraVazia.setVisibility(View.GONE);
         }
+    }
+
+    private void excluirCarteira(){
+        walletRepository = new WalletRepository(requireContext());
+
+        Bundle bundle = getArguments();
+
+        if(bundle == null){
+            Toast.makeText(requireContext(), "Não foi possível identificar a carteira", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        int id_carteira = bundle.getInt("id_carteira", -1);
+
+        if(id_carteira <= 0){
+            Toast.makeText(requireContext(), "ID da carteira inválido.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        walletRepository.deletarWallet(id_carteira, new WalletRepository.WalletCallback() {
+            @Override
+            public void onSuccess(String mensagem) {
+                if(!isAdded()) return;
+
+                Toast.makeText(requireContext(), "Carteira excluida com sucesso", Toast.LENGTH_LONG).show();
+
+                getParentFragmentManager().popBackStack();
+            }
+
+            @Override
+            public void onError(String message) {
+                if(!isAdded()) return;
+
+
+
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
