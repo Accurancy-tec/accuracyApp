@@ -1,5 +1,13 @@
 package com.example.accurancymobileapp.activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.graphics.drawable.GradientDrawable;
+import android.view.animation.DecelerateInterpolator;
+import java.util.HashMap;
+import java.util.Map;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -74,10 +82,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private View btnComprarAtivo;
     private View btnVenderAtivo;
 
+    private TextView filtroHoje;
     private TextView filtro1S;
     private TextView filtro1M;
     private TextView filtro3M;
     private TextView filtro6M;
+    private final Map<TextView, ValueAnimator> animacoesFiltro = new HashMap<>();
 
     private View detalhesAtivoRoot;
     private ScrollView scrollDetalhesAtivo;
@@ -105,6 +115,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private boolean carregandoHistorico = false;
     private boolean carregandoHistoricoAnual = false;
     private boolean historicoAnualCarregado = false;
+    private int historicoRequestId;
     private String erroHistorico;
 
     @Override
@@ -183,6 +194,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         btnComprarAtivo = findViewById(R.id.btnComprarAtivo);
         btnVenderAtivo = findViewById(R.id.btnVenderAtivo);
 
+        filtroHoje = findViewById(R.id.filtroHoje);
         filtro1S = findViewById(R.id.filtro1S);
         filtro1M = findViewById(R.id.filtro1M);
         filtro3M = findViewById(R.id.filtro3M);
@@ -249,6 +261,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         btnComprarAtivo.setOnClickListener(view -> abrirTelaOperacao("Compra"));
         btnVenderAtivo.setOnClickListener(view -> abrirTelaOperacao("Venda"));
 
+        filtroHoje.setOnClickListener(view ->
+                selecionarPeriodo("1d", "Hoje", filtroHoje)
+        );
+
         filtro1S.setOnClickListener(view -> selecionarPeriodo("7d", "1S", filtro1S));
         filtro1M.setOnClickListener(view -> selecionarPeriodo("1mo", "1M", filtro1M));
         filtro3M.setOnClickListener(view -> selecionarPeriodo("3mo", "3M", filtro3M));
@@ -263,21 +279,116 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     }
 
     private void selecionarFiltroVisual(TextView selecionado) {
-        TextView[] filtros = {filtro1S, filtro1M, filtro3M, filtro6M};
+        int corFundoSelecionado = ContextCompat.getColor(this, R.color.btn_primary);
+        int corTextoSelecionado = ContextCompat.getColor(this, R.color.blue_primary);
+        int corTextoInativo = ContextCompat.getColor(this, R.color.text_secondary);
+
+        TextView[] filtros = {filtroHoje, filtro1S, filtro1M, filtro3M, filtro6M};
 
         for (TextView filtro : filtros) {
-            boolean ativo = filtro == selecionado;
+            if (filtro == null) {
+                continue;
+            }
 
-            filtro.setBackgroundColor(ContextCompat.getColor(
-                    this,
-                    ativo ? R.color.btn_primary : android.R.color.transparent
-            ));
-
-            filtro.setTextColor(ContextCompat.getColor(
-                    this,
-                    ativo ? R.color.blue_primary : R.color.text_secondary
-            ));
+            animarEstiloFiltro(
+                    filtro,
+                    filtro == selecionado,
+                    corFundoSelecionado,
+                    corTextoSelecionado,
+                    corTextoInativo
+            );
         }
+    }
+
+    private void animarEstiloFiltro(
+            TextView filtro,
+            boolean ativo,
+            int corFundoSelecionado,
+            int corTextoSelecionado,
+            int corTextoInativo
+    ) {
+        ValueAnimator animacaoAnterior = animacoesFiltro.remove(filtro);
+        if (animacaoAnterior != null) {
+            animacaoAnterior.cancel();
+        }
+
+        int fundoInicial = filtro.isSelected() ? corFundoSelecionado : Color.TRANSPARENT;
+        int fundoFinal = ativo ? corFundoSelecionado : Color.TRANSPARENT;
+        int textoInicial = filtro.getCurrentTextColor();
+        int textoFinal = ativo ? corTextoSelecionado : corTextoInativo;
+
+        filtro.setSelected(ativo);
+
+        ArgbEvaluator avaliador = new ArgbEvaluator();
+        ValueAnimator animacao = ValueAnimator.ofFloat(0f, 1f);
+        animacao.setDuration(180L);
+        animacao.setInterpolator(new DecelerateInterpolator());
+
+        animacao.addUpdateListener(animator -> {
+            float progresso = (float) animator.getAnimatedValue();
+
+            int corFundo = (Integer) avaliador.evaluate(
+                    progresso,
+                    fundoInicial,
+                    fundoFinal
+            );
+            int corTexto = (Integer) avaliador.evaluate(
+                    progresso,
+                    textoInicial,
+                    textoFinal
+            );
+
+            GradientDrawable fundo = new GradientDrawable();
+            fundo.setShape(GradientDrawable.RECTANGLE);
+            fundo.setCornerRadius(dp(19));
+            fundo.setColor(corFundo);
+            fundo.setStroke(
+                    dp(1),
+                    corFundo == Color.TRANSPARENT ? Color.TRANSPARENT : corFundo
+            );
+
+            filtro.setBackground(fundo);
+            filtro.setTextColor(corTexto);
+        });
+
+        animacao.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                removerAnimacaoFiltro(filtro, animation);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                removerAnimacaoFiltro(filtro, animation);
+            }
+        });
+
+        animacoesFiltro.put(filtro, animacao);
+        animacao.start();
+
+        filtro.animate().cancel();
+        filtro.setScaleX(ativo ? 0.96f : 1.0f);
+        filtro.setScaleY(ativo ? 0.96f : 1.0f);
+        filtro.animate()
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .setDuration(180L)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
+    }
+
+    private void removerAnimacaoFiltro(TextView filtro, Animator animacao) {
+        if (animacoesFiltro.get(filtro) == animacao) {
+            animacoesFiltro.remove(filtro);
+        }
+    }
+
+    private boolean ehFiiAtivo() {
+        String categoria = categoriaAtivo == null
+                ? ""
+                : categoriaAtivo.trim().toLowerCase(ptBR);
+
+        return categoria.contains("fii") || categoria.contains("imobili");
     }
 
     private void carregarCotacao() {
@@ -672,6 +783,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     }
 
     private void carregarHistorico(String range, String etiqueta) {
+        final int historicoRequestIdAtual = ++historicoRequestId;
         carregandoHistorico = true;
         erroHistorico = null;
 
@@ -684,11 +796,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 new QuoteRepository.HistoricoCallback() {
                     @Override
                     public void onSucesso(List<StockHistoryResponse.Point> pontos) {
-                        carregandoHistorico = false;
-
-                        if (isFinishing() || isDestroyed()) {
+                        if (historicoRequestIdAtual != historicoRequestId
+                                || isFinishing() || isDestroyed()) {
                             return;
                         }
+
+                        carregandoHistorico = false;
 
                         labelsGrafico.clear();
                         valoresGrafico.clear();
@@ -727,10 +840,16 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                                     continue;
                                 }
 
-                                String data = Instant.ofEpochSecond(ponto.getDate())
-                                        .atZone(ZoneId.of("America/Sao_Paulo"))
-                                        .toLocalDate()
-                                        .toString();
+                                Instant instante = Instant.ofEpochSecond(ponto.getDate());
+                                String formatoData;
+                                if ("Hoje".equalsIgnoreCase(etiqueta)) {
+                                    // Acoes usam candles intradiarios; FIIs fornecem apenas dados diarios.
+                                    formatoData = ehFiiAtivo() ? "dd/MM" : "HH:mm";
+                                } else {
+                                    formatoData = "yyyy-MM-dd";
+                                }
+                                String data = instante.atZone(ZoneId.of("America/Sao_Paulo"))
+                                        .format(DateTimeFormatter.ofPattern(formatoData, ptBR));
 
                                 labelsGrafico.add(data);
                                 valoresGrafico.add(fechamento);
@@ -742,11 +861,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
                     @Override
                     public void onErro(String mensagem) {
-                        carregandoHistorico = false;
-
-                        if (isFinishing() || isDestroyed()) {
+                        if (historicoRequestIdAtual != historicoRequestId
+                                || isFinishing() || isDestroyed()) {
                             return;
                         }
+
+                        carregandoHistorico = false;
 
                         erroHistorico = mensagem;
                         desenharGrafico(false, mensagem);
