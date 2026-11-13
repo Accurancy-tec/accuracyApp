@@ -123,7 +123,13 @@ public class QuoteRepository {
     }
 
     private boolean ehFii(String categoria) {
-        return categoria != null && categoria.trim().equalsIgnoreCase("FIIs");
+        if (categoria == null) {
+            return false;
+        }
+
+        String categoriaNormalizada = categoria.trim().toLowerCase(java.util.Locale.ROOT);
+        return categoriaNormalizada.contains("fii")
+                || categoriaNormalizada.contains("imobili");
     }
 
     private String mensagemErro(Throwable t, String padrao) {
