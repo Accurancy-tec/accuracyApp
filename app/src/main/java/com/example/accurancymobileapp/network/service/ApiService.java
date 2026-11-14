@@ -75,6 +75,15 @@ public interface ApiService {
             @Query("sortOrder") String sortOrder
     );
 
+    @GET("brapi/listar-internacionais")
+    Call<AcaoResponse> listarAtivosInternacionais(
+            @Query("page") int page,
+            @Query("limit") int limit,
+            @Query("search") String search,
+            @Query("sortBy") String sortBy,
+            @Query("sortOrder") String sortOrder
+    );
+
     @GET("brapi/historico-acoes")
     Call<StockHistoryResponse> historicoAcoes(
             @Query("symbol") String symbol,
