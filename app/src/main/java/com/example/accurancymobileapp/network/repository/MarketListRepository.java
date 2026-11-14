@@ -98,6 +98,21 @@ public class MarketListRepository {
                 );
                 break;
 
+            case BDRS_ETFS:
+                acaoRepository.listarAtivosInternacionais(
+                        pagina, limite, search, sortBy, sortOrder,
+                        new AcaoRepository.acaoCallback() {
+                            @Override
+                            public void onSuccess(AcaoResponse resultado) {
+                                callback.onSuccess(resultado);
+                            }
+                            @Override
+                            public void onError(String mensagem) {
+                                callback.onError(mensagem);
+                            }
+                        }
+                );
+                break;
             default:
                 callback.onError("Tipo de mercado não suportado.");
                 break;

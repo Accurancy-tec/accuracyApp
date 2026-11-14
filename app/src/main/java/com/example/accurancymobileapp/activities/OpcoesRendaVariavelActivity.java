@@ -30,15 +30,14 @@ public class OpcoesRendaVariavelActivity extends AppCompatActivity {
         cardContratosFuturos = findViewById(R.id.cardContratosFuturos);
         cardAcoesETFsInternacionais = findViewById(R.id.cardAcoesETFsInternacionais);
 
-        //Voltar para a tela inicial
         btnVoltarRendaVariavel.setOnClickListener(v -> finish());
-
-        //Abrir telas dos cards
         cardAcoesNacionais.setOnClickListener(v -> abrirTela(MarketListActivity.class,"ACOES_NACIONAIS"));
 
         cardFundosImobiliarios.setOnClickListener(v -> abrirTela(MarketListActivity.class,"FIIS"));
+        cardAcoesETFsInternacionais.setOnClickListener(v ->
+                abrirTela(MarketListActivity.class, "BDRS_ETFS")
+        );
 
-        //cardContratosFuturos.setOnClickListener(v -> abrirTela(ContratosFuturosActivity.class));
 
     }
 
