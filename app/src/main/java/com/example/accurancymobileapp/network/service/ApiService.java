@@ -109,6 +109,25 @@ public interface ApiService {
             @Query("range") String range
     );
 
+    @GET("brapi/listar-futuros")
+    Call<AcaoResponse> listarFuturos(
+            @Query("page") int page,
+            @Query("limit") int limit,
+            @Query("search") String search,
+            @Query("segment") String segment,
+            @Query("sortBy") String sortBy,
+            @Query("sortOrder") String sortOrder
+    );
+
+    @GET("brapi/get-futures-quote")
+    Call<QuoteResponse> getFutureQuote(@Query("symbol") String symbol);
+
+    @GET("brapi/historico-futuros")
+    Call<StockHistoryResponse> historicoFuturos(
+            @Query("symbol") String symbol,
+            @Query("range") String range
+    );
+
     @GET("carteiras/posicao-ativo")
     Call<AssetPositionResponse> getAssetPosition(
             @Query("symbol") String symbol
