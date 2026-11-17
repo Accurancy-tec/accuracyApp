@@ -118,10 +118,10 @@ public class MarketListActivity extends AppCompatActivity {
     private void inicializarEstadoInicial() {
         searchTerm = null;
         segmentType = null;
-        sortOrder = "desc";
+        sortOrder = marketType == MarketType.FUTUROS ? "asc" : "desc";
         sortBy = marketType == MarketType.FIIS
                 ? "totalInvestors"
-                : "volume";
+                : marketType == MarketType.FUTUROS ? "expirationDate" : "volume";
     }
 
     private void bindViews() {
@@ -131,6 +131,9 @@ public class MarketListActivity extends AppCompatActivity {
         tvTitulo = findViewById(R.id.tvTituloListaAtivos);
         containerBusca = findViewById(R.id.containerBuscaTitulo);
         edtBuscarAtivo = findViewById(R.id.edtBuscarTitulo);
+        if (marketType == MarketType.FUTUROS) {
+            edtBuscarAtivo.setHint("Buscar contrato (ex.: WIN, DI1, BGI)");
+        }
 
         btnPaginaAnterior = findViewById(R.id.btnPaginaAnterior);
         btnProximaPagina = findViewById(R.id.btnProximaPagina);
@@ -344,8 +347,12 @@ public class MarketListActivity extends AppCompatActivity {
         tvTituloFiltros.setText("Filtros e ordenação");
 
         boolean isFii = marketType == MarketType.FIIS;
-        rgSegmentType.setVisibility(isFii ? View.VISIBLE : View.GONE);
-        tvDescricaoSegmento.setVisibility(isFii ? View.VISIBLE : View.GONE);
+        boolean isFuturo = marketType == MarketType.FUTUROS;
+        boolean temSegmento = isFii || isFuturo;
+        rgSegmentType.setVisibility(temSegmento ? View.VISIBLE : View.GONE);
+        tvDescricaoSegmento.setVisibility(temSegmento ? View.VISIBLE : View.GONE);
+        tvDescricaoSegmento.setText(isFuturo ? "Segmento do contrato" : "Tipo de fundo");
+        configurarOpcoesDeSegmento(content, isFuturo);
 
         configurarOpcoesDeOrdenacao(content, isFii);
         selecionarSegmentoAtual(rgSegmentType);
@@ -358,8 +365,8 @@ public class MarketListActivity extends AppCompatActivity {
 
         btnLimpar.setOnClickListener(v -> {
             segmentType = null;
-            sortBy = isFii ? "totalInvestors" : "volume";
-            sortOrder = "desc";
+            sortBy = isFii ? "totalInvestors" : isFuturo ? "expirationDate" : "volume";
+            sortOrder = isFuturo ? "asc" : "desc";
             dialog.dismiss();
             paginaAtual = 1;
             temProximaPagina = false;
@@ -367,7 +374,7 @@ public class MarketListActivity extends AppCompatActivity {
         });
 
         btnAplicar.setOnClickListener(v -> {
-            segmentType = isFii
+            segmentType = temSegmento
                     ? obterSegmentoSelecionado(rgSegmentType)
                     : null;
             sortBy = obterOrdenacaoSelecionada(rgSortBy, isFii);
@@ -394,7 +401,43 @@ public class MarketListActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private void configurarOpcoesDeSegmento(View content, boolean isFuturo) {
+        int[] fiiIds = {
+                R.id.rbSegmentPapel,
+                R.id.rbSegmentTijolo,
+                R.id.rbSegmentHibrido,
+                R.id.rbSegmentFof
+        };
+        for (int id : fiiIds) {
+            content.findViewById(id).setVisibility(isFuturo ? View.GONE : View.VISIBLE);
+        }
+        content.findViewById(R.id.rbSegmentFinancial)
+                .setVisibility(isFuturo ? View.VISIBLE : View.GONE);
+        content.findViewById(R.id.rbSegmentAgro)
+                .setVisibility(isFuturo ? View.VISIBLE : View.GONE);
+    }
+
     private void configurarOpcoesDeOrdenacao(View content, boolean isFii) {
+        if (marketType == MarketType.FUTUROS) {
+            int[] ocultarIds = {
+                    R.id.rbSortName,
+                    R.id.rbSortPrice,
+                    R.id.rbSortInvestors,
+                    R.id.rbSortDividendYield,
+                    R.id.rbSortPvp,
+                    R.id.rbSortChange,
+                    R.id.rbSortVolume,
+                    R.id.rbSortMarketCap
+            };
+            for (int id : ocultarIds) {
+                content.findViewById(id).setVisibility(View.GONE);
+            }
+            content.findViewById(R.id.rbSortExpiration).setVisibility(View.VISIBLE);
+            content.findViewById(R.id.rbSortSymbol).setVisibility(View.VISIBLE);
+            content.findViewById(R.id.rbSortUnderlying).setVisibility(View.VISIBLE);
+            return;
+        }
+
         int[] fiiOnlyIds = {
                 R.id.rbSortInvestors,
                 R.id.rbSortDividendYield,
@@ -426,6 +469,10 @@ public class MarketListActivity extends AppCompatActivity {
             id = R.id.rbSegmentHibrido;
         } else if ("fof".equals(segmentType)) {
             id = R.id.rbSegmentFof;
+        } else if ("financial".equals(segmentType)) {
+            id = R.id.rbSegmentFinancial;
+        } else if ("agribusiness".equals(segmentType)) {
+            id = R.id.rbSegmentAgro;
         } else {
             id = R.id.rbSegmentAll;
         }
@@ -438,11 +485,25 @@ public class MarketListActivity extends AppCompatActivity {
         if (selectedId == R.id.rbSegmentTijolo) return "tijolo";
         if (selectedId == R.id.rbSegmentHibrido) return "hibrido";
         if (selectedId == R.id.rbSegmentFof) return "fof";
+        if (selectedId == R.id.rbSegmentFinancial) return "financial";
+        if (selectedId == R.id.rbSegmentAgro) return "agribusiness";
         return null;
     }
 
     private void selecionarOrdenacaoAtual(RadioGroup group, boolean isFii) {
         int id;
+
+        if (marketType == MarketType.FUTUROS) {
+            if ("symbol".equals(sortBy)) {
+                id = R.id.rbSortSymbol;
+            } else if ("underlyingAsset".equals(sortBy)) {
+                id = R.id.rbSortUnderlying;
+            } else {
+                id = R.id.rbSortExpiration;
+            }
+            group.check(id);
+            return;
+        }
 
         if (isFii) {
             switch (sortBy) {
@@ -491,6 +552,12 @@ public class MarketListActivity extends AppCompatActivity {
 
     private String obterOrdenacaoSelecionada(RadioGroup group, boolean isFii) {
         int selectedId = group.getCheckedRadioButtonId();
+
+        if (marketType == MarketType.FUTUROS) {
+            if (selectedId == R.id.rbSortSymbol) return "symbol";
+            if (selectedId == R.id.rbSortUnderlying) return "underlyingAsset";
+            return "expirationDate";
+        }
 
         if (selectedId == R.id.rbSortName) return "name";
         if (selectedId == R.id.rbSortPrice) return isFii ? "price" : "close";
