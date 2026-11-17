@@ -72,6 +72,18 @@
                 android:id="@+id/rbSegmentFof"
                 style="@style/MarketFilterRadioButton"
                 android:text="FOF" />
+
+            <RadioButton
+                android:id="@+id/rbSegmentFinancial"
+                style="@style/MarketFilterRadioButton"
+                android:text="Financeiros"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rbSegmentAgro"
+                style="@style/MarketFilterRadioButton"
+                android:text="Agronegócio"
+                android:visibility="gone" />
         </RadioGroup>
 
         <TextView
@@ -128,6 +140,24 @@
                 android:id="@+id/rbSortMarketCap"
                 style="@style/MarketFilterRadioButton"
                 android:text="Valor de mercado" />
+
+            <RadioButton
+                android:id="@+id/rbSortExpiration"
+                style="@style/MarketFilterRadioButton"
+                android:text="Vencimento"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rbSortSymbol"
+                style="@style/MarketFilterRadioButton"
+                android:text="Código do contrato"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rbSortUnderlying"
+                style="@style/MarketFilterRadioButton"
+                android:text="Ativo (WIN, DI1, BGI...)"
+                android:visibility="gone" />
         </RadioGroup>
 
         <TextView

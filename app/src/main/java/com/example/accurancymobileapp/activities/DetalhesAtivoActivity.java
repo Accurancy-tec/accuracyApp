@@ -150,6 +150,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         configurarBarrasSistema();
         configurarTelaInicial();
         configurarEventos();
+        if (ehFuturoAtivo()) {
+            btnComprarAtivo.setVisibility(View.GONE);
+            btnVenderAtivo.setVisibility(View.GONE);
+        }
         configurarGraficoResponsivo();
 
         quoteRepository = new QuoteRepository(this);
@@ -163,7 +167,9 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadAssetPosition();
+        if (!ehFuturoAtivo()) {
+            loadAssetPosition();
+        }
     }
 
     private void vincularViews() {
@@ -632,6 +638,15 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     }
 
     private void atualizarResumoPosicao() {
+        if (ehFuturoAtivo()) {
+            tvPrecoMedio.setText("—");
+            tvQuantidadeAtivo.setText("—");
+            tvValorPosicao.setText("—");
+            tvVariacaoRentabilidade.setText("—");
+            tvValorRentabilidade.setText("—");
+            return;
+        }
+
         tvPrecoMedio.setText(precoMedio > 0
                 ? formatoMoeda.format(precoMedio)
                 : "R$ 0");
@@ -844,7 +859,9 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                                 String formatoData;
                                 if ("Hoje".equalsIgnoreCase(etiqueta)) {
                                     // Acoes usam candles intradiarios; FIIs fornecem apenas dados diarios.
-                                    formatoData = ehFiiAtivo() ? "dd/MM" : "HH:mm";
+                                    formatoData = ehHistoricoDiarioAtivo()
+                                            || !pontosIntradiarios(ordenados)
+                                            ? "dd/MM" : "HH:mm";
                                 } else {
                                     formatoData = "yyyy-MM-dd";
                                 }
@@ -887,6 +904,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     }
 
     private void abrirTelaOperacao(String tipo) {
+        if (ehFuturoAtivo()) {
+            Toast.makeText(this, "Operações de compra e venda de futuros não estão disponíveis nesta versão.", Toast.LENGTH_LONG).show();
+            return;
+        }
         if (!Double.isFinite(precoAtual) || precoAtual <= 0.0) {
             Toast.makeText(
                     this,
@@ -932,6 +953,24 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         asset.putExtra(BuyAssetActivity.EXTRA_TIPO_OPERACAO, tipo);
 
         startActivity(asset);
+    }
+
+    private boolean ehFuturoAtivo() {
+        return categoriaAtivo != null
+                && categoriaAtivo.trim().toLowerCase(Locale.ROOT).contains("futuro");
+    }
+
+    private boolean pontosIntradiarios(List<StockHistoryResponse.Point> pontos) {
+        if (pontos == null || pontos.size() < 2) {
+            return false;
+        }
+        long primeiro = pontos.get(0).getDate();
+        long ultimo = pontos.get(pontos.size() - 1).getDate();
+        return ultimo - primeiro < 86400L;
+    }
+
+    private boolean ehHistoricoDiarioAtivo() {
+        return ehFiiAtivo() || ehFuturoAtivo();
     }
 
     private String formatarHorario(String valor) {

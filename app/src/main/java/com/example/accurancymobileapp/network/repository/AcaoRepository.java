@@ -145,6 +145,44 @@ public class AcaoRepository {
             }
         });
     }
+    public void listarFuturos(
+            int pagina, int limite, String search, String segment, String sortBy, String sortOrder,
+            acaoCallback callback
+    ) {
+        if (chamadaAtual != null && !chamadaAtual.isCanceled()) chamadaAtual.cancel();
+        Call<AcaoResponse> call = apiService.listarFuturos(
+                pagina, limite, search, segment, sortBy, sortOrder
+        );
+        chamadaAtual = call;
+        call.enqueue(new Callback<AcaoResponse>() {
+            @Override
+            public void onResponse(Call<AcaoResponse> currentCall, Response<AcaoResponse> response) {
+                if (currentCall.isCanceled()) return;
+                if (chamadaAtual == currentCall) chamadaAtual = null;
+                if (!response.isSuccessful()) {
+                    String detalhe = response.code() == 403
+                            ? " A consulta exige o plano Pro da brapi."
+                            : "";
+                    callback.onError("Erro HTTP ao listar contratos futuros: " + response.code() + detalhe);
+                    return;
+                }
+                AcaoResponse resultado = response.body();
+                if (resultado == null || resultado.getAcoes() == null || resultado.getPaginacao() == null) {
+                    callback.onError("A API retornou dados incompletos dos contratos futuros.");
+                    return;
+                }
+                callback.onSuccess(resultado);
+            }
+            @Override
+            public void onFailure(Call<AcaoResponse> currentCall, Throwable erro) {
+                if (currentCall.isCanceled()) return;
+                if (chamadaAtual == currentCall) chamadaAtual = null;
+                callback.onError(erro.getMessage() == null
+                        ? "Erro de conexão ao listar contratos futuros."
+                        : "Erro de conexão: " + erro.getMessage());
+            }
+        });
+    }
     public interface acaoCallback {
         void onSuccess(AcaoResponse resultado);
         void onError(String message);

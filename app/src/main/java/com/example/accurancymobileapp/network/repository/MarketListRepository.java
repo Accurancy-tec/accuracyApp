@@ -113,6 +113,21 @@ public class MarketListRepository {
                         }
                 );
                 break;
+            case FUTUROS:
+                acaoRepository.listarFuturos(
+                        pagina, limite, search, segmentType, sortBy, sortOrder,
+                        new AcaoRepository.acaoCallback() {
+                            @Override
+                            public void onSuccess(AcaoResponse resultado) {
+                                callback.onSuccess(resultado);
+                            }
+                            @Override
+                            public void onError(String mensagem) {
+                                callback.onError(mensagem);
+                            }
+                        }
+                );
+                break;
             default:
                 callback.onError("Tipo de mercado não suportado.");
                 break;
