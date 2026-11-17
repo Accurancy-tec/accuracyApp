@@ -5,7 +5,8 @@ public enum MarketType {
     FIIS("FIIS", "Fundos Imobiliários", "FIIs"),
 
     ACOES_NACIONAIS("ACOES_NACIONAIS", "Ações Nacionais", "Ações"),
-    BDRS_ETFS("BDRS_ETFS", "Ações e ETFs Internacionais", "Ações");
+    BDRS_ETFS("BDRS_ETFS", "Ações e ETFs Internacionais", "Ações"),
+    FUTUROS("FUTUROS", "Contratos Futuros", "Futuros");
 
     private final String tag;
     private final String title;
