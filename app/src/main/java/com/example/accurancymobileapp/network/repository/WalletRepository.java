@@ -2,10 +2,12 @@ package com.example.accurancymobileapp.network.repository;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
+import com.example.accurancymobileapp.response.AdicionarSaldoResponse;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
@@ -138,6 +140,39 @@ public class WalletRepository {
             }
         });
 
+    }
+
+    public void adicionarSaldo(String valor, WalletCallback callback){
+        apiService.adicionarSaldo(valor).enqueue(new Callback<AdicionarSaldoResponse>() {
+            @Override
+            public void onResponse(Call<AdicionarSaldoResponse> call, Response<AdicionarSaldoResponse> response) {
+
+                if(!response.isSuccessful()){
+                    callback.onError("Erro HTTP: " + response.code());
+                    return;
+                }
+
+                AdicionarSaldoResponse resultado = response.body();
+
+                if(resultado == null){
+                    callback.onError("Resposta da API vazia.");
+                    return;
+                }
+
+                if(!resultado.isSuccess()){
+                    callback.onError(resultado.getMessage());
+                    return;
+                }
+
+                callback.onSuccess(resultado.getSaldoAtual());
+            }
+
+            @Override
+            public void onFailure(Call<AdicionarSaldoResponse> call, Throwable t) {
+
+                callback.onError("Erro ao adicionar saldo: " + t.getMessage());
+            }
+        });
     }
 
     public interface WalletCallback {

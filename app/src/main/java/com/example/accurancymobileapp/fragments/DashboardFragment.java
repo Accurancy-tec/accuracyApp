@@ -2,6 +2,7 @@ package com.example.accurancymobileapp.fragments;
 
 import static android.widget.Toast.LENGTH_LONG;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,9 +18,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.activities.FormAdicionarSaldoActivity;
 import com.example.accurancymobileapp.adapter.EmphasisAdapter;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
+import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.service.VicoService;
 import com.example.accurancymobileapp.response.ApiResponse;
@@ -27,8 +30,10 @@ import com.example.accurancymobileapp.response.VicoResponse;
 import com.example.accurancymobileapp.ui.AnimationSpinner;
 import com.example.accurancymobileapp.ui.ChartHelper;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,10 +42,11 @@ import retrofit2.Response;
 public class DashboardFragment extends Fragment {
 
     private ComposeView ctvChart;
-    private TextView btn1M, btn6M, btn1A;
+    private TextView btn1M, btn6M, btn1A, tvSaldoDisponivel;
     private RecyclerView recyclerInvestimentos;
     private Spinner spFiltroDestaques;
-    private TextView tvDestaquesVazio;
+    private TextView tvDestaquesVazio, btnAdicionarSaldo;
+    private WalletRepository walletRepository;
 
     public DashboardFragment() {
         super(R.layout.fragment_dashboard);
@@ -65,10 +71,19 @@ public class DashboardFragment extends Fragment {
         btn1A = view.findViewById(R.id.btn1A);
         tvDestaquesVazio = view.findViewById(R.id.tvDestaquesVazio);
         spFiltroDestaques = view.findViewById(R.id.spFiltroDestaques);
+        btnAdicionarSaldo = view.findViewById(R.id.btnAdicionarSaldo);
+        tvSaldoDisponivel = view.findViewById(R.id.tvSaldoDisponivel);
+        walletRepository = new WalletRepository(requireContext());
 
         carregarGrafico(periodo);
         recicleView();
         timeInvested();
+
+        btnAdicionarSaldo.setOnClickListener(v -> {
+            Intent it = new Intent(requireContext(), FormAdicionarSaldoActivity.class);
+            startActivity(it);
+        });
+
     }
 
     private void recicleView() {
@@ -267,5 +282,10 @@ public class DashboardFragment extends Fragment {
 
     private void name() {
         //TODO: adicionar logica para buscar nome do usuario
+    }
+
+    private void carregarSaldo() {
+
+
     }
 }

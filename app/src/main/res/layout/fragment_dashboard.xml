@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/bg_deep"
     tools:context=".activities.MainPageActivity">
 
@@ -207,6 +208,74 @@
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/cardSaldoDisponivel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_saldo"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <!-- ÍCONE DA CARTEIRA -->
+
+                <ImageView
+                    android:id="@+id/ivIconeSaldo"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_icone_saldo"
+                    android:contentDescription="Ícone de saldo"
+                    android:padding="11dp"
+                    android:src="@drawable/ic_wallet_saldo"
+                    app:tint="#60A5FA" />
+
+                <!-- INFORMAÇÕES DO SALDO -->
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Saldo disponível"
+                        android:textColor="#B3C7D9"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvSaldoDisponivel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="R$ 3.200,00"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <!-- BOTÃO ADICIONAR SALDO -->
+
+                <TextView
+                    android:id="@+id/btnAdicionarSaldo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_btn_primary"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingHorizontal="14dp"
+                    android:text="+ Adicionar saldo"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
