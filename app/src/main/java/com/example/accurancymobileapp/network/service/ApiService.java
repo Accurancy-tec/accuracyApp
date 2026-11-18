@@ -1,9 +1,11 @@
 package com.example.accurancymobileapp.network.service;
 
+import com.example.accurancymobileapp.model.AdicionarSaldoRequest;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.response.AcaoResponse;
+import com.example.accurancymobileapp.response.AdicionarSaldoResponse;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.AporteResponse;
 import com.example.accurancymobileapp.response.AssetPositionResponse;
@@ -14,6 +16,7 @@ import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.response.TitulosRendaFixaResponse;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import okhttp3.ResponseBody;
@@ -135,4 +138,14 @@ public interface ApiService {
 
     @GET("aportes/listar-titulosRF")
     Call<TitulosRendaFixaResponse> listarTitulosRendaFixa();
+
+    @POST("carteiras/excluir-carteira")
+    Call<ApiResponse> excluirCarteira(
+            @Query("id_carteira") int idCarteira
+    );
+
+    @POST("carteiras/adicionar-saldo")
+    Call<AdicionarSaldoResponse> adicionarSaldo(
+            @Query("valor")String valor
+    );
 }

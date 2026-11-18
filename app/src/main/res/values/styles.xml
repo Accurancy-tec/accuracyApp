@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ValorRapidoDeposito">
+        <item name="android:layout_height">38dp</item>
+        <item name="android:background">@drawable/bg_valor_rapido</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textColor">#B3C7D9</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="ValorRapidoSelecionado"
+        parent="ValorRapidoDeposito">
+        <item name="android:background">@drawable/bg_filtro_categoria_selecionado</item>
+        <item name="android:textColor">#60A5FA</item>
+    </style>
+
+</resources>
