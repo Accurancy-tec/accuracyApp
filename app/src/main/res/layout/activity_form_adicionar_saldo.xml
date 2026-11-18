@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/bg_deep"
+    android:orientation="vertical"
+    android:paddingTop="12dp">
+
+    <!-- CONTEÚDO DA TELA -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingHorizontal="14dp"
+        android:paddingBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- CABEÇALHO -->
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp">
+
+                <ImageView
+                    android:id="@+id/btnVoltarSaldo"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentStart="true"
+                    android:background="@drawable/bg_icon_button"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="11dp"
+                    android:src="@drawable/ic_arrow_back"
+                    android:contentDescription="Voltar"
+                    app:tint="@color/text_secondary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:text="Adicionar saldo"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+            <!-- CARD DO VALOR -->
+
+            <LinearLayout
+                android:id="@+id/cardValorDeposito"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card_adicionar_saldo"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quanto você quer adicionar?"
+                    android:textColor="#9CB4D2"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$"
+                        android:textColor="@color/text_primary"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/etValorDeposito"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:background="@null"
+                        android:ems="7"
+                        android:gravity="center"
+                        android:hint="0,00"
+                        android:inputType="numberDecimal"
+                        android:maxLength="12"
+                        android:singleLine="true"
+                        android:text="0,00"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="#7086A5"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvSaldoAtualDeposito"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Saldo atual: R$ 00,00"
+                    android:textColor="#829BB9"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <!-- VALORES RÁPIDOS -->
+
+            <LinearLayout
+                android:id="@+id/containerValoresRapidos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="4">
+
+                <TextView
+                    android:id="@+id/btnValor50"
+                    style="@style/ValorRapidoDeposito"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="R$ 50" />
+
+                <TextView
+                    android:id="@+id/btnValor100"
+                    style="@style/ValorRapidoDeposito"
+                    android:layout_width="0dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:text="R$ 100" />
+
+                <TextView
+                    android:id="@+id/btnValor200"
+                    style="@style/ValorRapidoSelecionado"
+                    android:layout_width="0dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:text="R$ 200"
+                    android:textColor="@color/text_primary"/>
+
+                <TextView
+                    android:id="@+id/btnValor500"
+                    style="@style/ValorRapidoDeposito"
+                    android:layout_width="0dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:text="R$ 500" />
+
+            </LinearLayout>
+
+            <!-- RESUMO DO DEPÓSITO -->
+
+            <LinearLayout
+                android:id="@+id/cardResumoDeposito"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_card_adicionar_saldo"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <!-- VALOR DO DEPÓSITO -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Valor do depósito"
+                        android:textColor="#9CB4D2"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvValorResumo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 00,00"
+                        android:textColor="@color/text_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="10dp"
+                    android:background="#263B56" />
+
+                <!-- NOVO SALDO -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Novo saldo"
+                        android:textColor="#9CB4D2"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvNovoSaldo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R$ 00,00"
+                        android:textColor="#34D399"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- RODAPÉ FIXO -->
+
+    <LinearLayout
+        android:id="@+id/footerAdicionarSaldo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/btnContinuarDeposito"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_btn_primary"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="Continuar"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>
