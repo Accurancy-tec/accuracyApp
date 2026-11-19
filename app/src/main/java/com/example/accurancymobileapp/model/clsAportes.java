@@ -12,6 +12,9 @@ public class clsAportes {
     private String recorrencia_aporte;
     private int id_carteira;
     private Double rendimento_percentual;
+    // Optional fields: Gson omits them when null, so existing calls keep the same JSON.
+    private Integer id_titulo;
+    private Double preco_unitario;
 
     public clsAportes(String ativo,String name,String categoria,double quantidade,double preco, String tipo, String recorrencia, int idCarteira) {
         ativo_aporte = ativo;
@@ -22,6 +25,26 @@ public class clsAportes {
         tipo_aporte = tipo;
         recorrencia_aporte = recorrencia;
         id_carteira = idCarteira;
+    }
+
+    /** Builds a fixed income application; the server reads the title data (name, rate, maturity) from id_titulo. */
+    public static clsAportes paraRendaFixa(int idTitulo, String nomeTitulo, double valor, int idCarteira) {
+        clsAportes aporte = new clsAportes("RF-" + idTitulo, nomeTitulo, "Renda Fixa", valor, valor, "Compra", "Único", idCarteira);
+        aporte.id_titulo = idTitulo;
+        return aporte;
+    }
+
+    public Integer getIdTitulo() {
+        return id_titulo;
+    }
+
+    public Double getPrecoUnitario() {
+        return preco_unitario;
+    }
+
+    /** Quoted unit price at the moment of the order (variable income); the server validates it. */
+    public void setPrecoUnitario(Double precoUnitario) {
+        this.preco_unitario = precoUnitario;
     }
 
     public Double getRendimentoPercentual() {
