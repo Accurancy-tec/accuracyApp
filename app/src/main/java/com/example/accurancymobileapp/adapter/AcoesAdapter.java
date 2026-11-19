@@ -79,13 +79,17 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
             holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), cor));
         }
 
+        String rotuloPreco = acao.getPriceLabel();
         Double fechamento = acao.getClose();
-        holder.txtValorAtivo.setText(
-                fechamento == null || !Double.isFinite(fechamento) || fechamento <= 0
-                        ? "—"
-                        : formatoMoeda.format(fechamento)
-        );
-
+        if (rotuloPreco != null && !rotuloPreco.trim().isEmpty()) {
+            holder.txtValorAtivo.setText(rotuloPreco);
+        } else {
+            holder.txtValorAtivo.setText(
+                    fechamento == null || !Double.isFinite(fechamento) || fechamento <= 0
+                            ? "—"
+                            : formatoMoeda.format(fechamento)
+            );
+        }
         holder.itemView.setOnClickListener(v -> {
             int posicaoAtual = holder.getBindingAdapterPosition();
             if (listener != null && posicaoAtual != RecyclerView.NO_POSITION) {

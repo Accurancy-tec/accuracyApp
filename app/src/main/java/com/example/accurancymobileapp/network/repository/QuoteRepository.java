@@ -29,7 +29,9 @@ public class QuoteRepository {
     }
 
     public void buscarCotacoes(String ticker, String categoria, QuoteCallback callback) {
-        Call<QuoteResponse> chamada = ehFii(categoria)
+        Call<QuoteResponse> chamada = ehFuturo(categoria)
+                ? apiService.getFutureQuote(ticker)
+                : ehFii(categoria)
                 ? apiService.getFiiQuote(ticker)
                 : apiService.getQuote(ticker);
 
@@ -83,7 +85,9 @@ public class QuoteRepository {
     }
 
     public void buscarHistorico(String ticker, String range, String categoria, HistoricoCallback callback) {
-        Call<StockHistoryResponse> chamada = ehFii(categoria)
+        Call<StockHistoryResponse> chamada = ehFuturo(categoria)
+                ? apiService.historicoFuturos(ticker, range)
+                : ehFii(categoria)
                 ? apiService.historicoFIIs(ticker, range)
                 : apiService.historicoAcoes(ticker, range);
 
@@ -130,6 +134,11 @@ public class QuoteRepository {
         String categoriaNormalizada = categoria.trim().toLowerCase(java.util.Locale.ROOT);
         return categoriaNormalizada.contains("fii")
                 || categoriaNormalizada.contains("imobili");
+    }
+
+    private boolean ehFuturo(String categoria) {
+        return categoria != null
+                && categoria.trim().toLowerCase(java.util.Locale.ROOT).contains("futuro");
     }
 
     private String mensagemErro(Throwable t, String padrao) {
