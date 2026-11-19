@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Aporte;
+import com.example.accurancymobileapp.utils.AporteDetalhes;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -65,10 +66,18 @@ public class HistoricAdapter extends RecyclerView.Adapter<HistoricAdapter.Aporte
             cor = R.color.blue_primary;
         }
         holder.txtVariacaoAtivo.setTextColor(ContextCompat.getColor(context, cor));
-        holder.itemView.setOnClickListener(null);
+        if (AporteDetalhes.temDetalhes(aporte)) {
+            holder.itemView.setOnClickListener(v -> AporteDetalhes.mostrarDialogo(v.getContext(), aporte));
+        } else {
+            holder.itemView.setOnClickListener(null);
+        }
     }
 
     private String montarSubtitulo(Aporte aporte) {
+        // For fixed income, quantity equals the amount applied, so show the rate and maturity instead.
+        if (aporte.isRendaFixa()) {
+            return AporteDetalhes.subtituloRendaFixa(aporte);
+        }
         List<String> partes = new ArrayList<>();
         double quantidade = aporte.getQuantidadeAporte();
         if (quantidade > 0) {
@@ -77,6 +86,8 @@ public class HistoricAdapter extends RecyclerView.Adapter<HistoricAdapter.Aporte
                     : String.format(Locale.forLanguageTag("pt-BR"), "%.4f", quantidade).replaceAll("0+$", "").replaceAll(",$", "");
             partes.add(qtd + " " + textoOuPadrao(aporte.getCategoriaAtivo(), "un."));
         }
+        String precoUnitario = AporteDetalhes.precoUnitarioTexto(aporte);
+        if (precoUnitario != null) partes.add(precoUnitario);
         String data = formatarData(aporte.getData_aporte());
         if (data != null) partes.add(data);
         return partes.isEmpty() ? textoOuPadrao(aporte.getAtivoAporte(), "Ativo") : android.text.TextUtils.join(" • ", partes);

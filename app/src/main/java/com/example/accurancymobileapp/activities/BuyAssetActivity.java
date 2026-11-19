@@ -474,6 +474,11 @@ public class BuyAssetActivity extends AppCompatActivity {
                 selectedWalletId
         );
 
+        // Quoted unit price (without the estimated fee); the API validates it against the total.
+        if (isValidPrice()) {
+            contribution.setPrecoUnitario(currentPrice);
+        }
+
         new AporteRepository(this).registrarAporte(
                 contribution,
                 new AporteRepository.RegistroCallback() {
