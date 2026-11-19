@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.DetalhesAtivoActivity;
 import com.example.accurancymobileapp.model.Aporte;
+import com.example.accurancymobileapp.utils.AporteDetalhes;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -72,6 +73,11 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
         holder.txtVariacaoAtivo.setTextColor(holder.itemView.getContext().getColor(cor));
 
         holder.itemView.setOnClickListener(v -> {
+            // Fixed income has no quote screen: show the contracted conditions instead.
+            if (aporte.isRendaFixa()) {
+                AporteDetalhes.mostrarDialogo(holder.itemView.getContext(), aporte);
+                return;
+            }
             String ticker = aporte.getAtivoAporte();
             if (ticker == null || ticker.trim().isEmpty()) return;
             Intent intent = new Intent(holder.itemView.getContext(), DetalhesAtivoActivity.class);
@@ -84,6 +90,10 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
     }
 
     private String montarSubtitulo(Aporte aporte) {
+        // For fixed income, quantity equals the amount applied, so show the rate and maturity instead.
+        if (aporte.isRendaFixa()) {
+            return AporteDetalhes.subtituloRendaFixa(aporte);
+        }
         List<String> partes = new ArrayList<>();
         double quantidade = aporte.getQuantidadeAporte();
         if (quantidade > 0) {
@@ -92,6 +102,8 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
                     : String.format(Locale.forLanguageTag("pt-BR"), "%.4f", quantidade).replaceAll("0+$", "").replaceAll(",$", "");
             partes.add(quantidadeTexto + " " + textoOuPadrao(aporte.getCategoriaAtivo(), "un."));
         }
+        String precoUnitario = AporteDetalhes.precoUnitarioTexto(aporte);
+        if (precoUnitario != null) partes.add(precoUnitario);
         String dataTexto = formatarData(aporte.getData_aporte());
         if (dataTexto != null) partes.add(dataTexto);
         if (partes.isEmpty()) return textoOuPadrao(aporte.getAtivoAporte(), "Ativo");
