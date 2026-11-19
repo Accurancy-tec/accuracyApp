@@ -40,10 +40,16 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity {
         rvTitulosRendaFixa.setLayoutManager(new LinearLayoutManager(this));
         btnVoltarRendaFixa.setOnClickListener(v -> finish());
 
-        adapter = new TituloRendaFixaAdapter();
+        adapter = new TituloRendaFixaAdapter(this::abrirAplicacao);
         rvTitulosRendaFixa.setAdapter(adapter);
 
         carregarTitulosRendaFixa();
+    }
+
+    private void abrirAplicacao(TituloRendaFixa titulo) {
+        Intent intent = new Intent(this, AplicarRendaFixaActivity.class);
+        intent.putExtra(AplicarRendaFixaActivity.EXTRA_TITULO, titulo);
+        startActivity(intent);
     }
 
     private void carregarTitulosRendaFixa(){
