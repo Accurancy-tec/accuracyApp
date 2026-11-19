@@ -12,6 +12,9 @@ public class Acao {
     @SerializedName(value = "close", alternate = {"price", "regularMarketPrice"})
     private Double close;
 
+    @SerializedName("priceLabel")
+    private String priceLabel;
+
 
     @SerializedName(value = "change", alternate = {"regularMarketChangePercent"})
     private Double change;
@@ -36,6 +39,10 @@ public class Acao {
 
     public Double getClose() {
         return close;
+    }
+
+    public String getPriceLabel() {
+        return priceLabel;
     }
 
     public Long getVolume() {

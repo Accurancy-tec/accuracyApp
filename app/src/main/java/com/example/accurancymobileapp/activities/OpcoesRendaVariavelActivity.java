@@ -37,6 +37,9 @@ public class OpcoesRendaVariavelActivity extends AppCompatActivity {
         cardAcoesETFsInternacionais.setOnClickListener(v ->
                 abrirTela(MarketListActivity.class, "BDRS_ETFS")
         );
+        cardContratosFuturos.setOnClickListener(v ->
+                abrirTela(MarketListActivity.class, "FUTUROS")
+        );
 
 
     }
