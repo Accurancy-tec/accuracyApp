@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -44,11 +47,14 @@ public class BuyAssetActivity extends AppCompatActivity {
     private static final NumberFormat QUANTITY_FORMAT = NumberFormat.getIntegerInstance(PT_BR);
 
     private static final BigDecimal ESTIMATED_FEE_RATE = new BigDecimal("0.0003");
-    private static final int MAX_QUANTITY = 1_000_000;
+    private static final BigDecimal MAX_QUANTITY = new BigDecimal("1000000");
+    private static final int CRYPTO_QUANTITY_SCALE = 8;
+    private static final BigDecimal MIN_OPERATION_VALUE = new BigDecimal("0.01");
 
     private static final String TYPE_BUY = "Compra";
     private static final String TYPE_SELL = "Venda";
     private static final String DEFAULT_SIMULATION_NOTICE = "Operação simulada para fins educacionais. Nenhuma ordem será enviada à B3.";
+    private static final String CRYPTO_SIMULATION_NOTICE = "Operação simulada com a cotação atual da criptomoeda, em reais. Nenhuma ordem real é enviada.";
     private static final String FUTURES_SIMULATION_NOTICE = "Operação simulada com o preço de ajuste do contrato, sem margem, alavancagem ou ajuste diário. Nenhuma ordem será enviada à B3.";
 
     private static final int COLOR_POSITIVE = Color.rgb(43, 224, 163);
@@ -225,9 +231,11 @@ public class BuyAssetActivity extends AppCompatActivity {
 
         if (isSellOperation()) {
             tvBuyAvailableBalance.setText(
-                    "Disponível para venda: " + formatQuantity(availableAssetQuantity) + " un."
+                    "Disponível para venda: " + formatQuantity(availableAssetQuantity) + unitSuffix()
             );
-            tvBuyQuantityDescription.setText("Informe quantas unidades deseja vender.");
+            tvBuyQuantityDescription.setText(isCryptoAsset()
+                    ? "Informe quanto deseja vender (até 8 casas decimais)."
+                    : "Informe quantas unidades deseja vender.");
             tvBuyAssetsSubtotalLabel.setText("Valor bruto da venda");
             tvBuyEstimatedTotalLabel.setText("Total estimado da venda");
             btnSubmitBuyOrder.setText("Confirmar venda simulada");
@@ -235,7 +243,9 @@ public class BuyAssetActivity extends AppCompatActivity {
             tvBuyAvailableBalance.setText(
                     "Saldo para investir: " + formatCurrency(availableBalance)
             );
-            tvBuyQuantityDescription.setText("Informe quantas unidades deseja comprar.");
+            tvBuyQuantityDescription.setText(isCryptoAsset()
+                    ? "Informe quanto deseja comprar (até 8 casas decimais)."
+                    : "Informe quantas unidades deseja comprar.");
             tvBuyAssetsSubtotalLabel.setText("Valor dos ativos");
             tvBuyEstimatedTotalLabel.setText("Total estimado da compra");
             btnSubmitBuyOrder.setText("Confirmar compra simulada");
@@ -248,11 +258,18 @@ public class BuyAssetActivity extends AppCompatActivity {
     }
 
     private void configureQuantityControls() {
-        int initialQuantity = 1;
-        if (isSellOperation()) {
-            initialQuantity = availableAssetQuantity >= 1.0 ? 1 : 0;
+        if (isCryptoAsset()) {
+            // Crypto accepts fractions (up to 8 decimals); other assets stay integer-only.
+            edtBuyQuantity.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            edtBuyQuantity.setKeyListener(DigitsKeyListener.getInstance("0123456789.,"));
+            edtBuyQuantity.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
         }
-        edtBuyQuantity.setText(String.valueOf(initialQuantity));
+
+        BigDecimal initialQuantity = quantityStep();
+        if (isSellOperation() && initialQuantity.compareTo(getSellableQuantity()) > 0) {
+            initialQuantity = getSellableQuantity();
+        }
+        edtBuyQuantity.setText(plainQuantity(initialQuantity));
 
         edtBuyQuantity.addTextChangedListener(new TextWatcher() {
             @Override
@@ -275,18 +292,19 @@ public class BuyAssetActivity extends AppCompatActivity {
         btnDecreaseBuyQuantity.setOnClickListener(view -> changeQuantity(-1));
     }
 
-    private void changeQuantity(int difference) {
-        int quantity = getRequestedQuantity();
-        long updatedQuantity = (long) quantity + difference;
+    private void changeQuantity(int direction) {
+        BigDecimal quantity = getRequestedQuantity();
+        BigDecimal updatedQuantity = quantity.add(quantityStep().multiply(BigDecimal.valueOf(direction)))
+                .setScale(quantityScale(), RoundingMode.DOWN);
 
-        if (updatedQuantity < 0) {
-            updatedQuantity = 0;
+        if (updatedQuantity.signum() < 0) {
+            updatedQuantity = BigDecimal.ZERO;
         }
-        if (updatedQuantity > MAX_QUANTITY) {
+        if (updatedQuantity.compareTo(MAX_QUANTITY) > 0) {
             updatedQuantity = MAX_QUANTITY;
         }
 
-        if (isSellOperation() && updatedQuantity > getSellableQuantity()) {
+        if (isSellOperation() && updatedQuantity.compareTo(getSellableQuantity()) > 0) {
             Toast.makeText(
                     this,
                     "Você não possui essa quantidade disponível para venda.",
@@ -295,16 +313,18 @@ public class BuyAssetActivity extends AppCompatActivity {
             return;
         }
 
-        edtBuyQuantity.setText(String.valueOf(updatedQuantity));
+        edtBuyQuantity.setText(plainQuantity(updatedQuantity));
         edtBuyQuantity.setSelection(edtBuyQuantity.getText().length());
     }
 
     private void refreshOrderPreview() {
-        int quantity = getRequestedQuantity();
-        tvBuyOrderQuantity.setText(quantity > 0 ? formatQuantity(quantity) + " un." : "0 un.");
+        BigDecimal quantity = getRequestedQuantity();
+        tvBuyOrderQuantity.setText(quantity.signum() > 0
+                ? formatQuantity(quantity) + unitSuffix()
+                : "0" + unitSuffix());
         tvBuyUnitPrice.setText(formatCurrency(currentPrice));
 
-        if (quantity <= 0 || !isValidPrice()) {
+        if (quantity.signum() <= 0 || !isValidPrice()) {
             tvBuyAssetsSubtotal.setText("R$ 0");
             tvBuyEstimatedFees.setText("R$ 0");
             tvBuyEstimatedTotal.setText("R$ 0");
@@ -324,7 +344,7 @@ public class BuyAssetActivity extends AppCompatActivity {
         if (validationMessage == null) {
             tvBuySimulationNotice.setText(isFuturesAsset()
                     ? FUTURES_SIMULATION_NOTICE
-                    : DEFAULT_SIMULATION_NOTICE);
+                    : isCryptoAsset() ? CRYPTO_SIMULATION_NOTICE : DEFAULT_SIMULATION_NOTICE);
             tvBuySimulationNotice.setTextColor(
                     getColor(R.color.text_secondary)
             );
@@ -333,33 +353,41 @@ public class BuyAssetActivity extends AppCompatActivity {
             tvBuySimulationNotice.setTextColor(COLOR_NEGATIVE);
         }
 
-        btnDecreaseBuyQuantity.setEnabled(quantity > 0 && !operationInProgress);
-        boolean canIncrease = quantity < MAX_QUANTITY && !operationInProgress;
+        btnDecreaseBuyQuantity.setEnabled(quantity.signum() > 0 && !operationInProgress);
+        boolean canIncrease = quantity.compareTo(MAX_QUANTITY) < 0 && !operationInProgress;
         if (isSellOperation()) {
-            canIncrease = canIncrease && quantity < getSellableQuantity();
+            canIncrease = canIncrease && quantity.compareTo(getSellableQuantity()) < 0;
         }
         btnIncreaseBuyQuantity.setEnabled(canIncrease);
         btnSubmitBuyOrder.setEnabled(validationMessage == null && !operationInProgress);
     }
 
     @Nullable
-    private String getValidationMessage(int quantity) {
+    private String getValidationMessage(BigDecimal quantity) {
         if (!isValidPrice()) {
             return "Não há uma cotação válida para este ativo. Volte aos detalhes e atualize a cotação.";
         }
-        if (quantity <= 0) {
+        if (quantity.signum() <= 0) {
             return "Informe uma quantidade maior que zero.";
         }
-        if (quantity > MAX_QUANTITY) {
+        if (quantity.stripTrailingZeros().scale() > quantityScale()) {
+            return isCryptoAsset()
+                    ? "Use no máximo 8 casas decimais."
+                    : "Informe uma quantidade inteira.";
+        }
+        if (quantity.compareTo(MAX_QUANTITY) > 0) {
             return "A quantidade máxima permitida é 1.000.000 unidades.";
+        }
+        if (calculateSubtotal(quantity).compareTo(MIN_OPERATION_VALUE) < 0) {
+            return "O valor da operação é menor que R$ 0,01. Aumente a quantidade.";
         }
 
         if (isSellOperation()) {
-            int sellableQuantity = getSellableQuantity();
-            if (sellableQuantity <= 0) {
+            BigDecimal sellableQuantity = getSellableQuantity();
+            if (sellableQuantity.signum() <= 0) {
                 return "Você não possui unidades deste ativo disponíveis para venda.";
             }
-            if (quantity > sellableQuantity) {
+            if (quantity.compareTo(sellableQuantity) > 0) {
                 return "Quantidade indisponível. Você possui "
                         + formatQuantity(sellableQuantity) + " unidade(s) para vender.";
             }
@@ -382,7 +410,7 @@ public class BuyAssetActivity extends AppCompatActivity {
             return;
         }
 
-        int quantity = getRequestedQuantity();
+        BigDecimal quantity = getRequestedQuantity();
         String validationMessage = getValidationMessage(quantity);
         if (validationMessage != null) {
             Toast.makeText(this, validationMessage, Toast.LENGTH_LONG).show();
@@ -398,7 +426,7 @@ public class BuyAssetActivity extends AppCompatActivity {
         chooseWalletAndRegister(quantity);
     }
 
-    private void chooseWalletAndRegister(int quantity) {
+    private void chooseWalletAndRegister(BigDecimal quantity) {
         setOperationInProgress(true);
         new WalletRepository(this).buscarWallets(new WalletRepository.WalletListCallback() {
             @Override
@@ -453,7 +481,7 @@ public class BuyAssetActivity extends AppCompatActivity {
         });
     }
 
-    private void registerOperation(String type, int quantity, int selectedWalletId) {
+    private void registerOperation(String type, BigDecimal quantity, int selectedWalletId) {
         setOperationInProgress(true);
 
         String safeName = assetName == null || assetName.trim().isEmpty()
@@ -470,7 +498,7 @@ public class BuyAssetActivity extends AppCompatActivity {
                 ticker,
                 safeName,
                 assetCategory,
-                (double) quantity,
+                quantity.doubleValue(),
                 operationTotal.doubleValue(),
                 type,
                 "Único",
@@ -528,29 +556,56 @@ public class BuyAssetActivity extends AppCompatActivity {
                 && assetCategory.trim().toLowerCase(java.util.Locale.ROOT).contains("futuro");
     }
 
-    private int getRequestedQuantity() {
+    private BigDecimal getRequestedQuantity() {
         String value = edtBuyQuantity.getText() == null
                 ? ""
-                : edtBuyQuantity.getText().toString().trim();
+                : edtBuyQuantity.getText().toString().trim().replace(',', '.');
         if (value.isEmpty()) {
-            return 0;
+            return BigDecimal.ZERO;
         }
         try {
-            long parsed = Long.parseLong(value);
-            if (parsed > Integer.MAX_VALUE) {
-                return Integer.MAX_VALUE;
-            }
-            return (int) parsed;
+            BigDecimal parsed = new BigDecimal(value);
+            return parsed.signum() < 0 ? BigDecimal.ZERO : parsed;
         } catch (NumberFormatException exception) {
-            return 0;
+            // Inputs such as "1.2.3" are invalid: treated as zero so the screen asks for a valid amount.
+            return BigDecimal.ZERO;
         }
     }
 
-    private int getSellableQuantity() {
+    private BigDecimal getSellableQuantity() {
         if (!Double.isFinite(availableAssetQuantity) || availableAssetQuantity <= 0.0) {
-            return 0;
+            return BigDecimal.ZERO;
         }
-        return (int) Math.min(Math.floor(availableAssetQuantity), MAX_QUANTITY);
+        BigDecimal sellable = BigDecimal.valueOf(availableAssetQuantity)
+                .setScale(quantityScale(), RoundingMode.DOWN);
+        return sellable.min(MAX_QUANTITY);
+    }
+
+    private boolean isCryptoAsset() {
+        return assetCategory != null
+                && assetCategory.trim().toLowerCase(java.util.Locale.ROOT).startsWith("cripto");
+    }
+
+    private int quantityScale() {
+        return isCryptoAsset() ? CRYPTO_QUANTITY_SCALE : 0;
+    }
+
+    /** Step of the +/- buttons: 1 unit, or for crypto roughly R$ 100 worth rounded to a power of ten. */
+    private BigDecimal quantityStep() {
+        if (!isCryptoAsset() || !isValidPrice()) {
+            return BigDecimal.ONE;
+        }
+        int exponent = (int) Math.floor(Math.log10(100.0 / currentPrice));
+        exponent = Math.max(-CRYPTO_QUANTITY_SCALE, Math.min(0, exponent));
+        return BigDecimal.ONE.movePointLeft(-exponent);
+    }
+
+    private String plainQuantity(BigDecimal quantity) {
+        return quantity.signum() == 0 ? "0" : quantity.stripTrailingZeros().toPlainString();
+    }
+
+    private String unitSuffix() {
+        return isCryptoAsset() && ticker != null ? " " + ticker.trim() : " un.";
     }
 
     private boolean isSellOperation() {
@@ -561,9 +616,9 @@ public class BuyAssetActivity extends AppCompatActivity {
         return Double.isFinite(currentPrice) && currentPrice > 0.0;
     }
 
-    private BigDecimal calculateSubtotal(int quantity) {
+    private BigDecimal calculateSubtotal(BigDecimal quantity) {
         return BigDecimal.valueOf(currentPrice)
-                .multiply(BigDecimal.valueOf(quantity))
+                .multiply(quantity)
                 .setScale(2, RoundingMode.HALF_UP);
     }
 
@@ -587,6 +642,16 @@ public class BuyAssetActivity extends AppCompatActivity {
         if (!Double.isFinite(quantity) || quantity < 0.0) {
             return "0";
         }
-        return QUANTITY_FORMAT.format((long) Math.floor(quantity));
+        return formatQuantity(BigDecimal.valueOf(quantity).setScale(quantityScale(), RoundingMode.DOWN));
+    }
+
+    private String formatQuantity(BigDecimal quantity) {
+        if (isCryptoAsset()) {
+            NumberFormat cryptoFormat = NumberFormat.getNumberInstance(PT_BR);
+            cryptoFormat.setMinimumFractionDigits(0);
+            cryptoFormat.setMaximumFractionDigits(CRYPTO_QUANTITY_SCALE);
+            return cryptoFormat.format(quantity);
+        }
+        return QUANTITY_FORMAT.format(quantity.setScale(0, RoundingMode.DOWN));
     }
 }

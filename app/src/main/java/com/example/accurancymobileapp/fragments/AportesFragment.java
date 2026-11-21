@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.DashboardActivity;
+import com.example.accurancymobileapp.activities.MarketListActivity;
 import com.example.accurancymobileapp.activities.OpcoesRendaFixaActivity;
 import com.example.accurancymobileapp.activities.OpcoesRendaVariavelActivity;
 import com.example.accurancymobileapp.model.ActiveSpinner;
@@ -39,6 +40,7 @@ import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.network.service.ApiService;
+import com.example.accurancymobileapp.utils.AnimacaoUtils;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.google.android.material.button.MaterialButton;
@@ -59,7 +61,7 @@ public class AportesFragment extends Fragment {
         super(R.layout.fragment_aportes);
     }
 
-    LinearLayout cardBolsaDeValores, cardRendaFixa;
+    LinearLayout cardBolsaDeValores, cardRendaFixa, cardTesouroDireto, cardRendaVariavel;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -76,8 +78,36 @@ public class AportesFragment extends Fragment {
 
         cardRendaFixa.setOnClickListener(v -> {
             Intent it = new Intent(requireContext(), OpcoesRendaFixaActivity.class);
+            it.putExtra(OpcoesRendaFixaActivity.EXTRA_FILTRO, OpcoesRendaFixaActivity.FILTRO_BANCARIOS);
             startActivity(it);
         });
-        
+
+        // These two cards existed in the layout but had no click handler.
+        cardTesouroDireto = view.findViewById(R.id.cardTesouroDireto);
+        cardTesouroDireto.setOnClickListener(v -> {
+            Intent it = new Intent(requireContext(), OpcoesRendaFixaActivity.class);
+            it.putExtra(OpcoesRendaFixaActivity.EXTRA_FILTRO, OpcoesRendaFixaActivity.FILTRO_TESOURO);
+            startActivity(it);
+        });
+
+        LinearLayout cardCriptomoedas = view.findViewById(R.id.cardCriptomoedasAportes);
+        cardCriptomoedas.setOnClickListener(v -> {
+            Intent it = new Intent(requireContext(), MarketListActivity.class);
+            it.putExtra("TAG", "CRIPTO");
+            startActivity(it);
+        });
+
+        cardRendaVariavel = view.findViewById(R.id.cardRendaVariavel);
+        cardRendaVariavel.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), OpcoesRendaVariavelActivity.class)));
+
+        // Press feedback on every product card plus a staggered entrance when the tab opens.
+        LinearLayout[] cards = {cardRendaFixa, cardTesouroDireto, cardBolsaDeValores,
+                cardCriptomoedas, cardRendaVariavel};
+        for (LinearLayout card : cards) {
+            AnimacaoUtils.efeitoPressionar(card);
+        }
+        AnimacaoUtils.entradaEmCascata(cards);
+
     }
 }

@@ -35,6 +35,7 @@ import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.network.repository.AssetPositionRepository;
 import com.example.accurancymobileapp.network.repository.QuoteRepository;
+import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.ui.StockChartHelper;
@@ -72,6 +73,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private TextView tvPrecoAtualAtivo, tvVariacaoPrecoAtivo, tvUltimaAtualizacao;
     private TextView tvPrecoMedio, tvQuantidadeAtivo, tvValorPosicao;
     private TextView tvVariacaoRentabilidade, tvValorRentabilidade, tvSaldoInvestir;
+    /** Real balance read from the API (-1 until loaded); falls back to the Intent extra. */
+    private double saldoAtual = -1.0;
     private TextView tvTituloEstatisticas;
     private TextView tvAberturaAtivo;
     private TextView tvMaximaAtivo;
@@ -81,6 +84,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private View btnAtualizarCotacao;
     private View btnComprarAtivo;
     private View btnVenderAtivo;
+    private View btnRegistrarDividendo;
 
     private TextView filtroHoje;
     private TextView filtro1S;
@@ -164,6 +168,30 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadAssetPosition();
+        carregarSaldoAtual();
+    }
+
+    /** Reads the user balance so "Saldo para investir" is real and the buy screen receives it. */
+    private void carregarSaldoAtual() {
+        new WalletRepository(this).buscarSaldo(new WalletRepository.WalletCallback() {
+            @Override
+            public void onSuccess(String saldo) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                try {
+                    saldoAtual = Double.parseDouble(saldo.trim());
+                    tvSaldoInvestir.setText(formatoMoeda.format(saldoAtual));
+                } catch (NumberFormatException ignored) {
+                    // Keep the previous value; the server still validates the balance.
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                // Keep the previous value; the server still validates the balance.
+            }
+        });
     }
 
     private void vincularViews() {
@@ -193,6 +221,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         btnAtualizarCotacao = findViewById(R.id.btnAtualizarCotacao);
         btnComprarAtivo = findViewById(R.id.btnComprarAtivo);
         btnVenderAtivo = findViewById(R.id.btnVenderAtivo);
+        btnRegistrarDividendo = findViewById(R.id.btnRegistrarDividendo);
 
         filtroHoje = findViewById(R.id.filtroHoje);
         filtro1S = findViewById(R.id.filtro1S);
@@ -239,7 +268,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         tvVariacaoRentabilidade.setText("0%");
         tvValorRentabilidade.setText("0%");
 
-        double saldo = getIntent().getDoubleExtra(EXTRA_SALDO, -1.0);
+        double saldo = saldoAtual >= 0 ? saldoAtual : getIntent().getDoubleExtra(EXTRA_SALDO, -1.0);
         tvSaldoInvestir.setText(saldo >= 0
                 ? formatoMoeda.format(saldo)
                 : "R$ 0");
@@ -260,6 +289,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
         btnComprarAtivo.setOnClickListener(view -> abrirTelaOperacao("Compra"));
         btnVenderAtivo.setOnClickListener(view -> abrirTelaOperacao("Venda"));
+        btnRegistrarDividendo.setOnClickListener(view -> abrirTelaDividendo());
 
         filtroHoje.setOnClickListener(view ->
                 selecionarPeriodo("1d", "Hoje", filtroHoje)
@@ -631,7 +661,25 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         );
     }
 
+    /** Dividends only make sense for held stocks, FIIs and BDRs/ETFs (not futures or crypto). */
+    private void atualizarBotaoDividendo() {
+        boolean elegivel = quantidadePosicao > 0.0
+                && !ehFuturoAtivo()
+                && !ehCriptoAtivo();
+        btnRegistrarDividendo.setVisibility(elegivel ? View.VISIBLE : View.GONE);
+    }
+
+    private void abrirTelaDividendo() {
+        Intent dividendo = new Intent(this, RegistrarDividendoActivity.class);
+        dividendo.putExtra(EXTRA_TICKER, ticker);
+        dividendo.putExtra(EXTRA_NOME, nomeAtivo);
+        dividendo.putExtra(EXTRA_CATEGORIA, categoriaAtivo);
+        dividendo.putExtra(EXTRA_ID_CARTEIRA, idCarteira);
+        startActivity(dividendo);
+    }
+
     private void atualizarResumoPosicao() {
+        atualizarBotaoDividendo();
         tvPrecoMedio.setText(precoMedio > 0
                 ? formatoMoeda.format(precoMedio)
                 : "R$ 0");
@@ -924,7 +972,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         asset.putExtra(EXTRA_ID_CARTEIRA, idCarteira);
         asset.putExtra(
                 EXTRA_SALDO,
-                getIntent().getDoubleExtra(EXTRA_SALDO, -1.0)
+                saldoAtual >= 0 ? saldoAtual : getIntent().getDoubleExtra(EXTRA_SALDO, -1.0)
         );
         asset.putExtra(EXTRA_PRECO_ATUAL_COMPRA, precoAtual);
         asset.putExtra(EXTRA_VARIACAO_DIARIA_COMPRA, variacaoDiaria);
@@ -970,7 +1018,18 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         }
     }
 
+    private boolean ehCriptoAtivo() {
+        return categoriaAtivo != null
+                && categoriaAtivo.trim().toLowerCase(Locale.ROOT).startsWith("cripto");
+    }
+
     private String formatarQuantidade(double quantidade) {
+        if (ehCriptoAtivo() && Double.isFinite(quantidade)) {
+            java.text.NumberFormat formato = java.text.NumberFormat.getNumberInstance(ptBR);
+            formato.setMinimumFractionDigits(0);
+            formato.setMaximumFractionDigits(8);
+            return formato.format(java.math.BigDecimal.valueOf(quantidade));
+        }
         return String.format(
                 ptBR,
                 quantidade == Math.rint(quantidade) ? "%.0f" : "%.4f",
@@ -981,6 +1040,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private void limparResumoPosicao() {
         quantidadePosicao = 0.0;
         precoMedio = 0.0;
+        atualizarBotaoDividendo();
 
         tvPrecoMedio.setText("—");
         tvQuantidadeAtivo.setText("—");

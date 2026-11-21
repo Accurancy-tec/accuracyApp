@@ -37,5 +37,17 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
+    <!-- Bottom sheet cards (slide-up): transparent window so the rounded card drawable shows. -->
+    <style name="ThemeOverlay.Accurancy.BottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Accurancy.BottomSheet</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="Widget.Accurancy.BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
     <style name="Theme.AccurancyMobileApp" parent="Base.Theme.AccurancyMobileApp" />
 </resources>
