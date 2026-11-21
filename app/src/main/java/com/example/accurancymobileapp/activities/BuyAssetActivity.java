@@ -49,6 +49,7 @@ public class BuyAssetActivity extends AppCompatActivity {
     private static final String TYPE_BUY = "Compra";
     private static final String TYPE_SELL = "Venda";
     private static final String DEFAULT_SIMULATION_NOTICE = "Operação simulada para fins educacionais. Nenhuma ordem será enviada à B3.";
+    private static final String FUTURES_SIMULATION_NOTICE = "Operação simulada com o preço de ajuste do contrato, sem margem, alavancagem ou ajuste diário. Nenhuma ordem será enviada à B3.";
 
     private static final int COLOR_POSITIVE = Color.rgb(43, 224, 163);
     private static final int COLOR_NEGATIVE = Color.rgb(255, 82, 105);
@@ -321,7 +322,9 @@ public class BuyAssetActivity extends AppCompatActivity {
 
         String validationMessage = getValidationMessage(quantity);
         if (validationMessage == null) {
-            tvBuySimulationNotice.setText(DEFAULT_SIMULATION_NOTICE);
+            tvBuySimulationNotice.setText(isFuturesAsset()
+                    ? FUTURES_SIMULATION_NOTICE
+                    : DEFAULT_SIMULATION_NOTICE);
             tvBuySimulationNotice.setTextColor(
                     getColor(R.color.text_secondary)
             );
@@ -513,6 +516,11 @@ public class BuyAssetActivity extends AppCompatActivity {
                 ? "Registrando operação…"
                 : isSellOperation() ? "Confirmar venda simulada" : "Confirmar compra simulada");
         refreshOrderPreview();
+    }
+
+    private boolean isFuturesAsset() {
+        return assetCategory != null
+                && assetCategory.trim().toLowerCase(java.util.Locale.ROOT).contains("futuro");
     }
 
     private int getRequestedQuantity() {

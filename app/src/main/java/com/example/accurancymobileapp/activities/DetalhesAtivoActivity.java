@@ -150,10 +150,6 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         configurarBarrasSistema();
         configurarTelaInicial();
         configurarEventos();
-        if (ehFuturoAtivo()) {
-            btnComprarAtivo.setVisibility(View.GONE);
-            btnVenderAtivo.setVisibility(View.GONE);
-        }
         configurarGraficoResponsivo();
 
         quoteRepository = new QuoteRepository(this);
@@ -167,9 +163,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!ehFuturoAtivo()) {
-            loadAssetPosition();
-        }
+        loadAssetPosition();
     }
 
     private void vincularViews() {
@@ -638,15 +632,6 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     }
 
     private void atualizarResumoPosicao() {
-        if (ehFuturoAtivo()) {
-            tvPrecoMedio.setText("—");
-            tvQuantidadeAtivo.setText("—");
-            tvValorPosicao.setText("—");
-            tvVariacaoRentabilidade.setText("—");
-            tvValorRentabilidade.setText("—");
-            return;
-        }
-
         tvPrecoMedio.setText(precoMedio > 0
                 ? formatoMoeda.format(precoMedio)
                 : "R$ 0");
@@ -904,14 +889,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     }
 
     private void abrirTelaOperacao(String tipo) {
-        if (ehFuturoAtivo()) {
-            Toast.makeText(this, "Operações de compra e venda de futuros não estão disponíveis nesta versão.", Toast.LENGTH_LONG).show();
-            return;
-        }
         if (!Double.isFinite(precoAtual) || precoAtual <= 0.0) {
             Toast.makeText(
                     this,
-                    "Aguarde uma cotação válida antes de registrar a operação.",
+                    ehFuturoAtivo()
+                            ? "Este contrato não tem preço de ajuste em reais disponível; não é possível simular a operação."
+                            : "Aguarde uma cotação válida antes de registrar a operação.",
                     Toast.LENGTH_LONG
             ).show();
 
