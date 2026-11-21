@@ -121,7 +121,8 @@ public class MarketListActivity extends AppCompatActivity {
         sortOrder = marketType == MarketType.FUTUROS ? "asc" : "desc";
         sortBy = marketType == MarketType.FIIS
                 ? "totalInvestors"
-                : marketType == MarketType.FUTUROS ? "expirationDate" : "volume";
+                : marketType == MarketType.FUTUROS ? "expirationDate"
+                : marketType == MarketType.CRIPTO ? "rank" : "volume";
     }
 
     private void bindViews() {
@@ -133,6 +134,8 @@ public class MarketListActivity extends AppCompatActivity {
         edtBuscarAtivo = findViewById(R.id.edtBuscarTitulo);
         if (marketType == MarketType.FUTUROS) {
             edtBuscarAtivo.setHint("Buscar contrato (ex.: WIN, DI1, BGI)");
+        } else if (marketType == MarketType.CRIPTO) {
+            edtBuscarAtivo.setHint("Buscar criptomoeda (ex.: BTC, ETH, SOL)");
         }
 
         btnPaginaAnterior = findViewById(R.id.btnPaginaAnterior);
@@ -348,7 +351,7 @@ public class MarketListActivity extends AppCompatActivity {
 
         boolean isFii = marketType == MarketType.FIIS;
         boolean isFuturo = marketType == MarketType.FUTUROS;
-        boolean temSegmento = isFii || isFuturo;
+        boolean temSegmento = isFii || isFuturo; // crypto has no segment filter
         rgSegmentType.setVisibility(temSegmento ? View.VISIBLE : View.GONE);
         tvDescricaoSegmento.setVisibility(temSegmento ? View.VISIBLE : View.GONE);
         tvDescricaoSegmento.setText(isFuturo ? "Segmento do contrato" : "Tipo de fundo");
@@ -365,7 +368,8 @@ public class MarketListActivity extends AppCompatActivity {
 
         btnLimpar.setOnClickListener(v -> {
             segmentType = null;
-            sortBy = isFii ? "totalInvestors" : isFuturo ? "expirationDate" : "volume";
+            sortBy = isFii ? "totalInvestors" : isFuturo ? "expirationDate"
+                    : marketType == MarketType.CRIPTO ? "rank" : "volume";
             sortOrder = isFuturo ? "asc" : "desc";
             dialog.dismiss();
             paginaAtual = 1;
@@ -418,6 +422,31 @@ public class MarketListActivity extends AppCompatActivity {
     }
 
     private void configurarOpcoesDeOrdenacao(View content, boolean isFii) {
+        if (marketType == MarketType.CRIPTO) {
+            // Crypto list supports only provider ranking and alphabetical order.
+            int[] ocultarIds = {
+                    R.id.rbSortPrice,
+                    R.id.rbSortInvestors,
+                    R.id.rbSortDividendYield,
+                    R.id.rbSortPvp,
+                    R.id.rbSortChange,
+                    R.id.rbSortMarketCap,
+                    R.id.rbSortExpiration,
+                    R.id.rbSortSymbol,
+                    R.id.rbSortUnderlying
+            };
+            for (int id : ocultarIds) {
+                content.findViewById(id).setVisibility(View.GONE);
+            }
+            android.widget.RadioButton porNome = content.findViewById(R.id.rbSortName);
+            android.widget.RadioButton porRanking = content.findViewById(R.id.rbSortVolume);
+            porNome.setVisibility(View.VISIBLE);
+            porNome.setText("Código (A-Z)");
+            porRanking.setVisibility(View.VISIBLE);
+            porRanking.setText("Ranking de mercado");
+            return;
+        }
+
         if (marketType == MarketType.FUTUROS) {
             int[] ocultarIds = {
                     R.id.rbSortName,
@@ -493,6 +522,11 @@ public class MarketListActivity extends AppCompatActivity {
     private void selecionarOrdenacaoAtual(RadioGroup group, boolean isFii) {
         int id;
 
+        if (marketType == MarketType.CRIPTO) {
+            group.check("name".equals(sortBy) ? R.id.rbSortName : R.id.rbSortVolume);
+            return;
+        }
+
         if (marketType == MarketType.FUTUROS) {
             if ("symbol".equals(sortBy)) {
                 id = R.id.rbSortSymbol;
@@ -552,6 +586,10 @@ public class MarketListActivity extends AppCompatActivity {
 
     private String obterOrdenacaoSelecionada(RadioGroup group, boolean isFii) {
         int selectedId = group.getCheckedRadioButtonId();
+
+        if (marketType == MarketType.CRIPTO) {
+            return selectedId == R.id.rbSortName ? "name" : "rank";
+        }
 
         if (marketType == MarketType.FUTUROS) {
             if (selectedId == R.id.rbSortSymbol) return "symbol";

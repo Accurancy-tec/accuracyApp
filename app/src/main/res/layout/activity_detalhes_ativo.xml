@@ -739,6 +739,21 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/btnRegistrarDividendo"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_btn_vender"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="Registrar dividendo recebido"
+                android:textColor="#9CB4D2"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

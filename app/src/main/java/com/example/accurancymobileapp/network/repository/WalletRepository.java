@@ -175,6 +175,27 @@ public class WalletRepository {
         });
     }
 
+    /** Reads the current balance; onSuccess receives the amount as a plain decimal string. */
+    public void buscarSaldo(WalletCallback callback) {
+        apiService.buscarSaldo().enqueue(new Callback<AdicionarSaldoResponse>() {
+            @Override
+            public void onResponse(Call<AdicionarSaldoResponse> call, Response<AdicionarSaldoResponse> response) {
+                AdicionarSaldoResponse resultado = response.body();
+                if (!response.isSuccessful() || resultado == null || !resultado.isSuccess()
+                        || resultado.getSaldoAtual() == null) {
+                    callback.onError("Não foi possível carregar o saldo.");
+                    return;
+                }
+                callback.onSuccess(resultado.getSaldoAtual());
+            }
+
+            @Override
+            public void onFailure(Call<AdicionarSaldoResponse> call, Throwable t) {
+                callback.onError("Sem conexão para carregar o saldo.");
+            }
+        });
+    }
+
     public interface WalletCallback {
 
         void onSuccess(String mensagem);
