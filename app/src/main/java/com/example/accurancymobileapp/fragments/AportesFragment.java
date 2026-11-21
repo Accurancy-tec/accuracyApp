@@ -40,6 +40,7 @@ import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.network.service.ApiService;
+import com.example.accurancymobileapp.utils.AnimacaoUtils;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.google.android.material.button.MaterialButton;
@@ -99,6 +100,14 @@ public class AportesFragment extends Fragment {
         cardRendaVariavel = view.findViewById(R.id.cardRendaVariavel);
         cardRendaVariavel.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), OpcoesRendaVariavelActivity.class)));
-        
+
+        // Press feedback on every product card plus a staggered entrance when the tab opens.
+        LinearLayout[] cards = {cardRendaFixa, cardTesouroDireto, cardBolsaDeValores,
+                cardCriptomoedas, cardRendaVariavel};
+        for (LinearLayout card : cards) {
+            AnimacaoUtils.efeitoPressionar(card);
+        }
+        AnimacaoUtils.entradaEmCascata(cards);
+
     }
 }

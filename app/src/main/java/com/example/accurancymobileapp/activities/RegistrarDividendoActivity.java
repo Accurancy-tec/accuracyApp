@@ -22,6 +22,7 @@ import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
+import com.example.accurancymobileapp.utils.AnimacaoUtils;
 import com.example.accurancymobileapp.utils.MascaraMonetaria;
 
 import java.math.BigDecimal;
@@ -91,6 +92,18 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.tvDividendoTicker)).setText(ticker);
         ((TextView) findViewById(R.id.tvDividendoNome)).setText(nomeAtivo);
         ((ImageView) findViewById(R.id.btnVoltarDividendo)).setOnClickListener(v -> finish());
+
+        // Entrance and press feedback in the same style as the other new screens.
+        AnimacaoUtils.efeitoPressionar(btnConfirmar);
+        AnimacaoUtils.efeitoPressionar(chipDividendos);
+        AnimacaoUtils.efeitoPressionar(chipJcp);
+        AnimacaoUtils.efeitoPressionar(chipRendimento);
+        AnimacaoUtils.entradaEmCascata(
+                findViewById(R.id.tvDividendoTicker),
+                findViewById(R.id.tvDividendoNome),
+                chipDividendos,
+                etValor,
+                btnConfirmar);
 
         // FII income is called "rendimento"; stocks pay dividends or JCP.
         boolean fii = categoria.toLowerCase(Locale.ROOT).contains("fii");

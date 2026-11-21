@@ -166,4 +166,8 @@ public interface ApiService {
     Call<AdicionarSaldoResponse> adicionarSaldo(
             @Query("valor")String valor
     );
+
+    /** Current balance of the logged user (same payload shape as adicionar-saldo). */
+    @GET("carteiras/saldo")
+    Call<AdicionarSaldoResponse> buscarSaldo();
 }

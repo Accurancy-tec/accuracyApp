@@ -35,6 +35,7 @@ import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.network.repository.AssetPositionRepository;
 import com.example.accurancymobileapp.network.repository.QuoteRepository;
+import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.ui.StockChartHelper;
@@ -72,6 +73,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private TextView tvPrecoAtualAtivo, tvVariacaoPrecoAtivo, tvUltimaAtualizacao;
     private TextView tvPrecoMedio, tvQuantidadeAtivo, tvValorPosicao;
     private TextView tvVariacaoRentabilidade, tvValorRentabilidade, tvSaldoInvestir;
+    /** Real balance read from the API (-1 until loaded); falls back to the Intent extra. */
+    private double saldoAtual = -1.0;
     private TextView tvTituloEstatisticas;
     private TextView tvAberturaAtivo;
     private TextView tvMaximaAtivo;
@@ -165,6 +168,30 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadAssetPosition();
+        carregarSaldoAtual();
+    }
+
+    /** Reads the user balance so "Saldo para investir" is real and the buy screen receives it. */
+    private void carregarSaldoAtual() {
+        new WalletRepository(this).buscarSaldo(new WalletRepository.WalletCallback() {
+            @Override
+            public void onSuccess(String saldo) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                try {
+                    saldoAtual = Double.parseDouble(saldo.trim());
+                    tvSaldoInvestir.setText(formatoMoeda.format(saldoAtual));
+                } catch (NumberFormatException ignored) {
+                    // Keep the previous value; the server still validates the balance.
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                // Keep the previous value; the server still validates the balance.
+            }
+        });
     }
 
     private void vincularViews() {
@@ -241,7 +268,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         tvVariacaoRentabilidade.setText("0%");
         tvValorRentabilidade.setText("0%");
 
-        double saldo = getIntent().getDoubleExtra(EXTRA_SALDO, -1.0);
+        double saldo = saldoAtual >= 0 ? saldoAtual : getIntent().getDoubleExtra(EXTRA_SALDO, -1.0);
         tvSaldoInvestir.setText(saldo >= 0
                 ? formatoMoeda.format(saldo)
                 : "R$ 0");
@@ -945,7 +972,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         asset.putExtra(EXTRA_ID_CARTEIRA, idCarteira);
         asset.putExtra(
                 EXTRA_SALDO,
-                getIntent().getDoubleExtra(EXTRA_SALDO, -1.0)
+                saldoAtual >= 0 ? saldoAtual : getIntent().getDoubleExtra(EXTRA_SALDO, -1.0)
         );
         asset.putExtra(EXTRA_PRECO_ATUAL_COMPRA, precoAtual);
         asset.putExtra(EXTRA_VARIACAO_DIARIA_COMPRA, variacaoDiaria);
