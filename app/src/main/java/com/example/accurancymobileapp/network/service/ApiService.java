@@ -131,6 +131,24 @@ public interface ApiService {
             @Query("range") String range
     );
 
+    @GET("brapi/listar-criptomoedas")
+    Call<AcaoResponse> listarCriptomoedas(
+            @Query("page") int page,
+            @Query("limit") int limit,
+            @Query("search") String search,
+            @Query("sortBy") String sortBy,
+            @Query("sortOrder") String sortOrder
+    );
+
+    @GET("brapi/get-crypto-quote")
+    Call<QuoteResponse> getCryptoQuote(@Query("symbol") String symbol);
+
+    @GET("brapi/historico-criptomoedas")
+    Call<StockHistoryResponse> historicoCriptomoedas(
+            @Query("symbol") String symbol,
+            @Query("range") String range
+    );
+
     @GET("carteiras/posicao-ativo")
     Call<AssetPositionResponse> getAssetPosition(
             @Query("symbol") String symbol

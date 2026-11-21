@@ -189,6 +189,48 @@
 
                     </LinearLayout>
 
+                    <!-- Criptomoedas -->
+                    <LinearLayout
+                        android:id="@+id/cardCriptomoedasAportes"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/bg_carteira_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="13dp">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_categoria_cripto"
+                            android:gravity="center"
+                            android:text="₿"
+                            android:textColor="#F7931A"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="Criptomoedas"
+                            android:textColor="#F1F5FC"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Bitcoin, Ethereum e mais"
+                            android:textColor="#9BAAC0"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <!-- Renda variável -->

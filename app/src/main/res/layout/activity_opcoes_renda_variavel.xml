@@ -74,6 +74,7 @@
                 <!-- Pesquisa -->
                 <LinearLayout
                     android:id="@+id/containerPesquisaAtivo"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     android:background="@drawable/bg_carteira_card"
@@ -109,6 +110,7 @@
                 <!-- Abas: listagem geral e favoritos -->
                 <LinearLayout
                     android:id="@+id/abasRendaVariavel"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
                     android:layout_marginTop="9dp"
@@ -169,6 +171,8 @@
                 </LinearLayout>
 
                 <View
+                    android:id="@+id/divisorAbasRendaVariavel"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="#17263D" />
@@ -176,6 +180,7 @@
                 <!-- Filtros -->
                 <LinearLayout
                     android:id="@+id/filtrosAtivos"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="36dp"
                     android:layout_marginTop="11dp"
@@ -360,7 +365,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Índice, dólar e criptos"
+                            android:text="Índice, dólar e juros"
                             android:textColor="#9BAAC0"
                             android:textSize="10sp" />
 
@@ -407,6 +412,64 @@
                             android:textSize="10sp" />
 
                     </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Criptomoedas -->
+                <LinearLayout
+                    android:id="@+id/cardCriptomoedas"
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_carteira_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="14dp">
+
+                    <TextView
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/bg_categoria_cripto"
+                        android:gravity="center"
+                        android:text="₿"
+                        android:textColor="#F7931A"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="11dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Criptomoedas"
+                            android:textColor="#F1F5FC"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Bitcoin, Ethereum e outras moedas digitais"
+                            android:textColor="#9BAAC0"
+                            android:textSize="10sp" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_arrow_back"
+                        app:tint="#9BAAC0" />
 
                 </LinearLayout>
 

@@ -6,7 +6,8 @@ public enum MarketType {
 
     ACOES_NACIONAIS("ACOES_NACIONAIS", "Ações Nacionais", "Ações"),
     BDRS_ETFS("BDRS_ETFS", "Ações e ETFs Internacionais", "Ações"),
-    FUTUROS("FUTUROS", "Contratos Futuros", "Futuros");
+    FUTUROS("FUTUROS", "Contratos Futuros", "Futuros"),
+    CRIPTO("CRIPTO", "Criptomoedas", "Cripto");
 
     private final String tag;
     private final String title;

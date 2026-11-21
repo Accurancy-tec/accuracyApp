@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.DashboardActivity;
+import com.example.accurancymobileapp.activities.MarketListActivity;
 import com.example.accurancymobileapp.activities.OpcoesRendaFixaActivity;
 import com.example.accurancymobileapp.activities.OpcoesRendaVariavelActivity;
 import com.example.accurancymobileapp.model.ActiveSpinner;
@@ -85,6 +86,13 @@ public class AportesFragment extends Fragment {
         cardTesouroDireto.setOnClickListener(v -> {
             Intent it = new Intent(requireContext(), OpcoesRendaFixaActivity.class);
             it.putExtra(OpcoesRendaFixaActivity.EXTRA_FILTRO, OpcoesRendaFixaActivity.FILTRO_TESOURO);
+            startActivity(it);
+        });
+
+        LinearLayout cardCriptomoedas = view.findViewById(R.id.cardCriptomoedasAportes);
+        cardCriptomoedas.setOnClickListener(v -> {
+            Intent it = new Intent(requireContext(), MarketListActivity.class);
+            it.putExtra("TAG", "CRIPTO");
             startActivity(it);
         });
 

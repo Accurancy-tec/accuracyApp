@@ -970,7 +970,18 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         }
     }
 
+    private boolean ehCriptoAtivo() {
+        return categoriaAtivo != null
+                && categoriaAtivo.trim().toLowerCase(Locale.ROOT).startsWith("cripto");
+    }
+
     private String formatarQuantidade(double quantidade) {
+        if (ehCriptoAtivo() && Double.isFinite(quantidade)) {
+            java.text.NumberFormat formato = java.text.NumberFormat.getNumberInstance(ptBR);
+            formato.setMinimumFractionDigits(0);
+            formato.setMaximumFractionDigits(8);
+            return formato.format(java.math.BigDecimal.valueOf(quantidade));
+        }
         return String.format(
                 ptBR,
                 quantidade == Math.rint(quantidade) ? "%.0f" : "%.4f",
