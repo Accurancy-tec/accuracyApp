@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.TituloRendaFixa;
+import com.example.accurancymobileapp.utils.AnimacaoUtils;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -37,8 +38,12 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
     private final NumberFormat formatoMoeda =
             NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
+    /** Highest row position that already played its entrance animation. */
+    private int ultimaPosicaoAnimada = -1;
+
     public void atualizarLista(List<TituloRendaFixa> novaLista) {
         titulos.clear();
+        ultimaPosicaoAnimada = -1;
 
         if (novaLista != null) {
             titulos.addAll(novaLista);
@@ -112,6 +117,17 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
                 clickListener.onTituloClick(titulo);
             }
         });
+        AnimacaoUtils.efeitoPressionar(holder.itemView);
+
+        if (position > ultimaPosicaoAnimada) {
+            ultimaPosicaoAnimada = position;
+            AnimacaoUtils.entradaItemLista(holder.itemView, position);
+        } else {
+            // Recycled row scrolling back into view: make sure it is fully visible.
+            holder.itemView.animate().cancel();
+            holder.itemView.setAlpha(1f);
+            holder.itemView.setTranslationY(0f);
+        }
     }
 
     @Override
