@@ -18,7 +18,21 @@ import java.util.List;
 import java.util.Locale;
 
 public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixaAdapter.TituloViewHolder>  {
+    /** Called when the user taps a title card. */
+    public interface OnTituloClickListener {
+        void onTituloClick(TituloRendaFixa titulo);
+    }
+
     private final List<TituloRendaFixa> titulos = new ArrayList<>();
+    private final OnTituloClickListener clickListener;
+
+    public TituloRendaFixaAdapter() {
+        this(null);
+    }
+
+    public TituloRendaFixaAdapter(OnTituloClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
 
     private final NumberFormat formatoMoeda =
             NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
@@ -90,6 +104,14 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
         } else {
             holder.tvGarantiaFgc.setVisibility(View.GONE);
         }
+
+        holder.tvIsentoIR.setVisibility(titulo.isIsentoIR() ? View.VISIBLE : View.GONE);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onTituloClick(titulo);
+            }
+        });
     }
 
     @Override
@@ -102,6 +124,7 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
         TextView tvNomeTitulo;
         TextView tvIndexador;
         TextView tvGarantiaFgc;
+        TextView tvIsentoIR;
         TextView tvRentabilidade;
         TextView tvLiquidez;
         TextView tvAplicacaoMinima;
@@ -112,6 +135,7 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
             tvNomeTitulo = itemView.findViewById(R.id.tvNomeTitulo);
             tvIndexador = itemView.findViewById(R.id.tvIndexador);
             tvGarantiaFgc = itemView.findViewById(R.id.tvGarantiaFgc);
+            tvIsentoIR = itemView.findViewById(R.id.tvIsentoIR);
             tvRentabilidade = itemView.findViewById(R.id.tvRentabilidade);
             tvLiquidez = itemView.findViewById(R.id.tvLiquidez);
             tvAplicacaoMinima = itemView.findViewById(R.id.tvAplicacaoMinima);
