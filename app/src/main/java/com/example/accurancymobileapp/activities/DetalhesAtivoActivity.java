@@ -81,6 +81,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private View btnAtualizarCotacao;
     private View btnComprarAtivo;
     private View btnVenderAtivo;
+    private View btnRegistrarDividendo;
 
     private TextView filtroHoje;
     private TextView filtro1S;
@@ -193,6 +194,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         btnAtualizarCotacao = findViewById(R.id.btnAtualizarCotacao);
         btnComprarAtivo = findViewById(R.id.btnComprarAtivo);
         btnVenderAtivo = findViewById(R.id.btnVenderAtivo);
+        btnRegistrarDividendo = findViewById(R.id.btnRegistrarDividendo);
 
         filtroHoje = findViewById(R.id.filtroHoje);
         filtro1S = findViewById(R.id.filtro1S);
@@ -260,6 +262,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
         btnComprarAtivo.setOnClickListener(view -> abrirTelaOperacao("Compra"));
         btnVenderAtivo.setOnClickListener(view -> abrirTelaOperacao("Venda"));
+        btnRegistrarDividendo.setOnClickListener(view -> abrirTelaDividendo());
 
         filtroHoje.setOnClickListener(view ->
                 selecionarPeriodo("1d", "Hoje", filtroHoje)
@@ -631,7 +634,25 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         );
     }
 
+    /** Dividends only make sense for held stocks, FIIs and BDRs/ETFs (not futures or crypto). */
+    private void atualizarBotaoDividendo() {
+        boolean elegivel = quantidadePosicao > 0.0
+                && !ehFuturoAtivo()
+                && !ehCriptoAtivo();
+        btnRegistrarDividendo.setVisibility(elegivel ? View.VISIBLE : View.GONE);
+    }
+
+    private void abrirTelaDividendo() {
+        Intent dividendo = new Intent(this, RegistrarDividendoActivity.class);
+        dividendo.putExtra(EXTRA_TICKER, ticker);
+        dividendo.putExtra(EXTRA_NOME, nomeAtivo);
+        dividendo.putExtra(EXTRA_CATEGORIA, categoriaAtivo);
+        dividendo.putExtra(EXTRA_ID_CARTEIRA, idCarteira);
+        startActivity(dividendo);
+    }
+
     private void atualizarResumoPosicao() {
+        atualizarBotaoDividendo();
         tvPrecoMedio.setText(precoMedio > 0
                 ? formatoMoeda.format(precoMedio)
                 : "R$ 0");
@@ -992,6 +1013,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private void limparResumoPosicao() {
         quantidadePosicao = 0.0;
         precoMedio = 0.0;
+        atualizarBotaoDividendo();
 
         tvPrecoMedio.setText("—");
         tvQuantidadeAtivo.setText("—");
