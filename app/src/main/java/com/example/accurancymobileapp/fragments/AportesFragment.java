@@ -59,7 +59,7 @@ public class AportesFragment extends Fragment {
         super(R.layout.fragment_aportes);
     }
 
-    LinearLayout cardBolsaDeValores, cardRendaFixa;
+    LinearLayout cardBolsaDeValores, cardRendaFixa, cardTesouroDireto, cardRendaVariavel;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -76,8 +76,21 @@ public class AportesFragment extends Fragment {
 
         cardRendaFixa.setOnClickListener(v -> {
             Intent it = new Intent(requireContext(), OpcoesRendaFixaActivity.class);
+            it.putExtra(OpcoesRendaFixaActivity.EXTRA_FILTRO, OpcoesRendaFixaActivity.FILTRO_BANCARIOS);
             startActivity(it);
         });
+
+        // These two cards existed in the layout but had no click handler.
+        cardTesouroDireto = view.findViewById(R.id.cardTesouroDireto);
+        cardTesouroDireto.setOnClickListener(v -> {
+            Intent it = new Intent(requireContext(), OpcoesRendaFixaActivity.class);
+            it.putExtra(OpcoesRendaFixaActivity.EXTRA_FILTRO, OpcoesRendaFixaActivity.FILTRO_TESOURO);
+            startActivity(it);
+        });
+
+        cardRendaVariavel = view.findViewById(R.id.cardRendaVariavel);
+        cardRendaVariavel.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), OpcoesRendaVariavelActivity.class)));
         
     }
 }
