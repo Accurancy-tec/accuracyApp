@@ -40,6 +40,9 @@ public class OpcoesRendaVariavelActivity extends AppCompatActivity {
         cardContratosFuturos.setOnClickListener(v ->
                 abrirTela(MarketListActivity.class, "FUTUROS")
         );
+        findViewById(R.id.cardCriptomoedas).setOnClickListener(v ->
+                abrirTela(MarketListActivity.class, "CRIPTO")
+        );
 
 
     }
