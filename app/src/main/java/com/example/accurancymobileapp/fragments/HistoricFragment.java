@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.fragments;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +38,8 @@ public class HistoricFragment extends Fragment {
     private ComposeView graficoHistorico;
     private final List<Aporte> listaHistorico = new ArrayList<>();
     private HistoricAdapter adapter;
+    private PuxarParaAtualizar puxar;
+    private boolean primeiraRetomada = true;
 
     private enum PeriodoHistorico { SEMANA, MES, ANO }
     private PeriodoHistorico periodoSelecionado = PeriodoHistorico.SEMANA;
@@ -49,6 +52,7 @@ public class HistoricFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        puxar = new PuxarParaAtualizar(view.findViewById(R.id.swipeHistorico), this::carregarHistorico);
         recyclerHistorico = view.findViewById(R.id.recyclerHistorico);
         recyclerHistorico.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerHistorico.setNestedScrollingEnabled(false);
@@ -75,10 +79,23 @@ public class HistoricFragment extends Fragment {
         carregarHistorico();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // A purchase, sale or dividend made on another screen shows up when coming back.
+        if (primeiraRetomada) {
+            primeiraRetomada = false;
+            return;
+        }
+        carregarHistorico();
+    }
+
     private void carregarHistorico() {
+        puxar.iniciar();
         new HistoricRepository(requireContext()).buscarHistorico(new HistoricRepository.HistoricCallback() {
             @Override
             public void OnSuccess(List<Aporte> historico) {
+                puxar.concluir();
                 if (!isAdded()) return;
                 listaHistorico.clear();
                 if (historico != null) listaHistorico.addAll(historico);
@@ -87,6 +104,7 @@ public class HistoricFragment extends Fragment {
 
             @Override
             public void onError(String message) {
+                puxar.concluir();
                 if (!isAdded()) return;
                 Log.e("HISTORICO_APORTES", message == null ? "Erro sem mensagem" : message);
                 Toast.makeText(requireContext(), "Não foi possível carregar o histórico.", Toast.LENGTH_SHORT).show();
