@@ -31,21 +31,47 @@
                 android:paddingEnd="17dp"
                 android:paddingBottom="20dp">
 
-                <!-- Título -->
-                <TextView
+                <!-- Título + atalho para Favoritos -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Produtos"
-                    android:textColor="#F1F5FC"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Prateleira completa de investimentos"
-                    android:textColor="#9BAAC0"
-                    android:textSize="12sp" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Produtos"
+                            android:textColor="#F1F5FC"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Prateleira completa de investimentos"
+                            android:textColor="#9BAAC0"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btnFavoritosProdutos"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_btn_icone"
+                        android:contentDescription="Abrir meus favoritos"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_favorito_cheio"
+                        app:tint="#FF4D6D" />
+
+                </LinearLayout>
 
                 <!-- Primeira linha -->
                 <LinearLayout

@@ -32,13 +32,18 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.network.repository.AssetPositionRepository;
+import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.network.repository.QuoteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.ui.StockChartHelper;
+import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.FavoritoUi;
+import com.example.accurancymobileapp.utils.FavoritosCache;
 
 import java.text.NumberFormat;
 import java.time.Instant;
@@ -101,6 +106,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private AssetPositionRepository assetPositionRepository;
     private int assetPositionRequestId;
     private QuoteRepository quoteRepository;
+    private FavoritoRepository favoritoRepository;
+    private ImageButton btnFavoritarAtivo;
 
     private String ticker;
     private String nomeAtivo;
@@ -158,6 +165,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
         quoteRepository = new QuoteRepository(this);
         assetPositionRepository = new AssetPositionRepository(this);
+        configurarFavorito();
 
         desenharGrafico(true, null);
         carregarCotacao();
@@ -169,6 +177,50 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         super.onResume();
         loadAssetPosition();
         carregarSaldoAtual();
+        sincronizarFavorito();
+    }
+
+    /** Heart in the header: favorites the asset, with the state kept on the server. */
+    private void configurarFavorito() {
+        btnFavoritarAtivo = findViewById(R.id.btnFavoritarAtivo);
+        if (!FavoritoUi.categoriaFavoritavel(categoriaAtivo)) {
+            // Fixed income positions and other categories cannot be favorited.
+            btnFavoritarAtivo.setVisibility(View.INVISIBLE);
+            return;
+        }
+        favoritoRepository = new FavoritoRepository(this);
+        FavoritoUi.aplicar(btnFavoritarAtivo, FavoritosCache.contem(ticker, categoriaAtivo));
+        AnimacaoUtils.efeitoPressionar(btnFavoritarAtivo);
+        btnFavoritarAtivo.setOnClickListener(v -> favoritoRepository.alternar(
+                ticker, nomeAtivo, categoriaAtivo, new FavoritoRepository.AlternarCallback() {
+                    @Override
+                    public void onResultado(boolean favorito) {
+                        FavoritoUi.aplicarComAnimacao(btnFavoritarAtivo, favorito);
+                    }
+
+                    @Override
+                    public void onError(boolean estadoAnterior, String mensagem) {
+                        if (isFinishing() || isDestroyed()) return;
+                        FavoritoUi.aplicar(btnFavoritarAtivo, estadoAnterior);
+                        Toast.makeText(DetalhesAtivoActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                    }
+                }));
+    }
+
+    private void sincronizarFavorito() {
+        if (favoritoRepository == null) return;
+        favoritoRepository.carregar(new FavoritoRepository.ListaCallback() {
+            @Override
+            public void onSuccess(List<FavoritoAtivo> favoritos) {
+                if (isFinishing() || isDestroyed()) return;
+                FavoritoUi.aplicar(btnFavoritarAtivo, FavoritosCache.contem(ticker, categoriaAtivo));
+            }
+
+            @Override
+            public void onError(String mensagem) {
+                // Keep the heart already drawn from the local copy.
+            }
+        });
     }
 
     /** Reads the user balance so "Saldo para investir" is real and the buy screen receives it. */

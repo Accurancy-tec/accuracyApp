@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.DashboardActivity;
+import com.example.accurancymobileapp.activities.FavoritosActivity;
 import com.example.accurancymobileapp.activities.MarketListActivity;
 import com.example.accurancymobileapp.activities.OpcoesRendaFixaActivity;
 import com.example.accurancymobileapp.activities.OpcoesRendaVariavelActivity;
@@ -92,6 +93,11 @@ public class AportesFragment extends Fragment {
 
         LinearLayout cardCriptomoedas = view.findViewById(R.id.cardCriptomoedasAportes);
         cardCriptomoedas.setOnClickListener(v -> abrirMercado("CRIPTO"));
+
+        View btnFavoritos = view.findViewById(R.id.btnFavoritosProdutos);
+        btnFavoritos.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), FavoritosActivity.class)));
+        AnimacaoUtils.efeitoPressionar(btnFavoritos);
 
         LinearLayout cardFuturos = view.findViewById(R.id.cardFuturosAportes);
         cardFuturos.setOnClickListener(v -> abrirMercado("FUTUROS"));

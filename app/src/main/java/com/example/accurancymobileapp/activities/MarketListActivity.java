@@ -26,13 +26,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.AcoesAdapter;
 import com.example.accurancymobileapp.model.Acao;
+import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.model.MarketType;
+import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.network.repository.MarketListRepository;
 import com.example.accurancymobileapp.response.AcaoResponse;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MarketListActivity extends AppCompatActivity {
 
@@ -47,6 +50,7 @@ public class MarketListActivity extends AppCompatActivity {
     private MarketType marketType;
     private MarketListRepository marketListRepository;
     private AcoesAdapter adapter;
+    private FavoritoRepository favoritoRepository;
 
     private int paginaAtual = 1;
     private int totalPaginas = 1;
@@ -105,6 +109,8 @@ public class MarketListActivity extends AppCompatActivity {
 
         rvMarket.setLayoutManager(new LinearLayoutManager(this));
         adapter = new AcoesAdapter(new ArrayList<>(), this::abrirDetalhes);
+        favoritoRepository = new FavoritoRepository(this);
+        adapter.habilitarFavoritos(marketType.getDetailCategory(), this::alternarFavorito);
         rvMarket.setAdapter(adapter);
 
         configurarBotoes();
@@ -628,6 +634,43 @@ public class MarketListActivity extends AppCompatActivity {
         tvProximaPagina.setText(
                 temProximaPagina ? String.valueOf(paginaAtual + 1) : ""
         );
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Hearts may have changed on the details screen; the server copy wins.
+        favoritoRepository.carregar(new FavoritoRepository.ListaCallback() {
+            @Override
+            public void onSuccess(List<FavoritoAtivo> favoritos) {
+                if (!isFinishing() && !isDestroyed()) {
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onError(String mensagem) {
+                // Keep the hearts already on screen.
+            }
+        });
+    }
+
+    private void alternarFavorito(Acao ativo, int posicao) {
+        favoritoRepository.alternar(
+                ativo.getStock(), ativo.getName(), marketType.getDetailCategory(),
+                new FavoritoRepository.AlternarCallback() {
+                    @Override
+                    public void onResultado(boolean favorito) {
+                        // The row already redrew its heart.
+                    }
+
+                    @Override
+                    public void onError(boolean estadoAnterior, String mensagem) {
+                        if (isFinishing() || isDestroyed()) return;
+                        adapter.notifyItemChanged(posicao);
+                        Toast.makeText(MarketListActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override
