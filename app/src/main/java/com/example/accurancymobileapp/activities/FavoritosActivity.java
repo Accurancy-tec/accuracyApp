@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -43,6 +44,7 @@ public class FavoritosActivity extends AppCompatActivity {
     private ChipGroup chips;
     private RecyclerView lista;
     private ProgressBar progresso;
+    private PuxarParaAtualizar puxar;
     private LinearLayout estadoVazio;
     private TextView tvTituloVazio;
     private TextView tvMensagemVazio;
@@ -59,6 +61,7 @@ public class FavoritosActivity extends AppCompatActivity {
         voltar.setOnClickListener(v -> finish());
         chips = findViewById(R.id.chipsFavoritos);
         lista = findViewById(R.id.rvFavoritos);
+        puxar = new PuxarParaAtualizar(findViewById(R.id.swipeFavoritos), this::carregar);
         progresso = findViewById(R.id.progressFavoritos);
         estadoVazio = findViewById(R.id.estadoVazioFavoritos);
         tvTituloVazio = findViewById(R.id.tvTituloVazioFavoritos);
@@ -124,6 +127,7 @@ public class FavoritosActivity extends AppCompatActivity {
         repositorio.carregar(new FavoritoRepository.ListaCallback() {
             @Override
             public void onSuccess(List<FavoritoAtivo> favoritos) {
+                puxar.parar();
                 if (isFinishing() || isDestroyed()) return;
                 todos.clear();
                 todos.addAll(favoritos);
@@ -132,6 +136,7 @@ public class FavoritosActivity extends AppCompatActivity {
 
             @Override
             public void onError(String mensagem) {
+                puxar.parar();
                 if (isFinishing() || isDestroyed()) return;
                 if (todos.isEmpty()) {
                     mostrarEstado("Não foi possível carregar", mensagem, true);

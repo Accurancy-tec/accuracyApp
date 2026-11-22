@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.fragments;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -38,6 +39,8 @@ public class WalletFragment extends Fragment {
     private TextView txtCarteiraVazia;
     private ImageButton btnExcluirCarteira;
     WalletRepository walletRepository;
+    private PuxarParaAtualizar puxar;
+    private boolean primeiraRetomada = true;
 
     public WalletFragment() {
         super(R.layout.fragment_wallet);
@@ -47,6 +50,7 @@ public class WalletFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        puxar = new PuxarParaAtualizar(view.findViewById(R.id.swipeCarteira), this::carregarInvestimentos);
         recyclerInvestimentos = view.findViewById(R.id.recyclerInvestimentos);
         btnExcluirCarteira = view.findViewById(R.id.btnExcluirCarteira);
         txtCarteiraVazia = view.findViewById(R.id.txtCarteiraVazia);
@@ -57,10 +61,27 @@ public class WalletFragment extends Fragment {
             excluirCarteira();
         });
 
+        View btnAtualizar = view.findViewById(R.id.btnAtualizar);
+        if (btnAtualizar != null) {
+            btnAtualizar.setOnClickListener(v -> puxar.disparar(this::carregarInvestimentos));
+        }
+
+        carregarInvestimentos();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Coming back from a purchase, sale or dividend: reload this wallet's contributions.
+        if (primeiraRetomada) {
+            primeiraRetomada = false;
+            return;
+        }
         carregarInvestimentos();
     }
 
     private void carregarInvestimentos() {
+        puxar.iniciar();
         AporteRepository aporteRepository = new AporteRepository(requireContext());
 
         Bundle bundle = getArguments();
@@ -73,6 +94,7 @@ public class WalletFragment extends Fragment {
         aporteRepository.buscarAportes(idCarteira, new AporteRepository.aporteCallback() {
             @Override
             public void onSucesso(List<Aporte> aportes) {
+                puxar.concluir();
                 if (!isAdded()) {
                     return;
                 }
@@ -87,6 +109,7 @@ public class WalletFragment extends Fragment {
 
             @Override
             public void onErro(String mensagem) {
+                puxar.concluir();
                 Log.e("APORTES_TESTE", "Erro: " + mensagem);
 
                 if (!isAdded()) {
