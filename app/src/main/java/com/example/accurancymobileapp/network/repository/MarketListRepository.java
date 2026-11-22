@@ -23,7 +23,7 @@ public class MarketListRepository {
     ) {
         String defaultSort = type == MarketType.FIIS
                 ? "totalInvestors"
-                : type == MarketType.CRIPTO ? "rank" : "volume";
+                : type.isCatalogoSimples() ? "rank" : "volume";
 
         listarAtivos(
                 type,
@@ -130,6 +130,21 @@ public class MarketListRepository {
                 break;
             case CRIPTO:
                 acaoRepository.listarCriptomoedas(
+                        pagina, limite, search, sortBy, sortOrder,
+                        new AcaoRepository.acaoCallback() {
+                            @Override
+                            public void onSuccess(AcaoResponse resultado) {
+                                callback.onSuccess(resultado);
+                            }
+                            @Override
+                            public void onError(String mensagem) {
+                                callback.onError(mensagem);
+                            }
+                        }
+                );
+                break;
+            case MOEDAS:
+                acaoRepository.listarMoedas(
                         pagina, limite, search, sortBy, sortOrder,
                         new AcaoRepository.acaoCallback() {
                             @Override
