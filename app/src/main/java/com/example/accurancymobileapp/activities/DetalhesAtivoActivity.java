@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
@@ -122,6 +123,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
     private int idCarteira = -1;
 
+    private PuxarParaAtualizar puxar;
     private boolean carregandoCotacao = false;
     private boolean carregandoHistorico = false;
     private boolean carregandoHistoricoAnual = false;
@@ -158,6 +160,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         }
 
         vincularViews();
+        puxar = new PuxarParaAtualizar(findViewById(R.id.swipeDetalhesAtivo), this::atualizarTela);
         configurarBarrasSistema();
         configurarTelaInicial();
         configurarEventos();
@@ -170,6 +173,22 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         desenharGrafico(true, null);
         carregarCotacao();
         carregarHistorico(periodoSelecionado, etiquetaPeriodo);
+    }
+
+    /** Pull to refresh: quote, chart, position and balance. */
+    private void atualizarTela() {
+        carregarCotacao();
+        carregarHistorico(periodoSelecionado, etiquetaPeriodo);
+        loadAssetPosition();
+        carregarSaldoAtual();
+        finalizarAtualizacaoPuxar();
+    }
+
+    /** Releases the pull spinner once neither the quote nor the chart is still loading. */
+    private void finalizarAtualizacaoPuxar() {
+        if (puxar != null && !carregandoCotacao && !carregandoHistorico) {
+            puxar.parar();
+        }
     }
 
     @Override
@@ -488,6 +507,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                     @Override
                     public void onSucesso(List<QuoteData> quotes) {
                         carregandoCotacao = false;
+                        finalizarAtualizacaoPuxar();
 
                         if (isFinishing() || isDestroyed()
                                 || quotes == null || quotes.isEmpty()) {
@@ -570,6 +590,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                     @Override
                     public void onErro(String mensagem) {
                         carregandoCotacao = false;
+                        finalizarAtualizacaoPuxar();
 
                         if (isFinishing() || isDestroyed()) {
                             return;
@@ -903,6 +924,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                         }
 
                         carregandoHistorico = false;
+                        finalizarAtualizacaoPuxar();
 
                         labelsGrafico.clear();
                         valoresGrafico.clear();
@@ -970,6 +992,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                         }
 
                         carregandoHistorico = false;
+                        finalizarAtualizacaoPuxar();
 
                         erroHistorico = mensagem;
                         desenharGrafico(false, mensagem);
