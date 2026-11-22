@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -61,6 +62,7 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
         btnVoltarRendaFixa = findViewById(R.id.btnVoltarRendaFixa);
         rvTitulosRendaFixa = findViewById(R.id.rvTitulosRendaFixa);
         progressRendaFixa = findViewById(R.id.progressRendaFixa);
+        puxar = new PuxarParaAtualizar(findViewById(R.id.swipeRendaFixa), this::carregarTitulosRendaFixa);
         estadoVazio = findViewById(R.id.estadoVazioRendaFixa);
         tvEstadoVazioTitulo = findViewById(R.id.tvEstadoVazioTituloRf);
         tvEstadoVazioMensagem = findViewById(R.id.tvEstadoVazioMensagemRf);
@@ -204,12 +206,16 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
         }
     }
 
+    private PuxarParaAtualizar puxar;
+
     private void carregarTitulosRendaFixa(){
         estadoVazio.setVisibility(View.GONE);
-        progressRendaFixa.setVisibility(View.VISIBLE);
+        // When the user pulled to refresh, the pull spinner is already on screen.
+        progressRendaFixa.setVisibility(puxar != null && puxar.atualizando() ? View.GONE : View.VISIBLE);
         repositoryRF.listarTitulosRendaFixa(new RendaFixaRepository.RendaFixaCallback() {
             @Override
             public void onSuccess(List<TituloRendaFixa> titulos) {
+                puxar.parar();
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }
@@ -223,6 +229,7 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
 
             @Override
             public void onError(String message) {
+                puxar.parar();
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }

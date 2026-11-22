@@ -57,17 +57,22 @@
         </LinearLayout>
 
         <!-- CONTEÚDO ROLÁVEL -->
-        <ScrollView
-            android:id="@+id/scrollDetalhesAtivo"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeDetalhesAtivo"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:clipToPadding="false"
-            android:fillViewport="false"
-            android:overScrollMode="never"
             app:layout_constraintTop_toBottomOf="@id/cabecalhoDetalhes"
             app:layout_constraintBottom_toTopOf="@id/rodapeOperacoes"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/scrollDetalhesAtivo"
+            android:clipToPadding="false"
+            android:fillViewport="false"
+            android:overScrollMode="never">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -650,6 +655,8 @@
 
             </LinearLayout>
         </ScrollView>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <!-- RODAPÉ FIXO DE OPERAÇÕES -->
         <LinearLayout

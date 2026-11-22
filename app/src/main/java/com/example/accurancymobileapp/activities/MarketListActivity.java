@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -131,7 +132,10 @@ public class MarketListActivity extends AppCompatActivity {
                 : marketType.isCatalogoSimples() ? "rank" : "volume";
     }
 
+    private PuxarParaAtualizar puxar;
+
     private void bindViews() {
+        puxar = new PuxarParaAtualizar(findViewById(R.id.swipeListaMercado), () -> carregarPagina(paginaAtual));
         btnVoltar = findViewById(R.id.btnVoltarAtivosNacionais);
         btnFiltros = findViewById(R.id.btnFiltrosAtivos);
 
@@ -281,6 +285,7 @@ public class MarketListActivity extends AppCompatActivity {
                         }
 
                         carregando = false;
+                        puxar.parar();
 
                         if (isFinishing() || isDestroyed()) {
                             return;
@@ -321,6 +326,7 @@ public class MarketListActivity extends AppCompatActivity {
                         }
 
                         carregando = false;
+                        puxar.parar();
 
                         if (isFinishing() || isDestroyed()) {
                             return;

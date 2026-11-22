@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.fragments;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import static android.widget.Toast.LENGTH_LONG;
 
 import android.content.Intent;
@@ -47,6 +48,10 @@ public class DashboardFragment extends Fragment {
     private Spinner spFiltroDestaques;
     private TextView tvDestaquesVazio, btnAdicionarSaldo;
     private WalletRepository walletRepository;
+    private TextView tvSaldoLivre;
+    private PuxarParaAtualizar puxar;
+    private String filtroDestaque = "Mais caros";
+    private boolean primeiraRetomada = true;
 
     public DashboardFragment() {
         super(R.layout.fragment_dashboard);
@@ -73,11 +78,14 @@ public class DashboardFragment extends Fragment {
         spFiltroDestaques = view.findViewById(R.id.spFiltroDestaques);
         btnAdicionarSaldo = view.findViewById(R.id.btnAdicionarSaldo);
         tvSaldoDisponivel = view.findViewById(R.id.tvSaldoDisponivel);
+        tvSaldoLivre = view.findViewById(R.id.tvSaldoLivre);
         walletRepository = new WalletRepository(requireContext());
+        puxar = new PuxarParaAtualizar(view.findViewById(R.id.swipeDashboard), this::atualizarTudo);
 
         carregarGrafico(periodo);
         recicleView();
         timeInvested();
+        carregarSaldo();
 
         btnAdicionarSaldo.setOnClickListener(v -> {
             Intent it = new Intent(requireContext(), FormAdicionarSaldoActivity.class);
@@ -96,6 +104,7 @@ public class DashboardFragment extends Fragment {
                 filtros,
                 posicao -> {
                     String type = posicao == 0 ? "Mais caros" : posicao == 1 ? "Mais lucrativos" : "Maiores perdas";
+                    filtroDestaque = type;
                     carregarDestques(type);
                 }
         );
@@ -104,7 +113,7 @@ public class DashboardFragment extends Fragment {
     private void carregarDestques(String type) {
         ApiService api = RetrofitClient.getClient(requireContext()).create(ApiService.class);
 
-        api.buscarLista(type).enqueue(new Callback<ApiResponse>() {
+        api.buscarLista(type).enqueue(puxar.acompanhar(new Callback<ApiResponse>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {
 
@@ -153,14 +162,14 @@ public class DashboardFragment extends Fragment {
 
                 Log.e("DASHBOARD", "Erro ao carregar aportes", t);
             }
-        });
+        }));
     }
 
     private void carregarGrafico(String periodo) {
 
         VicoService vico = RetrofitClient.getClient(requireContext()).create(VicoService.class);
 
-        vico.getEvolucao(periodo).enqueue(new Callback<VicoResponse>() {
+        vico.getEvolucao(periodo).enqueue(puxar.acompanhar(new Callback<VicoResponse>() {
 
             @Override
             public void onResponse(@NonNull Call<VicoResponse> call, @NonNull Response<VicoResponse> response) {
@@ -223,7 +232,7 @@ public class DashboardFragment extends Fragment {
 
                 mostrarGrafico(new ArrayList<>(), new ArrayList<>(), periodo);
             }
-        });
+        }));
     }
 
     private void mostrarGrafico(List<String> datas, List<Double> valores, String periodo) {
@@ -284,8 +293,46 @@ public class DashboardFragment extends Fragment {
         //TODO: adicionar logica para buscar nome do usuario
     }
 
+    /** Reloads everything on the screen (pull to refresh and return from another screen). */
+    private void atualizarTudo() {
+        carregarGrafico(periodo);
+        carregarDestques(filtroDestaque);
+        carregarSaldo();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // After adding balance, buying or selling the numbers change: reload when coming back.
+        if (primeiraRetomada) {
+            primeiraRetomada = false;
+            return;
+        }
+        atualizarTudo();
+    }
+
     private void carregarSaldo() {
+        puxar.iniciar();
+        walletRepository.buscarSaldo(new WalletRepository.WalletCallback() {
+            @Override
+            public void onSuccess(String saldo) {
+                puxar.concluir();
+                if (!isAdded()) return;
+                try {
+                    NumberFormat formato = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
+                    String texto = formato.format(Double.parseDouble(saldo.trim()));
+                    tvSaldoDisponivel.setText(texto);
+                    if (tvSaldoLivre != null) tvSaldoLivre.setText(texto);
+                } catch (NumberFormatException ignored) {
+                    // Keep what is on screen.
+                }
+            }
 
-
+            @Override
+            public void onError(String message) {
+                puxar.concluir();
+                // Keep the previous value; the balance is validated by the server on every operation.
+            }
+        });
     }
 }
