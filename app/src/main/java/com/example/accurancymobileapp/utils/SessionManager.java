@@ -86,6 +86,7 @@ public class SessionManager {
     public void logout(){
         editor.clear();
         editor.apply();
+        FavoritosCache.limpar();
     }
 
 }

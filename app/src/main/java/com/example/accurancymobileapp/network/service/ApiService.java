@@ -11,6 +11,7 @@ import com.example.accurancymobileapp.response.AporteResponse;
 import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
+import com.example.accurancymobileapp.response.FavoritosResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
@@ -148,6 +149,15 @@ public interface ApiService {
             @Query("symbol") String symbol,
             @Query("range") String range
     );
+
+    @GET("favoritos/listar")
+    Call<FavoritosResponse> listarFavoritos();
+
+    @POST("favoritos/adicionar")
+    Call<FavoritosResponse> adicionarFavorito(@Body Map<String, String> body);
+
+    @POST("favoritos/remover")
+    Call<FavoritosResponse> removerFavorito(@Body Map<String, String> body);
 
     @GET("brapi/listar-moedas")
     Call<AcaoResponse> listarMoedas(

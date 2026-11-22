@@ -102,6 +102,15 @@ public final class AnimacaoUtils {
                 .setInterpolator(new OvershootInterpolator(3f)).start();
     }
 
+    /** Heart "pop" used when an asset is favorited. */
+    public static void pulsar(View view) {
+        view.animate().cancel();
+        view.setScaleX(0.6f);
+        view.setScaleY(0.6f);
+        view.animate().scaleX(1f).scaleY(1f).setDuration(380L)
+                .setInterpolator(new OvershootInterpolator(4f)).start();
+    }
+
     /** Counts a money value up to its final amount (e.g. the available balance). */
     public static void contarAte(TextView texto, double valorFinal, String prefixo) {
         ValueAnimator animador = ValueAnimator.ofFloat(0f, (float) valorFinal);
