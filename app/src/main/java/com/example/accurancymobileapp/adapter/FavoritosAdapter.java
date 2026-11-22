@@ -13,6 +13,7 @@ import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
 import com.example.accurancymobileapp.utils.FavoritoUi;
+import com.example.accurancymobileapp.utils.SiglaIcone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,10 +83,8 @@ public class FavoritosAdapter extends RecyclerView.Adapter<FavoritosAdapter.View
     }
 
     private String sigla(String simbolo, String categoria) {
-        String rotulo = FavoritoUi.rotuloCategoria(categoria);
-        if ("Moedas".equals(rotulo)) return "$";
-        String limpo = simbolo.replaceAll("[^A-Za-z0-9]", "");
-        return limpo.length() <= 3 ? limpo : limpo.substring(0, 3);
+        String sigla = SiglaIcone.sigla(simbolo);
+        return sigla == null ? "•" : sigla;
     }
 
     @Override
