@@ -14,6 +14,7 @@ import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Acao;
 import com.example.accurancymobileapp.utils.FavoritoUi;
 import com.example.accurancymobileapp.utils.FavoritosCache;
+import com.example.accurancymobileapp.utils.SiglaIcone;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -74,7 +75,8 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
         holder.txtNomeAtivo.setText(ticker);
         holder.txtSubtituloAtivo.setText(textoOuPadrao(acao.getName(), "Nome não informado"));
 
-        holder.txtIconAtivo.setImageResource(R.drawable.ic_ativo_placeholder);
+        // No logo: the initials of the symbol (or the old icon when there are none); the logo replaces it when it loads.
+        SiglaIcone.aplicar(holder.txtIconAtivo, acao.getStock(), R.drawable.ic_ativo_placeholder);
         SvgLogoLoader.carregar(acao.getLogo(), holder.txtIconAtivo);
 
         Double variacao = acao.getChange();
