@@ -661,11 +661,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         );
     }
 
-    /** Dividends only make sense for held stocks, FIIs and BDRs/ETFs (not futures or crypto). */
+    /** Dividends only make sense for held stocks, FIIs and BDRs/ETFs (not futures, crypto or currencies). */
     private void atualizarBotaoDividendo() {
         boolean elegivel = quantidadePosicao > 0.0
                 && !ehFuturoAtivo()
-                && !ehCriptoAtivo();
+                && !ehCriptoAtivo()
+                && !ehMoedaAtivo();
         btnRegistrarDividendo.setVisibility(elegivel ? View.VISIBLE : View.GONE);
     }
 
@@ -1023,8 +1024,13 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 && categoriaAtivo.trim().toLowerCase(Locale.ROOT).startsWith("cripto");
     }
 
+    private boolean ehMoedaAtivo() {
+        return categoriaAtivo != null
+                && categoriaAtivo.trim().toLowerCase(Locale.ROOT).startsWith("internacional");
+    }
+
     private String formatarQuantidade(double quantidade) {
-        if (ehCriptoAtivo() && Double.isFinite(quantidade)) {
+        if ((ehCriptoAtivo() || ehMoedaAtivo()) && Double.isFinite(quantidade)) {
             java.text.NumberFormat formato = java.text.NumberFormat.getNumberInstance(ptBR);
             formato.setMinimumFractionDigits(0);
             formato.setMaximumFractionDigits(8);

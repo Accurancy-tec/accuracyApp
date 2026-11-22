@@ -55,6 +55,7 @@ public class BuyAssetActivity extends AppCompatActivity {
     private static final String TYPE_SELL = "Venda";
     private static final String DEFAULT_SIMULATION_NOTICE = "Operação simulada para fins educacionais. Nenhuma ordem será enviada à B3.";
     private static final String CRYPTO_SIMULATION_NOTICE = "Operação simulada com a cotação atual da criptomoeda, em reais. Nenhuma ordem real é enviada.";
+    private static final String CURRENCY_SIMULATION_NOTICE = "Operação simulada com a cotação atual da moeda, em reais. Nenhuma ordem real de câmbio é enviada.";
     private static final String FUTURES_SIMULATION_NOTICE = "Operação simulada com o preço de ajuste do contrato, sem margem, alavancagem ou ajuste diário. Nenhuma ordem será enviada à B3.";
 
     private static final int COLOR_POSITIVE = Color.rgb(43, 224, 163);
@@ -233,7 +234,7 @@ public class BuyAssetActivity extends AppCompatActivity {
             tvBuyAvailableBalance.setText(
                     "Disponível para venda: " + formatQuantity(availableAssetQuantity) + unitSuffix()
             );
-            tvBuyQuantityDescription.setText(isCryptoAsset()
+            tvBuyQuantityDescription.setText(isFractionalAsset()
                     ? "Informe quanto deseja vender (até 8 casas decimais)."
                     : "Informe quantas unidades deseja vender.");
             tvBuyAssetsSubtotalLabel.setText("Valor bruto da venda");
@@ -243,7 +244,7 @@ public class BuyAssetActivity extends AppCompatActivity {
             tvBuyAvailableBalance.setText(
                     "Saldo para investir: " + formatCurrency(availableBalance)
             );
-            tvBuyQuantityDescription.setText(isCryptoAsset()
+            tvBuyQuantityDescription.setText(isFractionalAsset()
                     ? "Informe quanto deseja comprar (até 8 casas decimais)."
                     : "Informe quantas unidades deseja comprar.");
             tvBuyAssetsSubtotalLabel.setText("Valor dos ativos");
@@ -258,8 +259,8 @@ public class BuyAssetActivity extends AppCompatActivity {
     }
 
     private void configureQuantityControls() {
-        if (isCryptoAsset()) {
-            // Crypto accepts fractions (up to 8 decimals); other assets stay integer-only.
+        if (isFractionalAsset()) {
+            // Crypto and currencies accept fractions (up to 8 decimals); other assets stay integer-only.
             edtBuyQuantity.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
             edtBuyQuantity.setKeyListener(DigitsKeyListener.getInstance("0123456789.,"));
             edtBuyQuantity.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
@@ -344,7 +345,9 @@ public class BuyAssetActivity extends AppCompatActivity {
         if (validationMessage == null) {
             tvBuySimulationNotice.setText(isFuturesAsset()
                     ? FUTURES_SIMULATION_NOTICE
-                    : isCryptoAsset() ? CRYPTO_SIMULATION_NOTICE : DEFAULT_SIMULATION_NOTICE);
+                    : isCryptoAsset() ? CRYPTO_SIMULATION_NOTICE
+                    : isCurrencyAsset() ? CURRENCY_SIMULATION_NOTICE
+                    : DEFAULT_SIMULATION_NOTICE);
             tvBuySimulationNotice.setTextColor(
                     getColor(R.color.text_secondary)
             );
@@ -371,7 +374,7 @@ public class BuyAssetActivity extends AppCompatActivity {
             return "Informe uma quantidade maior que zero.";
         }
         if (quantity.stripTrailingZeros().scale() > quantityScale()) {
-            return isCryptoAsset()
+            return isFractionalAsset()
                     ? "Use no máximo 8 casas decimais."
                     : "Informe uma quantidade inteira.";
         }
@@ -586,13 +589,24 @@ public class BuyAssetActivity extends AppCompatActivity {
                 && assetCategory.trim().toLowerCase(java.util.Locale.ROOT).startsWith("cripto");
     }
 
-    private int quantityScale() {
-        return isCryptoAsset() ? CRYPTO_QUANTITY_SCALE : 0;
+    /** Foreign currencies are stored under the "Internacional" category. */
+    private boolean isCurrencyAsset() {
+        return assetCategory != null
+                && assetCategory.trim().toLowerCase(java.util.Locale.ROOT).startsWith("internacional");
     }
 
-    /** Step of the +/- buttons: 1 unit, or for crypto roughly R$ 100 worth rounded to a power of ten. */
+    /** Crypto and currencies can be traded in fractions (up to 8 decimals). */
+    private boolean isFractionalAsset() {
+        return isCryptoAsset() || isCurrencyAsset();
+    }
+
+    private int quantityScale() {
+        return isFractionalAsset() ? CRYPTO_QUANTITY_SCALE : 0;
+    }
+
+    /** Step of the +/- buttons: 1 unit, or for fractional assets roughly R$ 100 worth rounded to a power of ten. */
     private BigDecimal quantityStep() {
-        if (!isCryptoAsset() || !isValidPrice()) {
+        if (!isFractionalAsset() || !isValidPrice()) {
             return BigDecimal.ONE;
         }
         int exponent = (int) Math.floor(Math.log10(100.0 / currentPrice));
@@ -605,7 +619,7 @@ public class BuyAssetActivity extends AppCompatActivity {
     }
 
     private String unitSuffix() {
-        return isCryptoAsset() && ticker != null ? " " + ticker.trim() : " un.";
+        return isFractionalAsset() && ticker != null ? " " + ticker.trim() : " un.";
     }
 
     private boolean isSellOperation() {
@@ -646,7 +660,7 @@ public class BuyAssetActivity extends AppCompatActivity {
     }
 
     private String formatQuantity(BigDecimal quantity) {
-        if (isCryptoAsset()) {
+        if (isFractionalAsset()) {
             NumberFormat cryptoFormat = NumberFormat.getNumberInstance(PT_BR);
             cryptoFormat.setMinimumFractionDigits(0);
             cryptoFormat.setMaximumFractionDigits(CRYPTO_QUANTITY_SCALE);

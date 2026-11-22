@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.fragments.FiltrosRendaFixaBottomSheet;
 import com.example.accurancymobileapp.fragments.InvestirRendaFixaBottomSheet;
+import com.example.accurancymobileapp.model.FiltroRendaFixa;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
 import com.example.accurancymobileapp.adapter.TituloRendaFixaAdapter;
 import com.example.accurancymobileapp.model.TituloRendaFixa;
@@ -29,7 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class OpcoesRendaFixaActivity extends AppCompatActivity {
+public class OpcoesRendaFixaActivity extends AppCompatActivity
+        implements FiltrosRendaFixaBottomSheet.Listener {
 
     /** Optional Intent extra: which group of titles to list (default: all). */
     public static final String EXTRA_FILTRO = "filtro_titulos";
@@ -39,6 +42,8 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity {
     private final List<TituloRendaFixa> todosTitulos = new ArrayList<>();
     private String filtroGrupo;
     private EditText edtBuscarTitulo;
+    private FiltroRendaFixa filtroAtual = new FiltroRendaFixa();
+    private TextView tvBadgeFiltros;
 
     ImageButton btnVoltarRendaFixa;
     RecyclerView rvTitulosRendaFixa;
@@ -74,6 +79,11 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.tvTituloRendaFixa)).setText("Tesouro Direto");
         }
 
+        tvBadgeFiltros = findViewById(R.id.tvBadgeFiltrosRf);
+        ImageButton btnFiltros = findViewById(R.id.btnFiltrosRendaFixa);
+        btnFiltros.setOnClickListener(v -> abrirFiltros());
+        AnimacaoUtils.efeitoPressionar(btnFiltros);
+
         edtBuscarTitulo = findViewById(R.id.edtBuscarTitulo);
         edtBuscarTitulo.addTextChangedListener(new TextWatcher() {
             @Override
@@ -103,6 +113,42 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity {
                 .show(getSupportFragmentManager(), InvestirRendaFixaBottomSheet.TAG_FRAGMENT);
     }
 
+    private void abrirFiltros() {
+        if (getSupportFragmentManager().findFragmentByTag(FiltrosRendaFixaBottomSheet.TAG_FRAGMENT) != null) {
+            return;
+        }
+        // Offer only the types/indexers that exist in the group currently shown.
+        List<TituloRendaFixa> doGrupo = new ArrayList<>();
+        for (TituloRendaFixa titulo : todosTitulos) {
+            if (pertenceAoGrupo(titulo)) {
+                doGrupo.add(titulo);
+            }
+        }
+        FiltrosRendaFixaBottomSheet.nova(
+                filtroAtual,
+                FiltroRendaFixa.tiposDisponiveis(doGrupo),
+                FiltroRendaFixa.indexadoresDisponiveis(doGrupo)
+        ).show(getSupportFragmentManager(), FiltrosRendaFixaBottomSheet.TAG_FRAGMENT);
+    }
+
+    @Override
+    public void aoAplicarFiltros(FiltroRendaFixa filtro) {
+        filtroAtual = filtro == null ? new FiltroRendaFixa() : filtro;
+        int ativos = filtroAtual.quantidadeAtiva();
+        tvBadgeFiltros.setText(String.valueOf(ativos));
+        tvBadgeFiltros.setVisibility(ativos > 0 ? View.VISIBLE : View.GONE);
+        if (ativos > 0) {
+            AnimacaoUtils.destacar(tvBadgeFiltros);
+        }
+        aplicarFiltros();
+    }
+
+    private boolean pertenceAoGrupo(TituloRendaFixa titulo) {
+        if (FILTRO_TESOURO.equals(filtroGrupo)) return ehTesouro(titulo);
+        if (FILTRO_BANCARIOS.equals(filtroGrupo)) return !ehTesouro(titulo);
+        return true;
+    }
+
     private static boolean ehTesouro(TituloRendaFixa titulo) {
         String tipo = titulo.getTipoTitulo();
         return tipo != null && tipo.trim().toLowerCase(Locale.ROOT).startsWith("tesouro");
@@ -113,12 +159,9 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity {
         String busca = edtBuscarTitulo == null
                 ? ""
                 : edtBuscarTitulo.getText().toString().trim().toLowerCase(Locale.ROOT);
-        List<TituloRendaFixa> filtrados = new ArrayList<>();
+        List<TituloRendaFixa> doGrupo = new ArrayList<>();
         for (TituloRendaFixa titulo : todosTitulos) {
-            if (FILTRO_TESOURO.equals(filtroGrupo) && !ehTesouro(titulo)) {
-                continue;
-            }
-            if (FILTRO_BANCARIOS.equals(filtroGrupo) && ehTesouro(titulo)) {
+            if (!pertenceAoGrupo(titulo)) {
                 continue;
             }
             if (!busca.isEmpty()) {
@@ -128,8 +171,10 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity {
                     continue;
                 }
             }
-            filtrados.add(titulo);
+            doGrupo.add(titulo);
         }
+        // Filter choices (type, indexer, FGC, IR) and the sort order come last.
+        List<TituloRendaFixa> filtrados = filtroAtual.aplicar(doGrupo);
         adapter.atualizarLista(filtrados);
 
         boolean vazio = filtrados.isEmpty();
@@ -137,7 +182,9 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity {
             // Still loading: keep the spinner only, no empty message yet.
             estadoVazio.setVisibility(View.GONE);
         } else if (vazio && !todosTitulos.isEmpty()) {
-            mostrarEstadoVazio("Nenhum título encontrado", "Tente outra busca.", false);
+            mostrarEstadoVazio("Nenhum título encontrado",
+                    filtroAtual.estaAtivo() ? "Nenhum título combina com os filtros escolhidos. Tente limpar os filtros."
+                            : "Tente outra busca.", false);
         } else if (vazio) {
             mostrarEstadoVazio("Nenhum título disponível",
                     "Ainda não há títulos de renda fixa cadastrados para esta opção.", true);

@@ -122,7 +122,7 @@ public class MarketListActivity extends AppCompatActivity {
         sortBy = marketType == MarketType.FIIS
                 ? "totalInvestors"
                 : marketType == MarketType.FUTUROS ? "expirationDate"
-                : marketType == MarketType.CRIPTO ? "rank" : "volume";
+                : marketType.isCatalogoSimples() ? "rank" : "volume";
     }
 
     private void bindViews() {
@@ -136,6 +136,8 @@ public class MarketListActivity extends AppCompatActivity {
             edtBuscarAtivo.setHint("Buscar contrato (ex.: WIN, DI1, BGI)");
         } else if (marketType == MarketType.CRIPTO) {
             edtBuscarAtivo.setHint("Buscar criptomoeda (ex.: BTC, ETH, SOL)");
+        } else if (marketType == MarketType.MOEDAS) {
+            edtBuscarAtivo.setHint("Buscar moeda (ex.: USD, EUR, GBP)");
         }
 
         btnPaginaAnterior = findViewById(R.id.btnPaginaAnterior);
@@ -369,7 +371,7 @@ public class MarketListActivity extends AppCompatActivity {
         btnLimpar.setOnClickListener(v -> {
             segmentType = null;
             sortBy = isFii ? "totalInvestors" : isFuturo ? "expirationDate"
-                    : marketType == MarketType.CRIPTO ? "rank" : "volume";
+                    : marketType.isCatalogoSimples() ? "rank" : "volume";
             sortOrder = isFuturo ? "asc" : "desc";
             dialog.dismiss();
             paginaAtual = 1;
@@ -422,8 +424,8 @@ public class MarketListActivity extends AppCompatActivity {
     }
 
     private void configurarOpcoesDeOrdenacao(View content, boolean isFii) {
-        if (marketType == MarketType.CRIPTO) {
-            // Crypto list supports only provider ranking and alphabetical order.
+        if (marketType.isCatalogoSimples()) {
+            // Crypto and currency lists support only provider ranking and alphabetical order.
             int[] ocultarIds = {
                     R.id.rbSortPrice,
                     R.id.rbSortInvestors,
@@ -522,7 +524,7 @@ public class MarketListActivity extends AppCompatActivity {
     private void selecionarOrdenacaoAtual(RadioGroup group, boolean isFii) {
         int id;
 
-        if (marketType == MarketType.CRIPTO) {
+        if (marketType.isCatalogoSimples()) {
             group.check("name".equals(sortBy) ? R.id.rbSortName : R.id.rbSortVolume);
             return;
         }
@@ -587,7 +589,7 @@ public class MarketListActivity extends AppCompatActivity {
     private String obterOrdenacaoSelecionada(RadioGroup group, boolean isFii) {
         int selectedId = group.getCheckedRadioButtonId();
 
-        if (marketType == MarketType.CRIPTO) {
+        if (marketType.isCatalogoSimples()) {
             return selectedId == R.id.rbSortName ? "name" : "rank";
         }
 

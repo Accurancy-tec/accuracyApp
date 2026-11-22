@@ -233,60 +233,96 @@
 
                 </LinearLayout>
 
-                <!-- Renda variável -->
+                <!-- Terceira linha -->
                 <LinearLayout
-                    android:id="@+id/cardRendaVariavel"
                     android:layout_width="match_parent"
-                    android:layout_height="66dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_carteira_card"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:background="@drawable/bg_icone_renda_variavel"
-                        android:gravity="center"
-                        android:text="⌁"
-                        android:textColor="#57A6FF"
-                        android:textSize="24sp" />
-
+                    <!-- Contratos Futuros -->
                     <LinearLayout
+                        android:id="@+id/cardFuturosAportes"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="11dp"
+                        android:layout_height="128dp"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/bg_carteira_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="13dp">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_categoria_futuros"
+                            android:gravity="center"
+                            android:text="FUT"
+                            android:textColor="#FF9F43"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Renda variável"
+                            android:layout_marginTop="9dp"
+                            android:text="Contratos Futuros"
                             android:textColor="#F1F5FC"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Monitore e negocie ativos em tempo real"
+                            android:text="Índice, dólar e juros"
                             android:textColor="#9BAAC0"
                             android:textSize="11sp" />
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_arrow_back"
-                        app:tint="#9BAAC0" />
+                    <!-- Moedas Estrangeiras -->
+                    <LinearLayout
+                        android:id="@+id/cardMoedasAportes"
+                        android:layout_width="0dp"
+                        android:layout_height="128dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/bg_carteira_card"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="13dp">
+
+                        <TextView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_categoria_moeda"
+                            android:gravity="center"
+                            android:text="$"
+                            android:textColor="#57A6FF"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="9dp"
+                            android:text="Moedas Estrangeiras"
+                            android:textColor="#F1F5FC"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Dólar, euro, libra e mais"
+                            android:textColor="#9BAAC0"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
