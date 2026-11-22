@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Acao;
+import com.example.accurancymobileapp.utils.FavoritoUi;
+import com.example.accurancymobileapp.utils.FavoritosCache;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -24,7 +26,14 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
         void onAcaoClick(Acao acao);
     }
 
+    /** Called when the heart of a row is tapped; the host changes the favorite and the row redraws. */
+    public interface OnFavoritoClickListener {
+        void onFavoritoClick(Acao acao, int posicao);
+    }
+
     private final List<Acao> acoes = new ArrayList<>();
+    private OnFavoritoClickListener favoritoListener;
+    private String categoriaFavoritos;
     private final NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
     private final OnAcaoClickListener listener;
 
@@ -35,6 +44,13 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
     public AcoesAdapter(List<Acao> acoes, OnAcaoClickListener listener) {
         if (acoes != null) this.acoes.addAll(acoes);
         this.listener = listener;
+    }
+
+    /** Shows a heart on every row, using the given category to identify the asset. */
+    public void habilitarFavoritos(String categoria, OnFavoritoClickListener listener) {
+        this.categoriaFavoritos = categoria;
+        this.favoritoListener = listener;
+        notifyDataSetChanged();
     }
 
     public void atualizarLista(List<Acao> novasAcoes) {
@@ -90,6 +106,21 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
                             : formatoMoeda.format(fechamento)
             );
         }
+        if (favoritoListener == null) {
+            holder.btnFavoritoItem.setVisibility(View.GONE);
+        } else {
+            holder.btnFavoritoItem.setVisibility(View.VISIBLE);
+            FavoritoUi.aplicar(holder.btnFavoritoItem,
+                    FavoritosCache.contem(acao.getStock(), categoriaFavoritos));
+            holder.btnFavoritoItem.setOnClickListener(v -> {
+                int posicaoAtual = holder.getBindingAdapterPosition();
+                if (posicaoAtual == RecyclerView.NO_POSITION) return;
+                favoritoListener.onFavoritoClick(acoes.get(posicaoAtual), posicaoAtual);
+                // The cache is updated before the request is sent, so the heart can change at once.
+                FavoritoUi.aplicarComAnimacao(holder.btnFavoritoItem,
+                        FavoritosCache.contem(acao.getStock(), categoriaFavoritos));
+            });
+        }
         holder.itemView.setOnClickListener(v -> {
             int posicaoAtual = holder.getBindingAdapterPosition();
             if (listener != null && posicaoAtual != RecyclerView.NO_POSITION) {
@@ -113,6 +144,7 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
         final TextView txtSubtituloAtivo;
         final TextView txtValorAtivo;
         final TextView txtVariacaoAtivo;
+        final ImageView btnFavoritoItem;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -121,6 +153,7 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
             txtSubtituloAtivo = itemView.findViewById(R.id.txtSubtituloAtivo);
             txtValorAtivo = itemView.findViewById(R.id.txtValorAtivo);
             txtVariacaoAtivo = itemView.findViewById(R.id.txtVariacaoAtivo);
+            btnFavoritoItem = itemView.findViewById(R.id.btnFavoritoItem);
         }
     }
 }

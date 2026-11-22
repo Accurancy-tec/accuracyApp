@@ -187,10 +187,25 @@ public class AcaoRepository {
             int pagina, int limite, String search, String sortBy, String sortOrder,
             acaoCallback callback
     ) {
-        if (chamadaAtual != null && !chamadaAtual.isCanceled()) chamadaAtual.cancel();
-        Call<AcaoResponse> call = apiService.listarCriptomoedas(
-                pagina, limite, search, sortBy, sortOrder
+        executarListaSimples(
+                apiService.listarCriptomoedas(pagina, limite, search, sortBy, sortOrder),
+                "criptomoedas", callback
         );
+    }
+
+    public void listarMoedas(
+            int pagina, int limite, String search, String sortBy, String sortOrder,
+            acaoCallback callback
+    ) {
+        executarListaSimples(
+                apiService.listarMoedas(pagina, limite, search, sortBy, sortOrder),
+                "moedas", callback
+        );
+    }
+
+    // Shared by the crypto and currency catalogs, which return the same JSON shape.
+    private void executarListaSimples(Call<AcaoResponse> call, String nome, acaoCallback callback) {
+        if (chamadaAtual != null && !chamadaAtual.isCanceled()) chamadaAtual.cancel();
         chamadaAtual = call;
         call.enqueue(new Callback<AcaoResponse>() {
             @Override
@@ -198,12 +213,12 @@ public class AcaoRepository {
                 if (currentCall.isCanceled()) return;
                 if (chamadaAtual == currentCall) chamadaAtual = null;
                 if (!response.isSuccessful()) {
-                    callback.onError("Erro HTTP ao listar criptomoedas: " + response.code());
+                    callback.onError("Erro HTTP ao listar " + nome + ": " + response.code());
                     return;
                 }
                 AcaoResponse resultado = response.body();
                 if (resultado == null || resultado.getAcoes() == null || resultado.getPaginacao() == null) {
-                    callback.onError("A API retornou dados incompletos das criptomoedas.");
+                    callback.onError("A API retornou dados incompletos de " + nome + ".");
                     return;
                 }
                 callback.onSuccess(resultado);
@@ -213,7 +228,7 @@ public class AcaoRepository {
                 if (currentCall.isCanceled()) return;
                 if (chamadaAtual == currentCall) chamadaAtual = null;
                 callback.onError(erro.getMessage() == null
-                        ? "Erro de conexão ao listar criptomoedas."
+                        ? "Erro de conexão ao listar " + nome + "."
                         : "Erro de conexão: " + erro.getMessage());
             }
         });

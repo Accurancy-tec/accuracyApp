@@ -53,6 +53,10 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".activities.FavoritosActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".activities.OpcoesRendaFixaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

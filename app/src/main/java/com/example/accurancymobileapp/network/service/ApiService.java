@@ -11,6 +11,7 @@ import com.example.accurancymobileapp.response.AporteResponse;
 import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
+import com.example.accurancymobileapp.response.FavoritosResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
@@ -145,6 +146,33 @@ public interface ApiService {
 
     @GET("brapi/historico-criptomoedas")
     Call<StockHistoryResponse> historicoCriptomoedas(
+            @Query("symbol") String symbol,
+            @Query("range") String range
+    );
+
+    @GET("favoritos/listar")
+    Call<FavoritosResponse> listarFavoritos();
+
+    @POST("favoritos/adicionar")
+    Call<FavoritosResponse> adicionarFavorito(@Body Map<String, String> body);
+
+    @POST("favoritos/remover")
+    Call<FavoritosResponse> removerFavorito(@Body Map<String, String> body);
+
+    @GET("brapi/listar-moedas")
+    Call<AcaoResponse> listarMoedas(
+            @Query("page") int page,
+            @Query("limit") int limit,
+            @Query("search") String search,
+            @Query("sortBy") String sortBy,
+            @Query("sortOrder") String sortOrder
+    );
+
+    @GET("brapi/get-currency-quote")
+    Call<QuoteResponse> getCurrencyQuote(@Query("symbol") String symbol);
+
+    @GET("brapi/historico-moedas")
+    Call<StockHistoryResponse> historicoMoedas(
             @Query("symbol") String symbol,
             @Query("range") String range
     );
