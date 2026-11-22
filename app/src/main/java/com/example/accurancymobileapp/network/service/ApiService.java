@@ -149,6 +149,24 @@ public interface ApiService {
             @Query("range") String range
     );
 
+    @GET("brapi/listar-moedas")
+    Call<AcaoResponse> listarMoedas(
+            @Query("page") int page,
+            @Query("limit") int limit,
+            @Query("search") String search,
+            @Query("sortBy") String sortBy,
+            @Query("sortOrder") String sortOrder
+    );
+
+    @GET("brapi/get-currency-quote")
+    Call<QuoteResponse> getCurrencyQuote(@Query("symbol") String symbol);
+
+    @GET("brapi/historico-moedas")
+    Call<StockHistoryResponse> historicoMoedas(
+            @Query("symbol") String symbol,
+            @Query("range") String range
+    );
+
     @GET("carteiras/posicao-ativo")
     Call<AssetPositionResponse> getAssetPosition(
             @Query("symbol") String symbol

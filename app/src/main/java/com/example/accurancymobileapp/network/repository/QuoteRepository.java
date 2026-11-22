@@ -38,6 +38,8 @@ public class QuoteRepository {
     public void buscarCotacoes(String ticker, String categoria, QuoteCallback callback) {
         Call<QuoteResponse> chamada = ehCripto(categoria)
                 ? apiService.getCryptoQuote(ticker)
+                : ehMoeda(categoria)
+                ? apiService.getCurrencyQuote(ticker)
                 : ehFuturo(categoria)
                 ? apiService.getFutureQuote(ticker)
                 : ehFii(categoria)
@@ -109,6 +111,8 @@ public class QuoteRepository {
     public void buscarHistorico(String ticker, String range, String categoria, HistoricoCallback callback) {
         Call<StockHistoryResponse> chamada = ehCripto(categoria)
                 ? apiService.historicoCriptomoedas(ticker, range)
+                : ehMoeda(categoria)
+                ? apiService.historicoMoedas(ticker, range)
                 : ehFuturo(categoria)
                 ? apiService.historicoFuturos(ticker, range)
                 : ehFii(categoria)
@@ -176,6 +180,12 @@ public class QuoteRepository {
     private boolean ehCripto(String categoria) {
         return categoria != null
                 && categoria.trim().toLowerCase(java.util.Locale.ROOT).startsWith("cripto");
+    }
+
+    // Foreign currencies are stored under the existing "Internacional" category.
+    private boolean ehMoeda(String categoria) {
+        return categoria != null
+                && categoria.trim().toLowerCase(java.util.Locale.ROOT).startsWith("internacional");
     }
 
     private boolean ehFuturo(String categoria) {

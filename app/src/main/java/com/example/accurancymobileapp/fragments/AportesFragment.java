@@ -61,7 +61,7 @@ public class AportesFragment extends Fragment {
         super(R.layout.fragment_aportes);
     }
 
-    LinearLayout cardBolsaDeValores, cardRendaFixa, cardTesouroDireto, cardRendaVariavel;
+    LinearLayout cardBolsaDeValores, cardRendaFixa, cardTesouroDireto;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -91,23 +91,27 @@ public class AportesFragment extends Fragment {
         });
 
         LinearLayout cardCriptomoedas = view.findViewById(R.id.cardCriptomoedasAportes);
-        cardCriptomoedas.setOnClickListener(v -> {
-            Intent it = new Intent(requireContext(), MarketListActivity.class);
-            it.putExtra("TAG", "CRIPTO");
-            startActivity(it);
-        });
+        cardCriptomoedas.setOnClickListener(v -> abrirMercado("CRIPTO"));
 
-        cardRendaVariavel = view.findViewById(R.id.cardRendaVariavel);
-        cardRendaVariavel.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), OpcoesRendaVariavelActivity.class)));
+        LinearLayout cardFuturos = view.findViewById(R.id.cardFuturosAportes);
+        cardFuturos.setOnClickListener(v -> abrirMercado("FUTUROS"));
+
+        LinearLayout cardMoedas = view.findViewById(R.id.cardMoedasAportes);
+        cardMoedas.setOnClickListener(v -> abrirMercado("MOEDAS"));
 
         // Press feedback on every product card plus a staggered entrance when the tab opens.
         LinearLayout[] cards = {cardRendaFixa, cardTesouroDireto, cardBolsaDeValores,
-                cardCriptomoedas, cardRendaVariavel};
+                cardCriptomoedas, cardFuturos, cardMoedas};
         for (LinearLayout card : cards) {
             AnimacaoUtils.efeitoPressionar(card);
         }
         AnimacaoUtils.entradaEmCascata(cards);
 
+    }
+
+    private void abrirMercado(String tag) {
+        Intent it = new Intent(requireContext(), MarketListActivity.class);
+        it.putExtra("TAG", tag);
+        startActivity(it);
     }
 }
