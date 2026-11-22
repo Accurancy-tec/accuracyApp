@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.utils.SiglaIcone;
 import com.example.accurancymobileapp.activities.DetalhesAtivoActivity;
 import com.example.accurancymobileapp.model.Aporte;
 import com.example.accurancymobileapp.utils.AporteDetalhes;
@@ -56,7 +57,7 @@ public class AporteAdapter extends RecyclerView.Adapter<AporteAdapter.AporteView
         Aporte aporte = listaAportes.get(position);
 
         holder.txtNomeAtivo.setText(textoOuPadrao(aporte.getNameAtivo(), textoOuPadrao(aporte.getAtivoAporte(), "Ativo")));
-        holder.txtIconAtivo.setImageResource(R.drawable.ic_ativo_placeholder);
+        SiglaIcone.aplicarSeSimbolo(holder.txtIconAtivo, aporte.getAtivoAporte(), R.drawable.ic_ativo_placeholder);
         holder.txtSubtituloAtivo.setText(montarSubtitulo(aporte));
         holder.txtValorAtivo.setText(formatoMoeda.format(aporte.getValorAporte()));
 
