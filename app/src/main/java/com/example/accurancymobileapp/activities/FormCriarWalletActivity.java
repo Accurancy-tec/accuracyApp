@@ -97,16 +97,16 @@ public class FormCriarWalletActivity extends AppCompatActivity {
             String nome = edtNomeCarteira.getText().toString().trim();
             BigDecimal meta = MascaraMonetaria.obterValor(edtMetaCarteira);
 
-            criarWallet(nome, tipoCarteira, meta, estiloCarteira);
+            criarWallet(nome, estiloCarteira, meta, tipoCarteira);
         });
 
         edtMetaCarteira.addTextChangedListener(new MascaraMonetaria(edtMetaCarteira));
 
     }
 
-    private void criarWallet(String nome, String tipo, BigDecimal meta, String estilo){
+    private void criarWallet(String nome, String estilo, BigDecimal meta, String tipo){
         iniciarCarregamento();
-        walletRepository.criarNovaWallet(nome, tipo, meta, estilo, new WalletRepository.WalletCallback() {
+        walletRepository.criarNovaWallet(nome, estilo, meta, tipo, new WalletRepository.WalletCallback() {
             @Override
             public void onSuccess(String mensagem) {
                 finalizarCarregamento();

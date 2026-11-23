@@ -31,9 +31,9 @@ public class WalletRepository {
         apiService = retrofit.create(ApiService.class);
     }
 
-    public void criarNovaWallet(String nomeWallet, String tipoWallet, BigDecimal metaWallet, String estiloWallet, WalletCallback callback) {
+    public void criarNovaWallet(String nomeWallet, String estiloWallet, BigDecimal metaWallet, String tipoWallet, WalletCallback callback) {
 
-        Wallet wallet = new Wallet(nomeWallet, tipoWallet, metaWallet, estiloWallet);
+        Wallet wallet = new Wallet(nomeWallet, estiloWallet, metaWallet, tipoWallet);
 
         apiService.criarNovaWallet(wallet).enqueue(new Callback<CriarWalletResponse>() {
 

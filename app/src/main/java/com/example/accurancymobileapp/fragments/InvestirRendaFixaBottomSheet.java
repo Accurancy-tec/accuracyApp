@@ -40,11 +40,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Slide-up card to apply an amount in a fixed income title (CDB, LCI, LCA, Treasury...).
- * Only the title id and the amount are sent: the API reads the name, rate, maturity and
- * minimum from its own title table and enforces the balance rule.
- */
 public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
 
     public static final String TAG_FRAGMENT = "InvestirRendaFixaBottomSheet";
