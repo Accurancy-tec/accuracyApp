@@ -38,19 +38,19 @@ public class Wallet {
 
     }
 
-    public Wallet(int id_carteira, String nome_wallet, String tipo_wallet, BigDecimal meta_carteira, String estilo_carteira){
+    public Wallet(int id_carteira, String nome_wallet, String estilo_carteira, BigDecimal meta_carteira, String tipo_carteira){
         this.id_carteira = id_carteira;
         this.nome_carteira = nome_wallet;
-        this.tipo_carteira = tipo_wallet;
-        this.estilo_carteira = estilo_carteira;
+        this.tipo_carteira = estilo_carteira;
+        this.estilo_carteira = tipo_carteira;
         this.meta_carteira = meta_carteira;
     }
 
-    public Wallet(String nome_carteira, String tipo_carteira, BigDecimal meta_carteira, String estilo_carteira){
+    public Wallet(String nome_carteira, String estilo_carteira, BigDecimal meta_carteira, String tipo_carteira){
         this.nome_carteira = nome_carteira;
-        this.tipo_carteira = tipo_carteira;
+        this.tipo_carteira = estilo_carteira;
         this.meta_carteira = meta_carteira;
-        this.estilo_carteira = estilo_carteira;
+        this.estilo_carteira = tipo_carteira;
     }
 
     public int getId_carteira(){
