@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-/**
- * In-memory copy of the user's favorites so every list can draw its hearts instantly.
- * The server is the source of truth: screens reload it and replace this copy.
- */
 public final class FavoritosCache {
 
     private static final Set<String> CHAVES = new HashSet<>();
@@ -19,7 +15,6 @@ public final class FavoritosCache {
     private FavoritosCache() {
     }
 
-    /** Maps a category label to the one stored by the API, or null when it cannot be favorited. */
     public static String categoriaCanonica(String categoria) {
         if (categoria == null) return null;
         String limpa = Normalizer.normalize(categoria.trim(), Normalizer.Form.NFD)
@@ -30,6 +25,7 @@ public final class FavoritosCache {
         if (limpa.startsWith("cripto")) return "Cripto";
         if (limpa.startsWith("futuro")) return "Futuros";
         if (limpa.startsWith("internacional")) return "Internacional";
+        if (limpa.startsWith("renda")) return "Renda Fixa";
         return null;
     }
 
@@ -63,7 +59,6 @@ public final class FavoritosCache {
         }
     }
 
-    /** Called on logout so the next user never sees the previous user's hearts. */
     public static synchronized void limpar() {
         CHAVES.clear();
     }

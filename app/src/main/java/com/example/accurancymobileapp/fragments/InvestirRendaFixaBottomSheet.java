@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +24,11 @@ import com.example.accurancymobileapp.model.TituloRendaFixa;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
+import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.FavoritoUi;
+import com.example.accurancymobileapp.utils.FavoritosCache;
 import com.example.accurancymobileapp.utils.MascaraMonetaria;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -36,11 +40,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Slide-up card to apply an amount in a fixed income title (CDB, LCI, LCA, Treasury...).
- * Only the title id and the amount are sent: the API reads the name, rate, maturity and
- * minimum from its own title table and enforces the balance rule.
- */
 public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
 
     public static final String TAG_FRAGMENT = "InvestirRendaFixaBottomSheet";
@@ -56,6 +55,11 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
     /** Optional listener notified after a successful application. */
     public interface AoInvestirListener {
         void aoInvestir();
+    }
+
+    /** Implemented by the host activity to redraw its list when the card closes (hearts may have changed). */
+    public interface AoFecharListener {
+        void aoFecharSheet();
     }
 
     public static InvestirRendaFixaBottomSheet nova(TituloRendaFixa titulo) {
@@ -78,6 +82,8 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
     private View campoValor;
     private TextView tvAviso, tvSaldo, btnInvestir;
     private TextView chipSaldoTotal, chipMinimo, chip500, chip1000;
+    private ImageView btnFavorito;
+    private FavoritoRepository favoritoRepository;
 
     private boolean requisicaoEmAndamento = false;
     private boolean atualizandoCampo = false;
@@ -145,6 +151,7 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
         chip1000 = view.findViewById(R.id.chip1000);
 
         preencherTitulo(view);
+        configurarFavorito(view);
         configurarChips();
         configurarCampo();
         btnInvestir.setOnClickListener(v -> confirmar());
@@ -176,6 +183,41 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
                         ? "Não informado" : titulo.getLiquidez());
         view.findViewById(R.id.tvSheetSeloFgc).setVisibility(titulo.possuiGarantiaFgc() ? View.VISIBLE : View.GONE);
         view.findViewById(R.id.tvSheetSeloIr).setVisibility(titulo.isIsentoIR() ? View.VISIBLE : View.GONE);
+    }
+
+    private void configurarFavorito(View view) {
+        btnFavorito = view.findViewById(R.id.btnFavoritoSheet);
+        favoritoRepository = new FavoritoRepository(requireContext());
+        FavoritoUi.aplicar(btnFavorito,
+                FavoritosCache.contem(titulo.getSimboloFavorito(), TituloRendaFixa.CATEGORIA_FAVORITO));
+        AnimacaoUtils.efeitoPressionar(btnFavorito);
+        btnFavorito.setOnClickListener(v -> favoritoRepository.alternar(
+                titulo.getSimboloFavorito(), titulo.getNomeTitulo(), TituloRendaFixa.CATEGORIA_FAVORITO,
+                new FavoritoRepository.AlternarCallback() {
+                    @Override
+                    public void onResultado(boolean favorito) {
+                        if (isAdded() && getView() != null) {
+                            FavoritoUi.aplicarComAnimacao(btnFavorito, favorito);
+                        }
+                    }
+
+                    @Override
+                    public void onError(boolean estadoAnterior, String mensagem) {
+                        if (!isAdded() || getView() == null) {
+                            return;
+                        }
+                        FavoritoUi.aplicar(btnFavorito, estadoAnterior);
+                        Toast.makeText(requireContext(), mensagem, Toast.LENGTH_SHORT).show();
+                    }
+                }));
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if (getActivity() instanceof AoFecharListener) {
+            ((AoFecharListener) getActivity()).aoFecharSheet();
+        }
     }
 
     private void carregarSaldo() {

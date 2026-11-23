@@ -25,7 +25,10 @@ import com.example.accurancymobileapp.fragments.InvestirRendaFixaBottomSheet;
 import com.example.accurancymobileapp.model.FiltroRendaFixa;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
 import com.example.accurancymobileapp.adapter.TituloRendaFixaAdapter;
+import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.model.TituloRendaFixa;
+import com.example.accurancymobileapp.network.repository.FavoritoRepository;
+import android.widget.Toast;
 import com.example.accurancymobileapp.network.repository.RendaFixaRepository;
 
 import java.util.ArrayList;
@@ -33,12 +36,14 @@ import java.util.List;
 import java.util.Locale;
 
 public class OpcoesRendaFixaActivity extends AppCompatActivity
-        implements FiltrosRendaFixaBottomSheet.Listener {
+        implements FiltrosRendaFixaBottomSheet.Listener, InvestirRendaFixaBottomSheet.AoFecharListener {
 
     /** Optional Intent extra: which group of titles to list (default: all). */
     public static final String EXTRA_FILTRO = "filtro_titulos";
     public static final String FILTRO_BANCARIOS = "BANCARIOS";
     public static final String FILTRO_TESOURO = "TESOURO";
+    /** Optional Intent extra: id of a title whose application card opens as soon as the list loads. */
+    public static final String EXTRA_ABRIR_TITULO_ID = "abrir_titulo_id";
 
     private final List<TituloRendaFixa> todosTitulos = new ArrayList<>();
     private String filtroGrupo;
@@ -52,6 +57,8 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
     View estadoVazio;
     TextView tvEstadoVazioTitulo, tvEstadoVazioMensagem, btnTentarNovamente;
     RendaFixaRepository repositoryRF;
+    private FavoritoRepository favoritoRepository;
+    private int tituloParaAbrir;
     TituloRendaFixaAdapter adapter;
 
     @Override
@@ -69,11 +76,14 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
         btnTentarNovamente = findViewById(R.id.btnTentarNovamenteRf);
         btnTentarNovamente.setOnClickListener(v -> carregarTitulosRendaFixa());
         repositoryRF = new RendaFixaRepository(this);
+        favoritoRepository = new FavoritoRepository(this);
+        tituloParaAbrir = getIntent().getIntExtra(EXTRA_ABRIR_TITULO_ID, 0);
 
         rvTitulosRendaFixa.setLayoutManager(new LinearLayoutManager(this));
         btnVoltarRendaFixa.setOnClickListener(v -> finish());
 
         adapter = new TituloRendaFixaAdapter(this::abrirAplicacao);
+        adapter.habilitarFavoritos(this::alternarFavorito);
         rvTitulosRendaFixa.setAdapter(adapter);
 
         filtroGrupo = getIntent().getStringExtra(EXTRA_FILTRO);
@@ -105,6 +115,64 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
         });
 
         carregarTitulosRendaFixa();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Hearts may have changed elsewhere (Favoritos screen); the server copy wins.
+        favoritoRepository.carregar(new FavoritoRepository.ListaCallback() {
+            @Override
+            public void onSuccess(List<FavoritoAtivo> favoritos) {
+                if (!isFinishing() && !isDestroyed()) {
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onError(String mensagem) {
+                // Keep the hearts already on screen.
+            }
+        });
+    }
+
+    @Override
+    public void aoFecharSheet() {
+        if (!isFinishing() && !isDestroyed()) {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void alternarFavorito(TituloRendaFixa titulo, int posicao) {
+        favoritoRepository.alternar(
+                titulo.getSimboloFavorito(), titulo.getNomeTitulo(), TituloRendaFixa.CATEGORIA_FAVORITO,
+                new FavoritoRepository.AlternarCallback() {
+                    @Override
+                    public void onResultado(boolean favorito) {
+                        // The row already redrew its heart.
+                    }
+
+                    @Override
+                    public void onError(boolean estadoAnterior, String mensagem) {
+                        if (isFinishing() || isDestroyed()) return;
+                        adapter.notifyItemChanged(posicao);
+                        Toast.makeText(OpcoesRendaFixaActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    /** Opens the application card of the title requested through EXTRA_ABRIR_TITULO_ID, once. */
+    private void abrirTituloPedido() {
+        if (tituloParaAbrir == 0) return;
+        int procurado = tituloParaAbrir;
+        tituloParaAbrir = 0;
+        for (TituloRendaFixa titulo : todosTitulos) {
+            if (titulo.getIdTitulo() == procurado) {
+                abrirAplicacao(titulo);
+                return;
+            }
+        }
+        Toast.makeText(this, "Este título não está mais disponível.", Toast.LENGTH_SHORT).show();
     }
 
     private void abrirAplicacao(TituloRendaFixa titulo) {
@@ -225,6 +293,7 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
                     todosTitulos.addAll(titulos);
                 }
                 aplicarFiltros();
+                abrirTituloPedido();
             }
 
             @Override

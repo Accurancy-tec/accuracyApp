@@ -3,6 +3,7 @@ package com.example.accurancymobileapp.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.TituloRendaFixa;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.FavoritoUi;
+import com.example.accurancymobileapp.utils.FavoritosCache;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -24,8 +27,18 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
         void onTituloClick(TituloRendaFixa titulo);
     }
 
+    /** Called when the user taps the heart of a title card. */
+    public interface OnFavoritoClickListener {
+        void onFavoritoClick(TituloRendaFixa titulo, int posicao);
+    }
+
     private final List<TituloRendaFixa> titulos = new ArrayList<>();
     private final OnTituloClickListener clickListener;
+    private OnFavoritoClickListener favoritoListener;
+
+    public void habilitarFavoritos(OnFavoritoClickListener listener) {
+        this.favoritoListener = listener;
+    }
 
     public TituloRendaFixaAdapter() {
         this(null);
@@ -112,6 +125,22 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
 
         holder.tvIsentoIR.setVisibility(titulo.isIsentoIR() ? View.VISIBLE : View.GONE);
 
+        if (favoritoListener == null) {
+            holder.btnFavoritoTitulo.setVisibility(View.GONE);
+        } else {
+            holder.btnFavoritoTitulo.setVisibility(View.VISIBLE);
+            FavoritoUi.aplicar(holder.btnFavoritoTitulo,
+                    FavoritosCache.contem(titulo.getSimboloFavorito(), TituloRendaFixa.CATEGORIA_FAVORITO));
+            holder.btnFavoritoTitulo.setOnClickListener(v -> {
+                int posicaoAtual = holder.getBindingAdapterPosition();
+                if (posicaoAtual == RecyclerView.NO_POSITION) return;
+                favoritoListener.onFavoritoClick(titulos.get(posicaoAtual), posicaoAtual);
+                // The repository flips the cache right away, so the heart can redraw now.
+                FavoritoUi.aplicarComAnimacao(holder.btnFavoritoTitulo,
+                        FavoritosCache.contem(titulo.getSimboloFavorito(), TituloRendaFixa.CATEGORIA_FAVORITO));
+            });
+        }
+
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) {
                 clickListener.onTituloClick(titulo);
@@ -144,6 +173,7 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
         TextView tvRentabilidade;
         TextView tvLiquidez;
         TextView tvAplicacaoMinima;
+        ImageView btnFavoritoTitulo;
 
         TituloViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -155,6 +185,7 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
             tvRentabilidade = itemView.findViewById(R.id.tvRentabilidade);
             tvLiquidez = itemView.findViewById(R.id.tvLiquidez);
             tvAplicacaoMinima = itemView.findViewById(R.id.tvAplicacaoMinima);
+            btnFavoritoTitulo = itemView.findViewById(R.id.btnFavoritoTitulo);
         }
     }
 }

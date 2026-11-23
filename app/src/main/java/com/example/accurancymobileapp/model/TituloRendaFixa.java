@@ -42,6 +42,14 @@ public class TituloRendaFixa implements Serializable {
     @SerializedName("descricao")
     private String descricao;
 
+    /** Category under which a title is stored in the favorites. */
+    public static final String CATEGORIA_FAVORITO = "Renda Fixa";
+
+    /** Favorite key of this title: the same RF-<id> symbol the contributions use. */
+    public String getSimboloFavorito() {
+        return "RF-" + idTitulo;
+    }
+
     public int getIdTitulo() {
         return idTitulo;
     }

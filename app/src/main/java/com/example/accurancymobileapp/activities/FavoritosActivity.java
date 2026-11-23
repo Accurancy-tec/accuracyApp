@@ -32,9 +32,9 @@ import java.util.List;
 /** The user's favorite assets, with a category filter, tap to open and heart to remove. */
 public class FavoritosActivity extends AppCompatActivity {
 
-    private static final String[] ROTULOS = {"Todos", "Ações", "FIIs", "Cripto", "Futuros", "Moedas"};
+    private static final String[] ROTULOS = {"Todos", "Ações", "FIIs", "Cripto", "Futuros", "Moedas", "Renda fixa"};
     // Category stored by the API for each chip (null = all).
-    private static final String[] CATEGORIAS = {null, "Ações", "FIIs", "Cripto", "Futuros", "Internacional"};
+    private static final String[] CATEGORIAS = {null, "Ações", "FIIs", "Cripto", "Futuros", "Internacional", "Renda Fixa"};
 
     private FavoritoRepository repositorio;
     private FavoritosAdapter adapter;
@@ -188,10 +188,32 @@ public class FavoritosActivity extends AppCompatActivity {
     }
 
     private void abrirDetalhes(FavoritoAtivo favorito) {
+        if ("Renda Fixa".equals(FavoritosCache.categoriaCanonica(favorito.getCategoria()))) {
+            abrirTituloRendaFixa(favorito);
+            return;
+        }
         Intent intent = new Intent(this, DetalhesAtivoActivity.class);
         intent.putExtra(DetalhesAtivoActivity.EXTRA_TICKER, favorito.getSimbolo());
         intent.putExtra(DetalhesAtivoActivity.EXTRA_NOME, favorito.getNome());
         intent.putExtra(DetalhesAtivoActivity.EXTRA_CATEGORIA, favorito.getCategoria());
+        startActivity(intent);
+    }
+
+    /** Fixed income favorites are stored as RF-<id>; open the list with that title's card. */
+    private void abrirTituloRendaFixa(FavoritoAtivo favorito) {
+        String simbolo = favorito.getSimbolo() == null ? "" : favorito.getSimbolo().trim();
+        int id = 0;
+        if (simbolo.toUpperCase(java.util.Locale.ROOT).startsWith("RF-")) {
+            try {
+                id = Integer.parseInt(simbolo.substring(3));
+            } catch (NumberFormatException ignored) {
+                id = 0;
+            }
+        }
+        Intent intent = new Intent(this, OpcoesRendaFixaActivity.class);
+        if (id > 0) {
+            intent.putExtra(OpcoesRendaFixaActivity.EXTRA_ABRIR_TITULO_ID, id);
+        }
         startActivity(intent);
     }
 
