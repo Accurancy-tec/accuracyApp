@@ -1,5 +1,14 @@
 package com.example.accurancymobileapp.activities;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.graphics.drawable.GradientDrawable;
+import android.view.animation.DecelerateInterpolator;
+import java.util.HashMap;
+import java.util.Map;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -24,12 +33,18 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.model.QuoteData;
 import com.example.accurancymobileapp.network.repository.AssetPositionRepository;
+import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.network.repository.QuoteRepository;
+import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.ui.StockChartHelper;
+import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.FavoritoUi;
+import com.example.accurancymobileapp.utils.FavoritosCache;
 
 import java.text.NumberFormat;
 import java.time.Instant;
@@ -64,16 +79,25 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private TextView tvPrecoAtualAtivo, tvVariacaoPrecoAtivo, tvUltimaAtualizacao;
     private TextView tvPrecoMedio, tvQuantidadeAtivo, tvValorPosicao;
     private TextView tvVariacaoRentabilidade, tvValorRentabilidade, tvSaldoInvestir;
+    /** Real balance read from the API (-1 until loaded); falls back to the Intent extra. */
+    private double saldoAtual = -1.0;
     private TextView tvTituloEstatisticas;
+    private TextView tvAberturaAtivo;
+    private TextView tvMaximaAtivo;
+    private TextView tvMaxima52Semanas;
+    private TextView tvMinima52Semanas;
 
     private View btnAtualizarCotacao;
     private View btnComprarAtivo;
     private View btnVenderAtivo;
+    private View btnRegistrarDividendo;
 
+    private TextView filtroHoje;
     private TextView filtro1S;
     private TextView filtro1M;
     private TextView filtro3M;
     private TextView filtro6M;
+    private final Map<TextView, ValueAnimator> animacoesFiltro = new HashMap<>();
 
     private View detalhesAtivoRoot;
     private ScrollView scrollDetalhesAtivo;
@@ -83,6 +107,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private AssetPositionRepository assetPositionRepository;
     private int assetPositionRequestId;
     private QuoteRepository quoteRepository;
+    private FavoritoRepository favoritoRepository;
+    private ImageButton btnFavoritarAtivo;
 
     private String ticker;
     private String nomeAtivo;
@@ -97,8 +123,12 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
     private int idCarteira = -1;
 
+    private PuxarParaAtualizar puxar;
     private boolean carregandoCotacao = false;
     private boolean carregandoHistorico = false;
+    private boolean carregandoHistoricoAnual = false;
+    private boolean historicoAnualCarregado = false;
+    private int historicoRequestId;
     private String erroHistorico;
 
     @Override
@@ -130,6 +160,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         }
 
         vincularViews();
+        puxar = new PuxarParaAtualizar(findViewById(R.id.swipeDetalhesAtivo), this::atualizarTela);
         configurarBarrasSistema();
         configurarTelaInicial();
         configurarEventos();
@@ -137,16 +168,101 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
         quoteRepository = new QuoteRepository(this);
         assetPositionRepository = new AssetPositionRepository(this);
+        configurarFavorito();
 
         desenharGrafico(true, null);
         carregarCotacao();
         carregarHistorico(periodoSelecionado, etiquetaPeriodo);
     }
 
+    /** Pull to refresh: quote, chart, position and balance. */
+    private void atualizarTela() {
+        carregarCotacao();
+        carregarHistorico(periodoSelecionado, etiquetaPeriodo);
+        loadAssetPosition();
+        carregarSaldoAtual();
+        finalizarAtualizacaoPuxar();
+    }
+
+    /** Releases the pull spinner once neither the quote nor the chart is still loading. */
+    private void finalizarAtualizacaoPuxar() {
+        if (puxar != null && !carregandoCotacao && !carregandoHistorico) {
+            puxar.parar();
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         loadAssetPosition();
+        carregarSaldoAtual();
+        sincronizarFavorito();
+    }
+
+    /** Heart in the header: favorites the asset, with the state kept on the server. */
+    private void configurarFavorito() {
+        btnFavoritarAtivo = findViewById(R.id.btnFavoritarAtivo);
+        if (!FavoritoUi.categoriaFavoritavel(categoriaAtivo)) {
+            // Fixed income positions and other categories cannot be favorited.
+            btnFavoritarAtivo.setVisibility(View.INVISIBLE);
+            return;
+        }
+        favoritoRepository = new FavoritoRepository(this);
+        FavoritoUi.aplicar(btnFavoritarAtivo, FavoritosCache.contem(ticker, categoriaAtivo));
+        AnimacaoUtils.efeitoPressionar(btnFavoritarAtivo);
+        btnFavoritarAtivo.setOnClickListener(v -> favoritoRepository.alternar(
+                ticker, nomeAtivo, categoriaAtivo, new FavoritoRepository.AlternarCallback() {
+                    @Override
+                    public void onResultado(boolean favorito) {
+                        FavoritoUi.aplicarComAnimacao(btnFavoritarAtivo, favorito);
+                    }
+
+                    @Override
+                    public void onError(boolean estadoAnterior, String mensagem) {
+                        if (isFinishing() || isDestroyed()) return;
+                        FavoritoUi.aplicar(btnFavoritarAtivo, estadoAnterior);
+                        Toast.makeText(DetalhesAtivoActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                    }
+                }));
+    }
+
+    private void sincronizarFavorito() {
+        if (favoritoRepository == null) return;
+        favoritoRepository.carregar(new FavoritoRepository.ListaCallback() {
+            @Override
+            public void onSuccess(List<FavoritoAtivo> favoritos) {
+                if (isFinishing() || isDestroyed()) return;
+                FavoritoUi.aplicar(btnFavoritarAtivo, FavoritosCache.contem(ticker, categoriaAtivo));
+            }
+
+            @Override
+            public void onError(String mensagem) {
+                // Keep the heart already drawn from the local copy.
+            }
+        });
+    }
+
+    /** Reads the user balance so "Saldo para investir" is real and the buy screen receives it. */
+    private void carregarSaldoAtual() {
+        new WalletRepository(this).buscarSaldo(new WalletRepository.WalletCallback() {
+            @Override
+            public void onSuccess(String saldo) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                try {
+                    saldoAtual = Double.parseDouble(saldo.trim());
+                    tvSaldoInvestir.setText(formatoMoeda.format(saldoAtual));
+                } catch (NumberFormatException ignored) {
+                    // Keep the previous value; the server still validates the balance.
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                // Keep the previous value; the server still validates the balance.
+            }
+        });
     }
 
     private void vincularViews() {
@@ -168,11 +284,17 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         tvValorRentabilidade = findViewById(R.id.tvValorRentabilidade);
         tvSaldoInvestir = findViewById(R.id.tvSaldoInvestir);
         tvTituloEstatisticas = findViewById(R.id.tvTituloEstatisticas);
+        tvAberturaAtivo = findViewById(R.id.tvAberturaAtivo);
+        tvMaximaAtivo = findViewById(R.id.tvMaximaAtivo);
+        tvMaxima52Semanas = findViewById(R.id.tvMaxima52Semanas);
+        tvMinima52Semanas = findViewById(R.id.tvMinima52Semanas);
 
         btnAtualizarCotacao = findViewById(R.id.btnAtualizarCotacao);
         btnComprarAtivo = findViewById(R.id.btnComprarAtivo);
         btnVenderAtivo = findViewById(R.id.btnVenderAtivo);
+        btnRegistrarDividendo = findViewById(R.id.btnRegistrarDividendo);
 
+        filtroHoje = findViewById(R.id.filtroHoje);
         filtro1S = findViewById(R.id.filtro1S);
         filtro1M = findViewById(R.id.filtro1M);
         filtro3M = findViewById(R.id.filtro3M);
@@ -217,12 +339,16 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         tvVariacaoRentabilidade.setText("0%");
         tvValorRentabilidade.setText("0%");
 
-        double saldo = getIntent().getDoubleExtra(EXTRA_SALDO, -1.0);
+        double saldo = saldoAtual >= 0 ? saldoAtual : getIntent().getDoubleExtra(EXTRA_SALDO, -1.0);
         tvSaldoInvestir.setText(saldo >= 0
                 ? formatoMoeda.format(saldo)
                 : "R$ 0");
 
         tvTituloEstatisticas.setText("Estatísticas de " + ticker);
+        tvAberturaAtivo.setText("—");
+        tvMaximaAtivo.setText("—");
+        tvMaxima52Semanas.setText("—");
+        tvMinima52Semanas.setText("—");
         selecionarFiltroVisual(filtro3M);
     }
 
@@ -234,6 +360,11 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
         btnComprarAtivo.setOnClickListener(view -> abrirTelaOperacao("Compra"));
         btnVenderAtivo.setOnClickListener(view -> abrirTelaOperacao("Venda"));
+        btnRegistrarDividendo.setOnClickListener(view -> abrirTelaDividendo());
+
+        filtroHoje.setOnClickListener(view ->
+                selecionarPeriodo("1d", "Hoje", filtroHoje)
+        );
 
         filtro1S.setOnClickListener(view -> selecionarPeriodo("7d", "1S", filtro1S));
         filtro1M.setOnClickListener(view -> selecionarPeriodo("1mo", "1M", filtro1M));
@@ -249,21 +380,116 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     }
 
     private void selecionarFiltroVisual(TextView selecionado) {
-        TextView[] filtros = {filtro1S, filtro1M, filtro3M, filtro6M};
+        int corFundoSelecionado = ContextCompat.getColor(this, R.color.btn_primary);
+        int corTextoSelecionado = ContextCompat.getColor(this, R.color.blue_primary);
+        int corTextoInativo = ContextCompat.getColor(this, R.color.text_secondary);
+
+        TextView[] filtros = {filtroHoje, filtro1S, filtro1M, filtro3M, filtro6M};
 
         for (TextView filtro : filtros) {
-            boolean ativo = filtro == selecionado;
+            if (filtro == null) {
+                continue;
+            }
 
-            filtro.setBackgroundColor(ContextCompat.getColor(
-                    this,
-                    ativo ? R.color.btn_primary : android.R.color.transparent
-            ));
-
-            filtro.setTextColor(ContextCompat.getColor(
-                    this,
-                    ativo ? R.color.blue_primary : R.color.text_secondary
-            ));
+            animarEstiloFiltro(
+                    filtro,
+                    filtro == selecionado,
+                    corFundoSelecionado,
+                    corTextoSelecionado,
+                    corTextoInativo
+            );
         }
+    }
+
+    private void animarEstiloFiltro(
+            TextView filtro,
+            boolean ativo,
+            int corFundoSelecionado,
+            int corTextoSelecionado,
+            int corTextoInativo
+    ) {
+        ValueAnimator animacaoAnterior = animacoesFiltro.remove(filtro);
+        if (animacaoAnterior != null) {
+            animacaoAnterior.cancel();
+        }
+
+        int fundoInicial = filtro.isSelected() ? corFundoSelecionado : Color.TRANSPARENT;
+        int fundoFinal = ativo ? corFundoSelecionado : Color.TRANSPARENT;
+        int textoInicial = filtro.getCurrentTextColor();
+        int textoFinal = ativo ? corTextoSelecionado : corTextoInativo;
+
+        filtro.setSelected(ativo);
+
+        ArgbEvaluator avaliador = new ArgbEvaluator();
+        ValueAnimator animacao = ValueAnimator.ofFloat(0f, 1f);
+        animacao.setDuration(180L);
+        animacao.setInterpolator(new DecelerateInterpolator());
+
+        animacao.addUpdateListener(animator -> {
+            float progresso = (float) animator.getAnimatedValue();
+
+            int corFundo = (Integer) avaliador.evaluate(
+                    progresso,
+                    fundoInicial,
+                    fundoFinal
+            );
+            int corTexto = (Integer) avaliador.evaluate(
+                    progresso,
+                    textoInicial,
+                    textoFinal
+            );
+
+            GradientDrawable fundo = new GradientDrawable();
+            fundo.setShape(GradientDrawable.RECTANGLE);
+            fundo.setCornerRadius(dp(19));
+            fundo.setColor(corFundo);
+            fundo.setStroke(
+                    dp(1),
+                    corFundo == Color.TRANSPARENT ? Color.TRANSPARENT : corFundo
+            );
+
+            filtro.setBackground(fundo);
+            filtro.setTextColor(corTexto);
+        });
+
+        animacao.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                removerAnimacaoFiltro(filtro, animation);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                removerAnimacaoFiltro(filtro, animation);
+            }
+        });
+
+        animacoesFiltro.put(filtro, animacao);
+        animacao.start();
+
+        filtro.animate().cancel();
+        filtro.setScaleX(ativo ? 0.96f : 1.0f);
+        filtro.setScaleY(ativo ? 0.96f : 1.0f);
+        filtro.animate()
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .setDuration(180L)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
+    }
+
+    private void removerAnimacaoFiltro(TextView filtro, Animator animacao) {
+        if (animacoesFiltro.get(filtro) == animacao) {
+            animacoesFiltro.remove(filtro);
+        }
+    }
+
+    private boolean ehFiiAtivo() {
+        String categoria = categoriaAtivo == null
+                ? ""
+                : categoriaAtivo.trim().toLowerCase(ptBR);
+
+        return categoria.contains("fii") || categoria.contains("imobili");
     }
 
     private void carregarCotacao() {
@@ -281,6 +507,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                     @Override
                     public void onSucesso(List<QuoteData> quotes) {
                         carregandoCotacao = false;
+                        finalizarAtualizacaoPuxar();
 
                         if (isFinishing() || isDestroyed()
                                 || quotes == null || quotes.isEmpty()) {
@@ -302,6 +529,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                         }
 
                         precoAtual = preco;
+                        atualizarEstatisticasCotacao(quote);
 
                         String nomeDaBrapi = quote.getLongName() != null
                                 && !quote.getLongName().trim().isEmpty()
@@ -362,6 +590,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                     @Override
                     public void onErro(String mensagem) {
                         carregandoCotacao = false;
+                        finalizarAtualizacaoPuxar();
 
                         if (isFinishing() || isDestroyed()) {
                             return;
@@ -505,7 +734,26 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         );
     }
 
+    /** Dividends only make sense for held stocks, FIIs and BDRs/ETFs (not futures, crypto or currencies). */
+    private void atualizarBotaoDividendo() {
+        boolean elegivel = quantidadePosicao > 0.0
+                && !ehFuturoAtivo()
+                && !ehCriptoAtivo()
+                && !ehMoedaAtivo();
+        btnRegistrarDividendo.setVisibility(elegivel ? View.VISIBLE : View.GONE);
+    }
+
+    private void abrirTelaDividendo() {
+        Intent dividendo = new Intent(this, RegistrarDividendoActivity.class);
+        dividendo.putExtra(EXTRA_TICKER, ticker);
+        dividendo.putExtra(EXTRA_NOME, nomeAtivo);
+        dividendo.putExtra(EXTRA_CATEGORIA, categoriaAtivo);
+        dividendo.putExtra(EXTRA_ID_CARTEIRA, idCarteira);
+        startActivity(dividendo);
+    }
+
     private void atualizarResumoPosicao() {
+        atualizarBotaoDividendo();
         tvPrecoMedio.setText(precoMedio > 0
                 ? formatoMoeda.format(precoMedio)
                 : "R$ 0");
@@ -550,7 +798,114 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         ));
     }
 
+
+    private boolean valorEstatisticoValido(Double valor) {
+        return valor != null && Double.isFinite(valor) && valor > 0.0;
+    }
+
+    private void atualizarEstatistica(TextView view, Double valor) {
+        if (view != null && valorEstatisticoValido(valor)) {
+            view.setText(formatoMoeda.format(valor));
+        }
+    }
+
+    private void preencherEstatisticaSeIndisponivel(TextView view, Double valor) {
+        if (view == null || !"—".contentEquals(view.getText())) {
+            return;
+        }
+
+        atualizarEstatistica(view, valor);
+    }
+
+    private void atualizarEstatisticasCotacao(QuoteData quote) {
+        if (quote == null) {
+            return;
+        }
+
+        atualizarEstatistica(tvAberturaAtivo, quote.getRegularMarketOpen());
+        atualizarEstatistica(tvMaximaAtivo, quote.getRegularMarketDayHigh());
+        atualizarEstatistica(tvMaxima52Semanas, quote.getFiftyTwoWeekHigh());
+        atualizarEstatistica(tvMinima52Semanas, quote.getFiftyTwoWeekLow());
+
+        if (valorEstatisticoValido(quote.getFiftyTwoWeekHigh())
+                && valorEstatisticoValido(quote.getFiftyTwoWeekLow())) {
+            historicoAnualCarregado = true;
+        } else {
+            carregarEstatisticas52Semanas();
+        }
+    }
+
+    private void carregarEstatisticas52Semanas() {
+        if (historicoAnualCarregado || carregandoHistoricoAnual
+                || quoteRepository == null) {
+            return;
+        }
+
+        carregandoHistoricoAnual = true;
+        quoteRepository.buscarHistorico(
+                ticker,
+                "1y",
+                categoriaAtivo,
+                new QuoteRepository.HistoricoCallback() {
+                    @Override
+                    public void onSucesso(List<StockHistoryResponse.Point> pontos) {
+                        carregandoHistoricoAnual = false;
+                        historicoAnualCarregado = true;
+
+                        if (isFinishing() || isDestroyed() || pontos == null) {
+                            return;
+                        }
+
+                        double maiorValor = Double.NaN;
+                        double menorValor = Double.NaN;
+
+                        for (StockHistoryResponse.Point ponto : pontos) {
+                            if (ponto == null) {
+                                continue;
+                            }
+
+                            Double fechamento = ponto.getClose() != null
+                                    ? ponto.getClose()
+                                    : ponto.getAdjustedClose();
+                            Double maxima = ponto.getHigh() != null
+                                    ? ponto.getHigh() : fechamento;
+                            Double minima = ponto.getLow() != null
+                                    ? ponto.getLow() : fechamento;
+
+                            if (valorEstatisticoValido(maxima)) {
+                                maiorValor = Double.isNaN(maiorValor)
+                                        ? maxima : Math.max(maiorValor, maxima);
+                            }
+                            if (valorEstatisticoValido(minima)) {
+                                menorValor = Double.isNaN(menorValor)
+                                        ? minima : Math.min(menorValor, minima);
+                            }
+                        }
+
+                        preencherEstatisticaSeIndisponivel(
+                                tvMaxima52Semanas,
+                                Double.isNaN(maiorValor) ? null : maiorValor
+                        );
+                        preencherEstatisticaSeIndisponivel(
+                                tvMinima52Semanas,
+                                Double.isNaN(menorValor) ? null : menorValor
+                        );
+                    }
+
+                    @Override
+                    public void onErro(String mensagem) {
+                        carregandoHistoricoAnual = false;
+                        Log.w(
+                                "ASSET_STATISTICS",
+                                "Unable to load 52-week history for " + ticker + ": " + mensagem
+                        );
+                    }
+                }
+        );
+    }
+
     private void carregarHistorico(String range, String etiqueta) {
+        final int historicoRequestIdAtual = ++historicoRequestId;
         carregandoHistorico = true;
         erroHistorico = null;
 
@@ -563,11 +918,13 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 new QuoteRepository.HistoricoCallback() {
                     @Override
                     public void onSucesso(List<StockHistoryResponse.Point> pontos) {
-                        carregandoHistorico = false;
-
-                        if (isFinishing() || isDestroyed()) {
+                        if (historicoRequestIdAtual != historicoRequestId
+                                || isFinishing() || isDestroyed()) {
                             return;
                         }
+
+                        carregandoHistorico = false;
+                        finalizarAtualizacaoPuxar();
 
                         labelsGrafico.clear();
                         valoresGrafico.clear();
@@ -580,6 +937,18 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                                     a.getDate(),
                                     b.getDate()
                             ));
+
+                            if (!ordenados.isEmpty()) {
+                                StockHistoryResponse.Point ultimo = ordenados.get(
+                                        ordenados.size() - 1
+                                );
+                                preencherEstatisticaSeIndisponivel(
+                                        tvAberturaAtivo, ultimo.getOpen()
+                                );
+                                preencherEstatisticaSeIndisponivel(
+                                        tvMaximaAtivo, ultimo.getHigh()
+                                );
+                            }
 
                             for (StockHistoryResponse.Point ponto : ordenados) {
                                 if (ponto == null) {
@@ -594,10 +963,18 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                                     continue;
                                 }
 
-                                String data = Instant.ofEpochSecond(ponto.getDate())
-                                        .atZone(ZoneId.of("America/Sao_Paulo"))
-                                        .toLocalDate()
-                                        .toString();
+                                Instant instante = Instant.ofEpochSecond(ponto.getDate());
+                                String formatoData;
+                                if ("Hoje".equalsIgnoreCase(etiqueta)) {
+                                    // Acoes usam candles intradiarios; FIIs fornecem apenas dados diarios.
+                                    formatoData = ehHistoricoDiarioAtivo()
+                                            || !pontosIntradiarios(ordenados)
+                                            ? "dd/MM" : "HH:mm";
+                                } else {
+                                    formatoData = "yyyy-MM-dd";
+                                }
+                                String data = instante.atZone(ZoneId.of("America/Sao_Paulo"))
+                                        .format(DateTimeFormatter.ofPattern(formatoData, ptBR));
 
                                 labelsGrafico.add(data);
                                 valoresGrafico.add(fechamento);
@@ -609,11 +986,13 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
                     @Override
                     public void onErro(String mensagem) {
-                        carregandoHistorico = false;
-
-                        if (isFinishing() || isDestroyed()) {
+                        if (historicoRequestIdAtual != historicoRequestId
+                                || isFinishing() || isDestroyed()) {
                             return;
                         }
+
+                        carregandoHistorico = false;
+                        finalizarAtualizacaoPuxar();
 
                         erroHistorico = mensagem;
                         desenharGrafico(false, mensagem);
@@ -637,7 +1016,9 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         if (!Double.isFinite(precoAtual) || precoAtual <= 0.0) {
             Toast.makeText(
                     this,
-                    "Aguarde uma cotação válida antes de registrar a operação.",
+                    ehFuturoAtivo()
+                            ? "Este contrato não tem preço de ajuste em reais disponível; não é possível simular a operação."
+                            : "Aguarde uma cotação válida antes de registrar a operação.",
                     Toast.LENGTH_LONG
             ).show();
 
@@ -667,7 +1048,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         asset.putExtra(EXTRA_ID_CARTEIRA, idCarteira);
         asset.putExtra(
                 EXTRA_SALDO,
-                getIntent().getDoubleExtra(EXTRA_SALDO, -1.0)
+                saldoAtual >= 0 ? saldoAtual : getIntent().getDoubleExtra(EXTRA_SALDO, -1.0)
         );
         asset.putExtra(EXTRA_PRECO_ATUAL_COMPRA, precoAtual);
         asset.putExtra(EXTRA_VARIACAO_DIARIA_COMPRA, variacaoDiaria);
@@ -679,6 +1060,24 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         asset.putExtra(BuyAssetActivity.EXTRA_TIPO_OPERACAO, tipo);
 
         startActivity(asset);
+    }
+
+    private boolean ehFuturoAtivo() {
+        return categoriaAtivo != null
+                && categoriaAtivo.trim().toLowerCase(Locale.ROOT).contains("futuro");
+    }
+
+    private boolean pontosIntradiarios(List<StockHistoryResponse.Point> pontos) {
+        if (pontos == null || pontos.size() < 2) {
+            return false;
+        }
+        long primeiro = pontos.get(0).getDate();
+        long ultimo = pontos.get(pontos.size() - 1).getDate();
+        return ultimo - primeiro < 86400L;
+    }
+
+    private boolean ehHistoricoDiarioAtivo() {
+        return ehFiiAtivo() || ehFuturoAtivo();
     }
 
     private String formatarHorario(String valor) {
@@ -695,7 +1094,23 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         }
     }
 
+    private boolean ehCriptoAtivo() {
+        return categoriaAtivo != null
+                && categoriaAtivo.trim().toLowerCase(Locale.ROOT).startsWith("cripto");
+    }
+
+    private boolean ehMoedaAtivo() {
+        return categoriaAtivo != null
+                && categoriaAtivo.trim().toLowerCase(Locale.ROOT).startsWith("internacional");
+    }
+
     private String formatarQuantidade(double quantidade) {
+        if ((ehCriptoAtivo() || ehMoedaAtivo()) && Double.isFinite(quantidade)) {
+            java.text.NumberFormat formato = java.text.NumberFormat.getNumberInstance(ptBR);
+            formato.setMinimumFractionDigits(0);
+            formato.setMaximumFractionDigits(8);
+            return formato.format(java.math.BigDecimal.valueOf(quantidade));
+        }
         return String.format(
                 ptBR,
                 quantidade == Math.rint(quantidade) ? "%.0f" : "%.4f",
@@ -706,6 +1121,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private void limparResumoPosicao() {
         quantidadePosicao = 0.0;
         precoMedio = 0.0;
+        atualizarBotaoDividendo();
 
         tvPrecoMedio.setText("—");
         tvQuantidadeAtivo.setText("—");

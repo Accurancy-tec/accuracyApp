@@ -1,6 +1,7 @@
 package com.example.accurancymobileapp.network.client;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.accurancymobileapp.BuildConfig;
 import com.example.accurancymobileapp.network.service.ApiService;
@@ -21,9 +22,19 @@ public class RetrofitClient {
 
         AuthInterceptor interceptor = new AuthInterceptor(sessionManager,context);
 
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        // Logs only in debug builds and never prints credentials (headers and JSON secrets are masked).
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(message -> Log.d(
+                "HTTP",
+                message.replaceAll(
+                        "(?i)(\"(?:password|senha|token|access_token|refresh_token|jwt)\"\\s*:\\s*\")[^\"]*(\")",
+                        "$1***$2")));
+        logging.redactHeader("Authorization");
+        logging.redactHeader("Cookie");
+        logging.redactHeader("Set-Cookie");
 
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logging.setLevel(BuildConfig.DEBUG
+                ? HttpLoggingInterceptor.Level.BODY
+                : HttpLoggingInterceptor.Level.NONE);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)

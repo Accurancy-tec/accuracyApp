@@ -2,9 +2,13 @@ package com.example.accurancymobileapp.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Locale;
 
-public class TituloRendaFixa {
+public class TituloRendaFixa implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @SerializedName("id_titulo")
     private int idTitulo;
 
@@ -80,5 +84,36 @@ public class TituloRendaFixa {
 
     public String getDescricao() {
         return descricao;
+    }
+
+    /** Fixed income titles from LCI/LCA are exempt from income tax for individuals. */
+    public boolean isIsentoIR() {
+        String tipo = tipoTitulo == null ? "" : tipoTitulo.trim().toUpperCase(Locale.ROOT);
+        return tipo.startsWith("LCI") || tipo.startsWith("LCA");
+    }
+
+    /** Example: "105% CDI", "12,8% PRE" or "6,1% + IPCA". */
+    public String getRentabilidadeFormatada() {
+        if (rentabilidade == null) {
+            return "Não informada";
+        }
+        String valor = rentabilidade.stripTrailingZeros().toPlainString().replace('.', ',');
+        String idx = indexador == null ? "" : indexador.trim();
+        if (idx.equalsIgnoreCase("IPCA")) {
+            return valor + "% + IPCA";
+        }
+        return idx.isEmpty() ? valor + "%" : valor + "% " + idx;
+    }
+
+    /** Converts the ISO maturity date (yyyy-MM-dd) to dd/MM/yyyy; returns the raw text if it is not ISO. */
+    public String getVencimentoFormatado() {
+        if (vencimento == null || vencimento.trim().isEmpty()) {
+            return "Não informado";
+        }
+        String texto = vencimento.trim();
+        if (texto.length() >= 10 && texto.charAt(4) == '-' && texto.charAt(7) == '-') {
+            return texto.substring(8, 10) + "/" + texto.substring(5, 7) + "/" + texto.substring(0, 4);
+        }
+        return texto;
     }
 }

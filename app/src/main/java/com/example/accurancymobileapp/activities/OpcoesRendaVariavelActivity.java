@@ -2,20 +2,21 @@ package com.example.accurancymobileapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.utils.AnimacaoUtils;
 
+/**
+ * "Bolsa de Valores" screen: stocks, real-estate funds and BDRs/ETFs, all as same-size rows.
+ * Futures, crypto and currencies have their own cards on the Produtos tab.
+ */
 public class OpcoesRendaVariavelActivity extends AppCompatActivity {
 
-    LinearLayout cardAcoesNacionais, cardFundosImobiliarios, cardContratosFuturos, cardAcoesETFsInternacionais;
     ImageButton btnVoltarRendaVariavel;
 
     @Override
@@ -24,27 +25,26 @@ public class OpcoesRendaVariavelActivity extends AppCompatActivity {
         setContentView(R.layout.activity_opcoes_renda_variavel);
 
         btnVoltarRendaVariavel = findViewById(R.id.btnVoltarRendaVariavel);
-
-        cardAcoesNacionais = findViewById(R.id.cardAcoesNacionais);
-        cardFundosImobiliarios = findViewById(R.id.cardFundosImobiliarios);
-        cardContratosFuturos = findViewById(R.id.cardContratosFuturos);
-        cardAcoesETFsInternacionais = findViewById(R.id.cardAcoesETFsInternacionais);
-
-        //Voltar para a tela inicial
         btnVoltarRendaVariavel.setOnClickListener(v -> finish());
 
-        //Abrir telas dos cards
-        cardAcoesNacionais.setOnClickListener(v -> abrirTela(MarketListActivity.class,"ACOES_NACIONAIS"));
+        LinearLayout cardAcoes = findViewById(R.id.cardAcoesNacionais);
+        LinearLayout cardFiis = findViewById(R.id.cardFundosImobiliarios);
+        LinearLayout cardBdrs = findViewById(R.id.cardAcoesETFsInternacionais);
 
-        cardFundosImobiliarios.setOnClickListener(v -> abrirTela(MarketListActivity.class,"FIIS"));
+        cardAcoes.setOnClickListener(v -> abrirTela("ACOES_NACIONAIS"));
+        cardFiis.setOnClickListener(v -> abrirTela("FIIS"));
+        cardBdrs.setOnClickListener(v -> abrirTela("BDRS_ETFS"));
 
-        //cardContratosFuturos.setOnClickListener(v -> abrirTela(ContratosFuturosActivity.class));
-
+        View[] cards = {cardAcoes, cardFiis, cardBdrs};
+        for (View card : cards) {
+            AnimacaoUtils.efeitoPressionar(card);
+        }
+        AnimacaoUtils.entradaEmCascata(cards);
     }
 
-    private void abrirTela(Class<?> activityClass,String screen){
-        Intent it = new Intent(this, activityClass);
-        it.putExtra("TAG",screen);
+    private void abrirTela(String tag) {
+        Intent it = new Intent(this, MarketListActivity.class);
+        it.putExtra("TAG", tag);
         startActivity(it);
     }
 }

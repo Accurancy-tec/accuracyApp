@@ -110,6 +110,129 @@ public class AcaoRepository {
         });
     }
 
+    public void listarAtivosInternacionais(
+            int pagina, int limite, String search, String sortBy, String sortOrder,
+            acaoCallback callback
+    ) {
+        if (chamadaAtual != null && !chamadaAtual.isCanceled()) chamadaAtual.cancel();
+        Call<AcaoResponse> call = apiService.listarAtivosInternacionais(
+                pagina, limite, search, sortBy, sortOrder
+        );
+        chamadaAtual = call;
+        call.enqueue(new Callback<AcaoResponse>() {
+            @Override
+            public void onResponse(Call<AcaoResponse> currentCall, Response<AcaoResponse> response) {
+                if (currentCall.isCanceled()) return;
+                if (chamadaAtual == currentCall) chamadaAtual = null;
+                if (!response.isSuccessful()) {
+                    callback.onError("Erro HTTP ao listar BDRs e ETFs: " + response.code());
+                    return;
+                }
+                AcaoResponse resultado = response.body();
+                if (resultado == null || resultado.getAcoes() == null || resultado.getPaginacao() == null) {
+                    callback.onError("A API retornou dados incompletos de BDRs e ETFs.");
+                    return;
+                }
+                callback.onSuccess(resultado);
+            }
+            @Override
+            public void onFailure(Call<AcaoResponse> currentCall, Throwable erro) {
+                if (currentCall.isCanceled()) return;
+                if (chamadaAtual == currentCall) chamadaAtual = null;
+                callback.onError(erro.getMessage() == null
+                        ? "Erro de conexão ao listar BDRs e ETFs."
+                        : "Erro de conexão: " + erro.getMessage());
+            }
+        });
+    }
+    public void listarFuturos(
+            int pagina, int limite, String search, String segment, String sortBy, String sortOrder,
+            acaoCallback callback
+    ) {
+        if (chamadaAtual != null && !chamadaAtual.isCanceled()) chamadaAtual.cancel();
+        Call<AcaoResponse> call = apiService.listarFuturos(
+                pagina, limite, search, segment, sortBy, sortOrder
+        );
+        chamadaAtual = call;
+        call.enqueue(new Callback<AcaoResponse>() {
+            @Override
+            public void onResponse(Call<AcaoResponse> currentCall, Response<AcaoResponse> response) {
+                if (currentCall.isCanceled()) return;
+                if (chamadaAtual == currentCall) chamadaAtual = null;
+                if (!response.isSuccessful()) {
+                    String detalhe = response.code() == 403
+                            ? " A consulta exige o plano Pro da brapi."
+                            : "";
+                    callback.onError("Erro HTTP ao listar contratos futuros: " + response.code() + detalhe);
+                    return;
+                }
+                AcaoResponse resultado = response.body();
+                if (resultado == null || resultado.getAcoes() == null || resultado.getPaginacao() == null) {
+                    callback.onError("A API retornou dados incompletos dos contratos futuros.");
+                    return;
+                }
+                callback.onSuccess(resultado);
+            }
+            @Override
+            public void onFailure(Call<AcaoResponse> currentCall, Throwable erro) {
+                if (currentCall.isCanceled()) return;
+                if (chamadaAtual == currentCall) chamadaAtual = null;
+                callback.onError(erro.getMessage() == null
+                        ? "Erro de conexão ao listar contratos futuros."
+                        : "Erro de conexão: " + erro.getMessage());
+            }
+        });
+    }
+    public void listarCriptomoedas(
+            int pagina, int limite, String search, String sortBy, String sortOrder,
+            acaoCallback callback
+    ) {
+        executarListaSimples(
+                apiService.listarCriptomoedas(pagina, limite, search, sortBy, sortOrder),
+                "criptomoedas", callback
+        );
+    }
+
+    public void listarMoedas(
+            int pagina, int limite, String search, String sortBy, String sortOrder,
+            acaoCallback callback
+    ) {
+        executarListaSimples(
+                apiService.listarMoedas(pagina, limite, search, sortBy, sortOrder),
+                "moedas", callback
+        );
+    }
+
+    // Shared by the crypto and currency catalogs, which return the same JSON shape.
+    private void executarListaSimples(Call<AcaoResponse> call, String nome, acaoCallback callback) {
+        if (chamadaAtual != null && !chamadaAtual.isCanceled()) chamadaAtual.cancel();
+        chamadaAtual = call;
+        call.enqueue(new Callback<AcaoResponse>() {
+            @Override
+            public void onResponse(Call<AcaoResponse> currentCall, Response<AcaoResponse> response) {
+                if (currentCall.isCanceled()) return;
+                if (chamadaAtual == currentCall) chamadaAtual = null;
+                if (!response.isSuccessful()) {
+                    callback.onError("Erro HTTP ao listar " + nome + ": " + response.code());
+                    return;
+                }
+                AcaoResponse resultado = response.body();
+                if (resultado == null || resultado.getAcoes() == null || resultado.getPaginacao() == null) {
+                    callback.onError("A API retornou dados incompletos de " + nome + ".");
+                    return;
+                }
+                callback.onSuccess(resultado);
+            }
+            @Override
+            public void onFailure(Call<AcaoResponse> currentCall, Throwable erro) {
+                if (currentCall.isCanceled()) return;
+                if (chamadaAtual == currentCall) chamadaAtual = null;
+                callback.onError(erro.getMessage() == null
+                        ? "Erro de conexão ao listar " + nome + "."
+                        : "Erro de conexão: " + erro.getMessage());
+            }
+        });
+    }
     public interface acaoCallback {
         void onSuccess(AcaoResponse resultado);
         void onError(String message);

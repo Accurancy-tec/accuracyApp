@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.TituloRendaFixa;
+import com.example.accurancymobileapp.utils.AnimacaoUtils;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -18,13 +19,31 @@ import java.util.List;
 import java.util.Locale;
 
 public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixaAdapter.TituloViewHolder>  {
+    /** Called when the user taps a title card. */
+    public interface OnTituloClickListener {
+        void onTituloClick(TituloRendaFixa titulo);
+    }
+
     private final List<TituloRendaFixa> titulos = new ArrayList<>();
+    private final OnTituloClickListener clickListener;
+
+    public TituloRendaFixaAdapter() {
+        this(null);
+    }
+
+    public TituloRendaFixaAdapter(OnTituloClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
 
     private final NumberFormat formatoMoeda =
             NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
+    /** Highest row position that already played its entrance animation. */
+    private int ultimaPosicaoAnimada = -1;
+
     public void atualizarLista(List<TituloRendaFixa> novaLista) {
         titulos.clear();
+        ultimaPosicaoAnimada = -1;
 
         if (novaLista != null) {
             titulos.addAll(novaLista);
@@ -90,6 +109,25 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
         } else {
             holder.tvGarantiaFgc.setVisibility(View.GONE);
         }
+
+        holder.tvIsentoIR.setVisibility(titulo.isIsentoIR() ? View.VISIBLE : View.GONE);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onTituloClick(titulo);
+            }
+        });
+        AnimacaoUtils.efeitoPressionar(holder.itemView);
+
+        if (position > ultimaPosicaoAnimada) {
+            ultimaPosicaoAnimada = position;
+            AnimacaoUtils.entradaItemLista(holder.itemView, position);
+        } else {
+            // Recycled row scrolling back into view: make sure it is fully visible.
+            holder.itemView.animate().cancel();
+            holder.itemView.setAlpha(1f);
+            holder.itemView.setTranslationY(0f);
+        }
     }
 
     @Override
@@ -102,6 +140,7 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
         TextView tvNomeTitulo;
         TextView tvIndexador;
         TextView tvGarantiaFgc;
+        TextView tvIsentoIR;
         TextView tvRentabilidade;
         TextView tvLiquidez;
         TextView tvAplicacaoMinima;
@@ -112,6 +151,7 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
             tvNomeTitulo = itemView.findViewById(R.id.tvNomeTitulo);
             tvIndexador = itemView.findViewById(R.id.tvIndexador);
             tvGarantiaFgc = itemView.findViewById(R.id.tvGarantiaFgc);
+            tvIsentoIR = itemView.findViewById(R.id.tvIsentoIR);
             tvRentabilidade = itemView.findViewById(R.id.tvRentabilidade);
             tvLiquidez = itemView.findViewById(R.id.tvLiquidez);
             tvAplicacaoMinima = itemView.findViewById(R.id.tvAplicacaoMinima);

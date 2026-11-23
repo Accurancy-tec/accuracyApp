@@ -34,6 +34,7 @@
                 app:tint="#9BAAC0" />
 
             <TextView
+                android:id="@+id/tvTituloRendaFixa"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -75,7 +76,8 @@
 
             <EditText
                 android:id="@+id/edtBuscarTitulo"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
                 android:background="@android:color/transparent"
@@ -88,23 +90,122 @@
                 android:textColorHint="#8291A8"
                 android:textSize="12sp" />
 
+            <FrameLayout
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_marginStart="8dp">
+
+                <ImageButton
+                    android:id="@+id/btnFiltrosRendaFixa"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_btn_icone"
+                    android:contentDescription="Abrir filtros"
+                    android:padding="7dp"
+                    android:src="@drawable/ic_filter_list"
+                    app:tint="#9BAAC0" />
+
+                <TextView
+                    android:id="@+id/tvBadgeFiltrosRf"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/bg_badge_filtro"
+                    android:gravity="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
         </LinearLayout>
 
         <!-- Lista de títulos -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvTitulosRendaFixa"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRendaFixa"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:clipToPadding="false"
-            android:paddingStart="17dp"
-            android:paddingTop="13dp"
-            android:paddingEnd="17dp"
-            android:paddingBottom="16dp"
-            android:overScrollMode="never"
+            app:layout_constraintTop_toBottomOf="@id/containerBuscaTitulo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/rvTitulosRendaFixa"
+                android:clipToPadding="false"
+                android:paddingStart="17dp"
+                android:paddingTop="13dp"
+                android:paddingEnd="17dp"
+                android:paddingBottom="16dp"
+                android:overScrollMode="never" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <!-- Carregando -->
+        <ProgressBar
+            android:id="@+id/progressRendaFixa"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:indeterminateTint="#2563EB"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/containerBuscaTitulo"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Estado vazio / erro -->
+        <LinearLayout
+            android:id="@+id/estadoVazioRendaFixa"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/containerBuscaTitulo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/tvEstadoVazioTituloRf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nenhum título encontrado"
+                android:textColor="#F1F5FC"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEstadoVazioMensagemRf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="Tente outra busca."
+                android:textColor="#8D9DB3"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btnTentarNovamenteRf"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_btn_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingHorizontal="24dp"
+                android:text="Tentar novamente"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

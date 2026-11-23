@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,13 +27,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.AcoesAdapter;
 import com.example.accurancymobileapp.model.Acao;
+import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.model.MarketType;
+import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.network.repository.MarketListRepository;
 import com.example.accurancymobileapp.response.AcaoResponse;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MarketListActivity extends AppCompatActivity {
 
@@ -47,6 +51,7 @@ public class MarketListActivity extends AppCompatActivity {
     private MarketType marketType;
     private MarketListRepository marketListRepository;
     private AcoesAdapter adapter;
+    private FavoritoRepository favoritoRepository;
 
     private int paginaAtual = 1;
     private int totalPaginas = 1;
@@ -105,6 +110,8 @@ public class MarketListActivity extends AppCompatActivity {
 
         rvMarket.setLayoutManager(new LinearLayoutManager(this));
         adapter = new AcoesAdapter(new ArrayList<>(), this::abrirDetalhes);
+        favoritoRepository = new FavoritoRepository(this);
+        adapter.habilitarFavoritos(marketType.getDetailCategory(), this::alternarFavorito);
         rvMarket.setAdapter(adapter);
 
         configurarBotoes();
@@ -118,19 +125,30 @@ public class MarketListActivity extends AppCompatActivity {
     private void inicializarEstadoInicial() {
         searchTerm = null;
         segmentType = null;
-        sortOrder = "desc";
+        sortOrder = marketType == MarketType.FUTUROS ? "asc" : "desc";
         sortBy = marketType == MarketType.FIIS
                 ? "totalInvestors"
-                : "volume";
+                : marketType == MarketType.FUTUROS ? "expirationDate"
+                : marketType.isCatalogoSimples() ? "rank" : "volume";
     }
 
+    private PuxarParaAtualizar puxar;
+
     private void bindViews() {
+        puxar = new PuxarParaAtualizar(findViewById(R.id.swipeListaMercado), () -> carregarPagina(paginaAtual));
         btnVoltar = findViewById(R.id.btnVoltarAtivosNacionais);
         btnFiltros = findViewById(R.id.btnFiltrosAtivos);
 
         tvTitulo = findViewById(R.id.tvTituloListaAtivos);
         containerBusca = findViewById(R.id.containerBuscaTitulo);
         edtBuscarAtivo = findViewById(R.id.edtBuscarTitulo);
+        if (marketType == MarketType.FUTUROS) {
+            edtBuscarAtivo.setHint("Buscar contrato (ex.: WIN, DI1, BGI)");
+        } else if (marketType == MarketType.CRIPTO) {
+            edtBuscarAtivo.setHint("Buscar criptomoeda (ex.: BTC, ETH, SOL)");
+        } else if (marketType == MarketType.MOEDAS) {
+            edtBuscarAtivo.setHint("Buscar moeda (ex.: USD, EUR, GBP)");
+        }
 
         btnPaginaAnterior = findViewById(R.id.btnPaginaAnterior);
         btnProximaPagina = findViewById(R.id.btnProximaPagina);
@@ -267,6 +285,7 @@ public class MarketListActivity extends AppCompatActivity {
                         }
 
                         carregando = false;
+                        puxar.parar();
 
                         if (isFinishing() || isDestroyed()) {
                             return;
@@ -307,6 +326,7 @@ public class MarketListActivity extends AppCompatActivity {
                         }
 
                         carregando = false;
+                        puxar.parar();
 
                         if (isFinishing() || isDestroyed()) {
                             return;
@@ -344,8 +364,12 @@ public class MarketListActivity extends AppCompatActivity {
         tvTituloFiltros.setText("Filtros e ordenação");
 
         boolean isFii = marketType == MarketType.FIIS;
-        rgSegmentType.setVisibility(isFii ? View.VISIBLE : View.GONE);
-        tvDescricaoSegmento.setVisibility(isFii ? View.VISIBLE : View.GONE);
+        boolean isFuturo = marketType == MarketType.FUTUROS;
+        boolean temSegmento = isFii || isFuturo; // crypto has no segment filter
+        rgSegmentType.setVisibility(temSegmento ? View.VISIBLE : View.GONE);
+        tvDescricaoSegmento.setVisibility(temSegmento ? View.VISIBLE : View.GONE);
+        tvDescricaoSegmento.setText(isFuturo ? "Segmento do contrato" : "Tipo de fundo");
+        configurarOpcoesDeSegmento(content, isFuturo);
 
         configurarOpcoesDeOrdenacao(content, isFii);
         selecionarSegmentoAtual(rgSegmentType);
@@ -358,8 +382,9 @@ public class MarketListActivity extends AppCompatActivity {
 
         btnLimpar.setOnClickListener(v -> {
             segmentType = null;
-            sortBy = isFii ? "totalInvestors" : "volume";
-            sortOrder = "desc";
+            sortBy = isFii ? "totalInvestors" : isFuturo ? "expirationDate"
+                    : marketType.isCatalogoSimples() ? "rank" : "volume";
+            sortOrder = isFuturo ? "asc" : "desc";
             dialog.dismiss();
             paginaAtual = 1;
             temProximaPagina = false;
@@ -367,7 +392,7 @@ public class MarketListActivity extends AppCompatActivity {
         });
 
         btnAplicar.setOnClickListener(v -> {
-            segmentType = isFii
+            segmentType = temSegmento
                     ? obterSegmentoSelecionado(rgSegmentType)
                     : null;
             sortBy = obterOrdenacaoSelecionada(rgSortBy, isFii);
@@ -394,7 +419,68 @@ public class MarketListActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private void configurarOpcoesDeSegmento(View content, boolean isFuturo) {
+        int[] fiiIds = {
+                R.id.rbSegmentPapel,
+                R.id.rbSegmentTijolo,
+                R.id.rbSegmentHibrido,
+                R.id.rbSegmentFof
+        };
+        for (int id : fiiIds) {
+            content.findViewById(id).setVisibility(isFuturo ? View.GONE : View.VISIBLE);
+        }
+        content.findViewById(R.id.rbSegmentFinancial)
+                .setVisibility(isFuturo ? View.VISIBLE : View.GONE);
+        content.findViewById(R.id.rbSegmentAgro)
+                .setVisibility(isFuturo ? View.VISIBLE : View.GONE);
+    }
+
     private void configurarOpcoesDeOrdenacao(View content, boolean isFii) {
+        if (marketType.isCatalogoSimples()) {
+            // Crypto and currency lists support only provider ranking and alphabetical order.
+            int[] ocultarIds = {
+                    R.id.rbSortPrice,
+                    R.id.rbSortInvestors,
+                    R.id.rbSortDividendYield,
+                    R.id.rbSortPvp,
+                    R.id.rbSortChange,
+                    R.id.rbSortMarketCap,
+                    R.id.rbSortExpiration,
+                    R.id.rbSortSymbol,
+                    R.id.rbSortUnderlying
+            };
+            for (int id : ocultarIds) {
+                content.findViewById(id).setVisibility(View.GONE);
+            }
+            android.widget.RadioButton porNome = content.findViewById(R.id.rbSortName);
+            android.widget.RadioButton porRanking = content.findViewById(R.id.rbSortVolume);
+            porNome.setVisibility(View.VISIBLE);
+            porNome.setText("Código (A-Z)");
+            porRanking.setVisibility(View.VISIBLE);
+            porRanking.setText("Ranking de mercado");
+            return;
+        }
+
+        if (marketType == MarketType.FUTUROS) {
+            int[] ocultarIds = {
+                    R.id.rbSortName,
+                    R.id.rbSortPrice,
+                    R.id.rbSortInvestors,
+                    R.id.rbSortDividendYield,
+                    R.id.rbSortPvp,
+                    R.id.rbSortChange,
+                    R.id.rbSortVolume,
+                    R.id.rbSortMarketCap
+            };
+            for (int id : ocultarIds) {
+                content.findViewById(id).setVisibility(View.GONE);
+            }
+            content.findViewById(R.id.rbSortExpiration).setVisibility(View.VISIBLE);
+            content.findViewById(R.id.rbSortSymbol).setVisibility(View.VISIBLE);
+            content.findViewById(R.id.rbSortUnderlying).setVisibility(View.VISIBLE);
+            return;
+        }
+
         int[] fiiOnlyIds = {
                 R.id.rbSortInvestors,
                 R.id.rbSortDividendYield,
@@ -426,6 +512,10 @@ public class MarketListActivity extends AppCompatActivity {
             id = R.id.rbSegmentHibrido;
         } else if ("fof".equals(segmentType)) {
             id = R.id.rbSegmentFof;
+        } else if ("financial".equals(segmentType)) {
+            id = R.id.rbSegmentFinancial;
+        } else if ("agribusiness".equals(segmentType)) {
+            id = R.id.rbSegmentAgro;
         } else {
             id = R.id.rbSegmentAll;
         }
@@ -438,11 +528,30 @@ public class MarketListActivity extends AppCompatActivity {
         if (selectedId == R.id.rbSegmentTijolo) return "tijolo";
         if (selectedId == R.id.rbSegmentHibrido) return "hibrido";
         if (selectedId == R.id.rbSegmentFof) return "fof";
+        if (selectedId == R.id.rbSegmentFinancial) return "financial";
+        if (selectedId == R.id.rbSegmentAgro) return "agribusiness";
         return null;
     }
 
     private void selecionarOrdenacaoAtual(RadioGroup group, boolean isFii) {
         int id;
+
+        if (marketType.isCatalogoSimples()) {
+            group.check("name".equals(sortBy) ? R.id.rbSortName : R.id.rbSortVolume);
+            return;
+        }
+
+        if (marketType == MarketType.FUTUROS) {
+            if ("symbol".equals(sortBy)) {
+                id = R.id.rbSortSymbol;
+            } else if ("underlyingAsset".equals(sortBy)) {
+                id = R.id.rbSortUnderlying;
+            } else {
+                id = R.id.rbSortExpiration;
+            }
+            group.check(id);
+            return;
+        }
 
         if (isFii) {
             switch (sortBy) {
@@ -492,6 +601,16 @@ public class MarketListActivity extends AppCompatActivity {
     private String obterOrdenacaoSelecionada(RadioGroup group, boolean isFii) {
         int selectedId = group.getCheckedRadioButtonId();
 
+        if (marketType.isCatalogoSimples()) {
+            return selectedId == R.id.rbSortName ? "name" : "rank";
+        }
+
+        if (marketType == MarketType.FUTUROS) {
+            if (selectedId == R.id.rbSortSymbol) return "symbol";
+            if (selectedId == R.id.rbSortUnderlying) return "underlyingAsset";
+            return "expirationDate";
+        }
+
         if (selectedId == R.id.rbSortName) return "name";
         if (selectedId == R.id.rbSortPrice) return isFii ? "price" : "close";
 
@@ -521,6 +640,43 @@ public class MarketListActivity extends AppCompatActivity {
         tvProximaPagina.setText(
                 temProximaPagina ? String.valueOf(paginaAtual + 1) : ""
         );
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Hearts may have changed on the details screen; the server copy wins.
+        favoritoRepository.carregar(new FavoritoRepository.ListaCallback() {
+            @Override
+            public void onSuccess(List<FavoritoAtivo> favoritos) {
+                if (!isFinishing() && !isDestroyed()) {
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onError(String mensagem) {
+                // Keep the hearts already on screen.
+            }
+        });
+    }
+
+    private void alternarFavorito(Acao ativo, int posicao) {
+        favoritoRepository.alternar(
+                ativo.getStock(), ativo.getName(), marketType.getDetailCategory(),
+                new FavoritoRepository.AlternarCallback() {
+                    @Override
+                    public void onResultado(boolean favorito) {
+                        // The row already redrew its heart.
+                    }
+
+                    @Override
+                    public void onError(boolean estadoAnterior, String mensagem) {
+                        if (isFinishing() || isDestroyed()) return;
+                        adapter.notifyItemChanged(posicao);
+                        Toast.makeText(MarketListActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override

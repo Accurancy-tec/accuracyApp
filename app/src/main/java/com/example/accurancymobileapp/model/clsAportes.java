@@ -5,13 +5,18 @@ import com.google.gson.annotations.SerializedName;
 public class clsAportes {
     private String name_ativo;
     private String categoria_ativo;
-    private double quantidade_aporte;
+    // Nullable: dividends have no quantity (Gson omits null fields).
+    private Double quantidade_aporte;
     private String ativo_aporte;
     private double valor_aporte;
     private String tipo_aporte;
     private String recorrencia_aporte;
     private int id_carteira;
     private Double rendimento_percentual;
+    // Optional fields: Gson omits them when null, so existing calls keep the same JSON.
+    private Integer id_titulo;
+    private Double preco_unitario;
+    private String observacao_aporte;
 
     public clsAportes(String ativo,String name,String categoria,double quantidade,double preco, String tipo, String recorrencia, int idCarteira) {
         ativo_aporte = ativo;
@@ -22,6 +27,35 @@ public class clsAportes {
         tipo_aporte = tipo;
         recorrencia_aporte = recorrencia;
         id_carteira = idCarteira;
+    }
+
+    /** Builds a fixed income application; the server reads the title data (name, rate, maturity) from id_titulo. */
+    public static clsAportes paraRendaFixa(int idTitulo, String nomeTitulo, double valor, int idCarteira) {
+        clsAportes aporte = new clsAportes("RF-" + idTitulo, nomeTitulo, "Renda Fixa", valor, valor, "Compra", "Único", idCarteira);
+        aporte.id_titulo = idTitulo;
+        return aporte;
+    }
+
+    /** Builds a dividend/JCP/income entry: no quantity and no unit price, only the amount received. */
+    public static clsAportes paraDividendo(String ativo, String nome, String categoria, double valor,
+                                           String tipoProvento, int idCarteira) {
+        clsAportes aporte = new clsAportes(ativo, nome, categoria, 0.0, valor, "Dividendo", "Único", idCarteira);
+        aporte.quantidade_aporte = null;
+        aporte.observacao_aporte = tipoProvento;
+        return aporte;
+    }
+
+    public Integer getIdTitulo() {
+        return id_titulo;
+    }
+
+    public Double getPrecoUnitario() {
+        return preco_unitario;
+    }
+
+    /** Quoted unit price at the moment of the order (variable income); the server validates it. */
+    public void setPrecoUnitario(Double precoUnitario) {
+        this.preco_unitario = precoUnitario;
     }
 
     public Double getRendimentoPercentual() {
@@ -81,7 +115,7 @@ public class clsAportes {
     }
 
     public double getQuantidade() {
-        return quantidade_aporte;
+        return quantidade_aporte == null ? 0.0 : quantidade_aporte;
     }
 
     public void setQuantidade(double quantidade) {

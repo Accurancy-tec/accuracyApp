@@ -23,7 +23,7 @@ public class MarketListRepository {
     ) {
         String defaultSort = type == MarketType.FIIS
                 ? "totalInvestors"
-                : "volume";
+                : type.isCatalogoSimples() ? "rank" : "volume";
 
         listarAtivos(
                 type,
@@ -98,6 +98,66 @@ public class MarketListRepository {
                 );
                 break;
 
+            case BDRS_ETFS:
+                acaoRepository.listarAtivosInternacionais(
+                        pagina, limite, search, sortBy, sortOrder,
+                        new AcaoRepository.acaoCallback() {
+                            @Override
+                            public void onSuccess(AcaoResponse resultado) {
+                                callback.onSuccess(resultado);
+                            }
+                            @Override
+                            public void onError(String mensagem) {
+                                callback.onError(mensagem);
+                            }
+                        }
+                );
+                break;
+            case FUTUROS:
+                acaoRepository.listarFuturos(
+                        pagina, limite, search, segmentType, sortBy, sortOrder,
+                        new AcaoRepository.acaoCallback() {
+                            @Override
+                            public void onSuccess(AcaoResponse resultado) {
+                                callback.onSuccess(resultado);
+                            }
+                            @Override
+                            public void onError(String mensagem) {
+                                callback.onError(mensagem);
+                            }
+                        }
+                );
+                break;
+            case CRIPTO:
+                acaoRepository.listarCriptomoedas(
+                        pagina, limite, search, sortBy, sortOrder,
+                        new AcaoRepository.acaoCallback() {
+                            @Override
+                            public void onSuccess(AcaoResponse resultado) {
+                                callback.onSuccess(resultado);
+                            }
+                            @Override
+                            public void onError(String mensagem) {
+                                callback.onError(mensagem);
+                            }
+                        }
+                );
+                break;
+            case MOEDAS:
+                acaoRepository.listarMoedas(
+                        pagina, limite, search, sortBy, sortOrder,
+                        new AcaoRepository.acaoCallback() {
+                            @Override
+                            public void onSuccess(AcaoResponse resultado) {
+                                callback.onSuccess(resultado);
+                            }
+                            @Override
+                            public void onError(String mensagem) {
+                                callback.onError(mensagem);
+                            }
+                        }
+                );
+                break;
             default:
                 callback.onError("Tipo de mercado não suportado.");
                 break;
