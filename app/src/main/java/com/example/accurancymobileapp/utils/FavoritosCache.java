@@ -30,6 +30,7 @@ public final class FavoritosCache {
         if (limpa.startsWith("cripto")) return "Cripto";
         if (limpa.startsWith("futuro")) return "Futuros";
         if (limpa.startsWith("internacional")) return "Internacional";
+        if (limpa.startsWith("renda")) return "Renda Fixa";
         return null;
     }
 

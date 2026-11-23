@@ -31,13 +31,26 @@
 
             <TextView
                 android:id="@+id/tvIndexador"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
+                android:layout_weight="1"
                 android:text="LCA"
                 android:textColor="#9BAAC0"
                 android:textSize="10sp"
                 android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnFavoritoTitulo"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="-9dp"
+                android:layout_marginEnd="-9dp"
+                android:layout_marginBottom="-9dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Adicionar aos favoritos"
+                android:padding="9dp"
+                android:src="@drawable/ic_favorito_vazio" />
 
         </LinearLayout>
 

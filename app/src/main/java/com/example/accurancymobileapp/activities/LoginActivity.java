@@ -21,6 +21,10 @@ import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.utils.SessionManager;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,7 +35,6 @@ public class LoginActivity extends AppCompatActivity {
     EditText editEmail;
     EditText editSenha;
     EditText txtNome;
-    EditText txtCpf;
     EditText txtCelular;
     EditText txtEmailCadastro;
     EditText txtSenhaCadastro;
@@ -62,7 +65,6 @@ public class LoginActivity extends AppCompatActivity {
         editEmail = findViewById(R.id.editEmail);
         editSenha = findViewById(R.id.editSenha);
         txtNome = findViewById(R.id.txtNome);
-        txtCpf = findViewById(R.id.txtCpf);
         txtCelular = findViewById(R.id.txtCelular);
         txtEmailCadastro = findViewById(R.id.txtEmailCadastro);
         txtSenhaCadastro = findViewById(R.id.txtSenhaCadastro);
@@ -112,7 +114,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String nome = txtNome.getText().toString().trim();
-                String cpf = txtCpf.getText().toString().trim();
                 String celular = txtCelular.getText().toString().trim();
                 String email = txtEmailCadastro.getText().toString().trim();
                 String senhaCadastro = txtSenhaCadastro.getText().toString().trim();
@@ -121,10 +122,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(nome.isEmpty()){
                     txtNome.setError("Informe o nome");
-                    return;
-                }
-                if(cpf.isEmpty()){
-                    txtCpf.setError("Informe o CPF");
                     return;
                 }
                 if(celular.isEmpty()){
@@ -149,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-                fazerRegistro(nome, celular, cpf, senhaCadastro, email);
+                fazerRegistro(nome, celular, senhaCadastro, email);
 
             }
         });
@@ -334,18 +331,28 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void fazerRegistro(String nome, String telefone, String cpf, String senha, String email){
-        User user = new User(nome, telefone, cpf, senha, email);
+    private void fazerRegistro(String nome, String telefone, String senha, String email){
+        User user = new User(nome, telefone, senha, email);
 
         ApiService api = RetrofitClient.getClient(this).create(ApiService.class);
         api.registerNewUser(user).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful()){
-                    Toast.makeText(LoginActivity.this, "Usuario cadastrado", Toast.LENGTH_LONG).show();
+                    // The API answers HTTP 200 even for refusals: the JSON "status" says what happened.
+                    JsonObject corpo = lerCorpo(response.body());
+                    String status = corpo != null && corpo.has("status") && !corpo.get("status").isJsonNull()
+                            ? corpo.get("status").getAsString() : "";
+                    if(!"sucesso".equals(status)){
+                        Toast.makeText(LoginActivity.this,
+                                mensagemDoCorpo(corpo, "Não foi possível concluir o cadastro."),
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Toast.makeText(LoginActivity.this,
+                            mensagemDoCorpo(corpo, "Usuario cadastrado"), Toast.LENGTH_LONG).show();
 
                     txtNome.setText("");
-                    txtCpf.setText("");
                     txtCelular.setText("");
                     txtEmailCadastro.setText("");
                     txtSenhaCadastro.setText("");
@@ -362,7 +369,15 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
                 else{
-                    Toast.makeText(LoginActivity.this, "Erro: " + response.code(),Toast.LENGTH_LONG).show();
+                    JsonObject corpo = null;
+                    try {
+                        corpo = lerCorpo(response.errorBody());
+                    } catch (Exception ignored) {
+                        // Falls back to the generic message below.
+                    }
+                    Toast.makeText(LoginActivity.this,
+                            mensagemDoCorpo(corpo, "Não foi possível cadastrar agora (erro " + response.code() + ")."),
+                            Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -371,6 +386,29 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Erro" + throwable.toString(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    /** Reads a JSON object from a response body; null when it is empty or not a JSON object. */
+    private static JsonObject lerCorpo(ResponseBody corpo) {
+        if (corpo == null) return null;
+        try {
+            JsonElement elemento = JsonParser.parseString(corpo.string());
+            return elemento.isJsonObject() ? elemento.getAsJsonObject() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String mensagemDoCorpo(JsonObject corpo, String padrao) {
+        if (corpo != null) {
+            for (String chave : new String[]{"mensagem", "message"}) {
+                if (corpo.has(chave) && !corpo.get(chave).isJsonNull()) {
+                    String texto = corpo.get(chave).getAsString();
+                    if (!texto.trim().isEmpty()) return texto;
+                }
+            }
+        }
+        return padrao;
     }
 
     public void isLoggedVerify(){
