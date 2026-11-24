@@ -64,6 +64,15 @@ public class AuthInterceptor implements Interceptor {
         Response response = chain.proceed(request);
 
         if (response.code() == 401) {
+            String corpoErro401 = "";
+            try {
+                corpoErro401 = response.peekBody(4096).string();
+            } catch (IOException erroLeitura) {
+                Log.w("AUTH", "Não foi possível ler o corpo do HTTP 401.", erroLeitura);
+            }
+
+            Log.w("AUTH", "HTTP 401 recebido: " + resumirRespostaAuth(corpoErro401));
+            Log.d("AUTH", "Tentando renovar token...");
 
             Log.d("AUTH", "401 recebido. Tentando renovar token...");
 
@@ -162,10 +171,7 @@ public class AuthInterceptor implements Interceptor {
                         "Refresh HTTP: " + refreshResponse.code()
                 );
 
-                Log.d(
-                        "AUTH",
-                        "Refresh response: " + responseBody
-                );
+                Log.d("AUTH", "Refresh response summary: " + resumirRespostaAuth(responseBody));
 
                 if (!refreshResponse.isSuccessful()) {
 
@@ -281,6 +287,43 @@ public class AuthInterceptor implements Interceptor {
         }
     }
 
+    // Keep authentication diagnostics useful without writing access or refresh tokens to Logcat.
+    private String resumirRespostaAuth(String body) {
+        if (body == null || body.trim().isEmpty()) {
+            return "corpo vazio";
+        }
+
+        try {
+            JsonElement element = JsonParser.parseString(body);
+            if (!element.isJsonObject()) {
+                return "resposta JSON sem objeto";
+            }
+
+            JsonObject object = element.getAsJsonObject();
+            StringBuilder summary = new StringBuilder();
+            String[] safeFields = {"success", "erro", "message", "mensagem", "detalhe"};
+
+            for (String field : safeFields) {
+                if (!object.has(field) || object.get(field).isJsonNull()) {
+                    continue;
+                }
+
+                String value = object.get(field).getAsString();
+                if (value.length() > 180) {
+                    value = value.substring(0, 180) + "...";
+                }
+
+                if (summary.length() > 0) {
+                    summary.append(" | ");
+                }
+                summary.append(field).append("=").append(value);
+            }
+
+            return summary.length() == 0 ? "JSON sem campos de diagnóstico" : summary.toString();
+        } catch (Exception ignored) {
+            return "resposta não JSON ou inválida";
+        }
+    }
     private String chainUrlParaRefresh() {
 
         return BuildConfig.API_URL + "auth/refresh";
