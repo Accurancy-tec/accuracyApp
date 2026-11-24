@@ -22,6 +22,7 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.response.LoginResponse;
 import com.example.accurancymobileapp.response.PerfilResponse;
 import com.example.accurancymobileapp.utils.GoogleEntrar;
+import com.example.accurancymobileapp.utils.TutorialPrefs;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 import com.example.accurancymobileapp.utils.ApiErros;
 import com.example.accurancymobileapp.model.User;
@@ -71,6 +72,8 @@ public class LoginActivity extends AppCompatActivity {
                 if (resultado.getResultCode() == RESULT_OK && resultado.getData() != null) {
                     String confirmado = resultado.getData()
                             .getStringExtra(VerificarEmailActivity.EXTRA_EMAIL);
+                    // New account just confirmed: the tour opens on the first entry.
+                    TutorialPrefs.marcarPendente(this, confirmado);
                     mostrarAbaEntrar();
                     if (confirmado != null) editEmail.setText(confirmado);
                     editSenha.setText("");
@@ -510,6 +513,13 @@ public class LoginActivity extends AppCompatActivity {
                         && login.getToken() != null && login.getRefreshToken() != null) {
                     sessionManager.saveTokens(login.getToken(), login.getRefreshToken());
                     String nome = login.getUser() != null ? login.getUser().getNome_usuario() : null;
+                    // The API does not say whether the Google account is new, so the tour is offered
+                    // once per account on this device.
+                    String emailGoogle = login.getUser() != null ? login.getUser().getEmail_usuario() : null;
+                    if (emailGoogle != null && !emailGoogle.isEmpty()
+                            && !TutorialPrefs.jaViu(LoginActivity.this, emailGoogle)) {
+                        TutorialPrefs.marcarPendente(LoginActivity.this, emailGoogle);
+                    }
                     Toast.makeText(LoginActivity.this,
                             nome != null && !nome.isEmpty() ? "Bem-vindo " + nome : "Bem-vindo!",
                             Toast.LENGTH_LONG).show();

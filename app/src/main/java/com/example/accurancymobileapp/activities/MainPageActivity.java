@@ -16,6 +16,8 @@ import com.example.accurancymobileapp.fragments.DashboardFragment;
 import com.example.accurancymobileapp.fragments.HistoricFragment;
 import com.example.accurancymobileapp.fragments.ProfileFragment;
 import com.example.accurancymobileapp.fragments.WalletFragment;
+import com.example.accurancymobileapp.utils.TutorialPrefs;
+import com.example.accurancymobileapp.utils.TutorialTour;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainPageActivity extends AppCompatActivity {
@@ -38,6 +40,15 @@ public class MainPageActivity extends AppCompatActivity {
 
         if(savedInstanceState == null){
             bottomNavigation.setSelectedItemId(R.id.nav_home);
+
+            // First access after creating the account: walk the user through the app.
+            if (TutorialPrefs.pendente(this)) {
+                findViewById(R.id.main).postDelayed(() -> {
+                    if (!isFinishing() && !isDestroyed()) {
+                        TutorialTour.iniciar(this, true);
+                    }
+                }, 900L);
+            }
         }
     }
 

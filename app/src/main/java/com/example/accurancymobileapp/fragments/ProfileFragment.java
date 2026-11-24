@@ -33,6 +33,7 @@ import com.example.accurancymobileapp.utils.FotoPerfil;
 import com.example.accurancymobileapp.utils.PerfilCache;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 import com.example.accurancymobileapp.utils.SessionManager;
+import com.example.accurancymobileapp.utils.TutorialTour;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -88,6 +89,8 @@ public class ProfileFragment extends Fragment {
         view.findViewById(R.id.itemEmail).setOnClickListener(v -> abrirTrocaEmail());
         view.findViewById(R.id.itemAlterarSenha).setOnClickListener(v -> abrirTrocaSenha());
         view.findViewById(R.id.itemSeguranca).setOnClickListener(v -> abrirTrocaSenha());
+        view.findViewById(R.id.itemReverTutorial).setOnClickListener(
+                v -> TutorialTour.iniciar(requireActivity(), false));
         btnAlterarFoto.setOnClickListener(v -> seletorFoto.launch("image/*"));
         imgFoto.setOnClickListener(v -> seletorFoto.launch("image/*"));
         view.findViewById(R.id.itemNotificacoes).setOnClickListener(v -> emBreve("Notificações"));
