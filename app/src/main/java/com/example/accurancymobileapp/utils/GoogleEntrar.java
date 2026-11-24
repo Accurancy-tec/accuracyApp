@@ -16,7 +16,6 @@ import androidx.credentials.exceptions.NoCredentialException;
 
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException;
 
 /**
  * "Sign in with Google" through the Android Credential Manager. It only gets the Google id_token;
@@ -60,7 +59,9 @@ public final class GoogleEntrar {
                                 GoogleIdTokenCredential google = GoogleIdTokenCredential
                                         .createFrom(((CustomCredential) credencial).getData());
                                 resultado.aoObterToken(google.getIdToken());
-                            } catch (GoogleIdTokenParsingException e) {
+                            } catch (Exception e) {
+                                // createFrom throws a parsing exception on bad data; in googleid 1.1.1 it is
+                                // no longer a declared (checked) exception, so catch broadly.
                                 resultado.aoFalhar("Não foi possível ler a resposta do Google.");
                             }
                         } else {
