@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tag used by Esqueleto to remember what a view looked like before the placeholder. -->
+    <item name="tag_esqueleto" type="id" />
+    <!-- Corner radius of a ShimmerView (a big value makes a circle). -->
+    <declare-styleable name="ShimmerView">
+        <attr name="raioShimmer" format="dimension" />
+    </declare-styleable>
+</resources>

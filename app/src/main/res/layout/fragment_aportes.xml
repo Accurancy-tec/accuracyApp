@@ -73,6 +73,89 @@
 
                 </LinearLayout>
 
+                <!-- Busca geral: acha qualquer produto, em qualquer categoria -->
+                <LinearLayout
+                    android:id="@+id/containerBuscaGeral"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_carteira_card"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="6dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_busca"
+                        app:tint="#9BAAC0" />
+
+                    <EditText
+                        android:id="@+id/edtBuscaGeral"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="Buscar ativo, título ou moeda"
+                        android:imeOptions="actionSearch"
+                        android:importantForAutofill="no"
+                        android:inputType="text"
+                        android:padding="0dp"
+                        android:singleLine="true"
+                        android:textColor="#F1F5FC"
+                        android:textColorHint="#8291A8"
+                        android:textSize="13sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnLimparBuscaGeral"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Limpar busca"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_limpar_busca"
+                        android:visibility="gone"
+                        app:tint="#9BAAC0" />
+                </LinearLayout>
+
+                <!-- Resultados da busca (aparecem no lugar dos cards) -->
+                <LinearLayout
+                    android:id="@+id/containerResultadosBusca"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvBuscaGeral"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        android:overScrollMode="never" />
+
+                    <TextView
+                        android:id="@+id/tvBuscaMensagem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:gravity="center"
+                        android:lineSpacingMultiplier="1.15"
+                        android:textColor="#8D9DB3"
+                        android:textSize="13sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <!-- Cards das categorias -->
+                <LinearLayout
+                    android:id="@+id/containerCardsProdutos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
                 <!-- Primeira linha -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -349,6 +432,8 @@
                             android:textSize="11sp" />
 
                     </LinearLayout>
+
+                </LinearLayout>
 
                 </LinearLayout>
 

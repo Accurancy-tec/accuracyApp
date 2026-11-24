@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.HistoricAdapter;
+import com.example.accurancymobileapp.adapter.EsqueletoAdapter;
+import com.example.accurancymobileapp.utils.Esqueleto;
 import com.example.accurancymobileapp.model.Aporte;
 import com.example.accurancymobileapp.network.repository.HistoricRepository;
 import com.example.accurancymobileapp.ui.ChartHelper;
@@ -36,6 +38,8 @@ public class HistoricFragment extends Fragment {
     private TextView btnCompra, btnVenda, btnTodos;
     private TextView btnSemana, btnMes, btnAno;
     private ComposeView graficoHistorico;
+    private View esqueletoGrafico;
+    private boolean carregouAlgumaVez = false;
     private final List<Aporte> listaHistorico = new ArrayList<>();
     private HistoricAdapter adapter;
     private PuxarParaAtualizar puxar;
@@ -66,6 +70,7 @@ public class HistoricFragment extends Fragment {
         btnMes = view.findViewById(R.id.btnMes);
         btnAno = view.findViewById(R.id.btnAno);
         graficoHistorico = view.findViewById(R.id.graficoHistorico);
+        esqueletoGrafico = view.findViewById(R.id.esqueletoGraficoHistorico);
 
         btnSemana.setOnClickListener(v -> selecionarPeriodo(PeriodoHistorico.SEMANA, btnSemana));
         btnMes.setOnClickListener(v -> selecionarPeriodo(PeriodoHistorico.MES, btnMes));
@@ -90,7 +95,26 @@ public class HistoricFragment extends Fragment {
         carregarHistorico();
     }
 
+    /** First load (or a reload with nothing on screen): placeholder rows and chart bar. */
+    private void mostrarCarregando() {
+        if (carregouAlgumaVez || puxar.atualizando()) return;
+        EsqueletoAdapter.mostrar(recyclerHistorico, R.layout.item_esqueleto_linha, 6);
+        graficoHistorico.setVisibility(View.INVISIBLE);
+        esqueletoGrafico.setVisibility(View.VISIBLE);
+    }
+
+    private void terminarCarregando() {
+        carregouAlgumaVez = true;
+        EsqueletoAdapter.ocultar(recyclerHistorico, adapter);
+        if (esqueletoGrafico.getVisibility() == View.VISIBLE) {
+            esqueletoGrafico.setVisibility(View.GONE);
+            graficoHistorico.setVisibility(View.VISIBLE);
+            Esqueleto.revelar(graficoHistorico);
+        }
+    }
+
     private void carregarHistorico() {
+        mostrarCarregando();
         puxar.iniciar();
         new HistoricRepository(requireContext()).buscarHistorico(new HistoricRepository.HistoricCallback() {
             @Override
@@ -100,6 +124,7 @@ public class HistoricFragment extends Fragment {
                 listaHistorico.clear();
                 if (historico != null) listaHistorico.addAll(historico);
                 aplicarFiltros();
+                terminarCarregando();
             }
 
             @Override
@@ -109,6 +134,7 @@ public class HistoricFragment extends Fragment {
                 Log.e("HISTORICO_APORTES", message == null ? "Erro sem mensagem" : message);
                 Toast.makeText(requireContext(), "Não foi possível carregar o histórico.", Toast.LENGTH_SHORT).show();
                 aplicarFiltros();
+                terminarCarregando();
             }
         });
     }

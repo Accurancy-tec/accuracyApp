@@ -21,6 +21,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.FormAdicionarSaldoActivity;
 import com.example.accurancymobileapp.adapter.EmphasisAdapter;
+import com.example.accurancymobileapp.adapter.EsqueletoAdapter;
+import com.example.accurancymobileapp.model.User;
+import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.utils.Esqueleto;
+import com.example.accurancymobileapp.utils.PerfilCache;
+import com.example.accurancymobileapp.utils.PerfilCallback;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
@@ -48,7 +54,10 @@ public class DashboardFragment extends Fragment {
     private Spinner spFiltroDestaques;
     private TextView tvDestaquesVazio, btnAdicionarSaldo;
     private WalletRepository walletRepository;
-    private TextView tvSaldoLivre;
+    private TextView tvSaldoLivre, tvSaldoTotal, tvInvestido, tvRendimento, tvNomeUsuario;
+    private View esqueletoGrafico;
+    private Double saldoLivre;
+    private Double investido;
     private PuxarParaAtualizar puxar;
     private String filtroDestaque = "Mais caros";
     private boolean primeiraRetomada = true;
@@ -79,13 +88,22 @@ public class DashboardFragment extends Fragment {
         btnAdicionarSaldo = view.findViewById(R.id.btnAdicionarSaldo);
         tvSaldoDisponivel = view.findViewById(R.id.tvSaldoDisponivel);
         tvSaldoLivre = view.findViewById(R.id.tvSaldoLivre);
+        tvSaldoTotal = view.findViewById(R.id.tvSaldoTotal);
+        tvInvestido = view.findViewById(R.id.tvInvestido);
+        tvRendimento = view.findViewById(R.id.tvRendimento);
+        tvNomeUsuario = view.findViewById(R.id.tvNomeUsuario);
+        esqueletoGrafico = view.findViewById(R.id.esqueletoGrafico);
         walletRepository = new WalletRepository(requireContext());
         puxar = new PuxarParaAtualizar(view.findViewById(R.id.swipeDashboard), this::atualizarTudo);
 
+        // Shimmering bars where the numbers will appear; each one is released when its data arrives.
+        Esqueleto.iniciar(tvSaldoTotal, tvInvestido, tvSaldoLivre, tvSaldoDisponivel);
+        carregarNome();
         carregarGrafico(periodo);
         recicleView();
         timeInvested();
         carregarSaldo();
+        carregarInvestido();
 
         btnAdicionarSaldo.setOnClickListener(v -> {
             Intent it = new Intent(requireContext(), FormAdicionarSaldoActivity.class);
@@ -113,6 +131,12 @@ public class DashboardFragment extends Fragment {
     private void carregarDestques(String type) {
         ApiService api = RetrofitClient.getClient(requireContext()).create(ApiService.class);
 
+        tvDestaquesVazio.setVisibility(View.GONE);
+        // Placeholder rows, unless the pull-to-refresh spinner is already showing.
+        if (!puxar.atualizando()) {
+            EsqueletoAdapter.mostrar(recyclerInvestimentos, R.layout.item_esqueleto_linha, 3);
+        }
+
         api.buscarLista(type).enqueue(puxar.acompanhar(new Callback<ApiResponse>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {
@@ -122,6 +146,7 @@ public class DashboardFragment extends Fragment {
                 }
 
                 if (!response.isSuccessful() || response.body() == null) {
+                    EsqueletoAdapter.ocultar(recyclerInvestimentos, new EmphasisAdapter(new ArrayList<>()));
                     String erro = "";
                     try {
                         if (response.errorBody() != null) erro = response.errorBody().string();
@@ -135,10 +160,11 @@ public class DashboardFragment extends Fragment {
 
                 if (aportes == null) {
                     Log.e("DASHBOARD", "Lista de aportes nula");
+                    EsqueletoAdapter.ocultar(recyclerInvestimentos, new EmphasisAdapter(new ArrayList<>()));
                     return;
                 }
 
-                recyclerInvestimentos.setAdapter(new EmphasisAdapter(aportes));
+                EsqueletoAdapter.ocultar(recyclerInvestimentos, new EmphasisAdapter(aportes));
 
                 if (aportes.isEmpty()) {
                     tvDestaquesVazio.setText(
@@ -158,6 +184,7 @@ public class DashboardFragment extends Fragment {
                     return;
                 }
 
+                EsqueletoAdapter.ocultar(recyclerInvestimentos, new EmphasisAdapter(new ArrayList<>()));
                 Toast.makeText(requireContext(), "Erro ao mostrar aportes", LENGTH_LONG).show();
 
                 Log.e("DASHBOARD", "Erro ao carregar aportes", t);
@@ -168,6 +195,12 @@ public class DashboardFragment extends Fragment {
     private void carregarGrafico(String periodo) {
 
         VicoService vico = RetrofitClient.getClient(requireContext()).create(VicoService.class);
+
+        // Placeholder instead of the chart until the new period arrives (not while pulling to refresh).
+        if (!puxar.atualizando()) {
+            ctvChart.setVisibility(View.INVISIBLE);
+            esqueletoGrafico.setVisibility(View.VISIBLE);
+        }
 
         vico.getEvolucao(periodo).enqueue(puxar.acompanhar(new Callback<VicoResponse>() {
 
@@ -237,7 +270,10 @@ public class DashboardFragment extends Fragment {
 
     private void mostrarGrafico(List<String> datas, List<Double> valores, String periodo) {
 
+        boolean eraPlaceholder = esqueletoGrafico.getVisibility() == View.VISIBLE;
+        esqueletoGrafico.setVisibility(View.GONE);
         ctvChart.setVisibility(View.VISIBLE);
+        if (eraPlaceholder) Esqueleto.revelar(ctvChart);
 
         ChartHelper.configurarGraficoEvolucao(
                 ctvChart,
@@ -289,8 +325,95 @@ public class DashboardFragment extends Fragment {
         btn.setBackgroundResource(R.drawable.bg_periodo_selecionado);
     }
 
-    private void name() {
-        //TODO: adicionar logica para buscar nome do usuario
+    /** Greeting with the first name; the last profile read is shown at once while it refreshes. */
+    private void carregarNome() {
+        User conhecido = PerfilCache.obter();
+        if (conhecido != null && conhecido.getNome_usuario() != null) {
+            mostrarNome(conhecido.getNome_usuario());
+        } else {
+            Esqueleto.iniciar(tvNomeUsuario);
+        }
+        RetrofitClient.getApiService(requireContext()).perfilObter().enqueue(new PerfilCallback(this) {
+            @Override
+            public void aoSucesso(PerfilResponse resposta) {
+                User usuario = resposta.getUser();
+                if (usuario == null) {
+                    aoErro("");
+                    return;
+                }
+                PerfilCache.guardar(usuario);
+                mostrarNome(usuario.getNome_usuario());
+            }
+
+            @Override
+            public void aoErro(String mensagem) {
+                if (Esqueleto.ativo(tvNomeUsuario)) {
+                    tvNomeUsuario.setText("Olá");
+                    Esqueleto.parar(tvNomeUsuario);
+                }
+            }
+        });
+    }
+
+    private void mostrarNome(String nomeCompleto) {
+        String nome = nomeCompleto == null ? "" : nomeCompleto.trim();
+        String primeiro = nome.isEmpty() ? "" : nome.split("\\s+")[0];
+        tvNomeUsuario.setText(primeiro.isEmpty() ? "Olá" : "Olá, " + primeiro);
+        Esqueleto.parar(tvNomeUsuario);
+    }
+
+    private static String reais(double valor) {
+        return NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(valor);
+    }
+
+    /** Total = free balance + what is invested; only shown when both are known. */
+    private void atualizarTotal() {
+        if (saldoLivre == null || investido == null) return;
+        tvSaldoTotal.setText(reais(saldoLivre + investido));
+        Esqueleto.parar(tvSaldoTotal);
+    }
+
+    /** What the person holds in assets today, from the portfolio distribution (all wallets). */
+    private void carregarInvestido() {
+        puxar.iniciar();
+        RetrofitClient.getClient(requireContext()).create(VicoService.class)
+                .getDistribuicao(null).enqueue(new Callback<VicoResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<VicoResponse> call, @NonNull Response<VicoResponse> response) {
+                        puxar.concluir();
+                        if (!isAdded() || getView() == null) return;
+                        VicoResponse corpo = response.body();
+                        if (!response.isSuccessful() || corpo == null || !corpo.isSucesso()) {
+                            falhaInvestido();
+                            return;
+                        }
+                        double soma = 0;
+                        if (corpo.getDistribuicao() != null) {
+                            for (VicoResponse.Distribuicao d : corpo.getDistribuicao()) {
+                                if (d != null && Double.isFinite(d.getValor())) soma += d.getValor();
+                            }
+                        }
+                        investido = soma;
+                        tvInvestido.setText(reais(soma));
+                        Esqueleto.parar(tvInvestido);
+                        atualizarTotal();
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<VicoResponse> call, @NonNull Throwable t) {
+                        puxar.concluir();
+                        if (!isAdded() || getView() == null) return;
+                        falhaInvestido();
+                    }
+                });
+    }
+
+    private void falhaInvestido() {
+        if (investido == null) {
+            tvInvestido.setText("—");
+            tvSaldoTotal.setText("—");
+        }
+        Esqueleto.parar(tvInvestido, tvSaldoTotal);
     }
 
     /** Reloads everything on the screen (pull to refresh and return from another screen). */
@@ -298,6 +421,7 @@ public class DashboardFragment extends Fragment {
         carregarGrafico(periodo);
         carregarDestques(filtroDestaque);
         carregarSaldo();
+        carregarInvestido();
     }
 
     @Override
@@ -319,19 +443,29 @@ public class DashboardFragment extends Fragment {
                 puxar.concluir();
                 if (!isAdded()) return;
                 try {
-                    NumberFormat formato = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"));
-                    String texto = formato.format(Double.parseDouble(saldo.trim()));
+                    double valor = Double.parseDouble(saldo.trim());
+                    saldoLivre = valor;
+                    String texto = reais(valor);
                     tvSaldoDisponivel.setText(texto);
                     if (tvSaldoLivre != null) tvSaldoLivre.setText(texto);
+                    atualizarTotal();
                 } catch (NumberFormatException ignored) {
                     // Keep what is on screen.
                 }
+                Esqueleto.parar(tvSaldoDisponivel, tvSaldoLivre);
             }
 
             @Override
             public void onError(String message) {
                 puxar.concluir();
-                // Keep the previous value; the balance is validated by the server on every operation.
+                if (!isAdded()) return;
+                // Keep the previous value (the server validates the balance on every operation);
+                // without one, show a dash instead of an endless placeholder.
+                if (saldoLivre == null) {
+                    tvSaldoDisponivel.setText("—");
+                    tvSaldoLivre.setText("—");
+                }
+                Esqueleto.parar(tvSaldoDisponivel, tvSaldoLivre);
             }
         });
     }

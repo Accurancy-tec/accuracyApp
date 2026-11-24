@@ -28,6 +28,7 @@ import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.utils.Esqueleto;
 import com.example.accurancymobileapp.utils.FotoPerfil;
 import com.example.accurancymobileapp.utils.PerfilCache;
 import com.example.accurancymobileapp.utils.PerfilCallback;
@@ -130,6 +131,12 @@ public class ProfileFragment extends Fragment {
             @Override
             public void aoErro(String mensagem) {
                 if (usuario == null) {
+                    Esqueleto.parar(txtNomePerfil, txtEmailPerfil, txtNomeConta, txtEmailConta, txtTelefoneConta);
+                    txtNomePerfil.setText("Não foi possível carregar");
+                    txtEmailPerfil.setText("Abra a aba de novo para tentar outra vez");
+                    txtNomeConta.setText("—");
+                    txtEmailConta.setText("—");
+                    txtTelefoneConta.setText("—");
                     Toast.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
                 }
             }
@@ -138,15 +145,19 @@ public class ProfileFragment extends Fragment {
 
     private void mostrarUsuario() {
         if (usuario == null) {
-            txtNomePerfil.setText("Carregando...");
-            txtEmailPerfil.setText("");
-            txtNomeConta.setText("—");
-            txtEmailConta.setText("—");
-            txtTelefoneConta.setText("—");
+            // Nothing known yet: shimmering bars (the texts only give them a width).
+            txtNomePerfil.setText("Carregando nome");
+            txtEmailPerfil.setText("carregando@email.com");
+            txtNomeConta.setText("Carregando nome");
+            txtEmailConta.setText("carregando@email.com");
+            txtTelefoneConta.setText("(00) 00000-0000");
+            Esqueleto.iniciar(txtNomePerfil, txtEmailPerfil, txtNomeConta, txtEmailConta, txtTelefoneConta);
             txtEmailExtra.setVisibility(View.GONE);
             mostrarFoto(null, null);
             return;
         }
+        // Real data: give the views their normal look back before setting texts and colors.
+        Esqueleto.parar(txtNomePerfil, txtEmailPerfil, txtNomeConta, txtEmailConta, txtTelefoneConta);
         String nome = valor(usuario.getNome_usuario());
         String email = valor(usuario.getEmail_usuario());
         String telefone = valor(usuario.getTelefone_usuario());
