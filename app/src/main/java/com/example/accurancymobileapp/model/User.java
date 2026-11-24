@@ -6,6 +6,9 @@ public class User {
     private String email_usuario;
     private String senha_usuario;
     private String telefone_usuario;
+    private String foto_usuario;
+    private Boolean email_verificado_usuario;
+    private Boolean google_vinculado;
 
     public User(String nome_usuario, String telefone_usuario, String senha_usuario, String email_usuario) {
         this.nome_usuario = nome_usuario;
@@ -65,5 +68,17 @@ public class User {
 
     public void setTelefone_usuario(String telefone_usuario) {
         this.telefone_usuario = telefone_usuario;
+    }
+
+    public String getFoto_usuario() {
+        return foto_usuario;
+    }
+
+    public boolean isEmailVerificado() {
+        return Boolean.TRUE.equals(email_verificado_usuario);
+    }
+
+    public boolean isGoogleVinculado() {
+        return Boolean.TRUE.equals(google_vinculado);
     }
 }

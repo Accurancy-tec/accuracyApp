@@ -78,6 +78,23 @@
                         android:src="@android:drawable/ic_menu_myplaces"
                         app:tint="@color/text_primary" />
 
+                    <TextView
+                        android:id="@+id/txtIniciaisPerfil"
+                        android:layout_width="112dp"
+                        android:layout_height="112dp"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:textSize="38sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <ProgressBar
+                        android:id="@+id/progressoFoto"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone" />
+
                     <ImageButton
                         android:id="@+id/btnAlterarFoto"
                         android:layout_width="36dp"
@@ -96,7 +113,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
-                    android:text="João Davi"
+                    android:text=""
                     android:textColor="@color/text_primary"
                     android:textSize="23sp"
                     android:textStyle="bold" />
@@ -106,7 +123,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
-                    android:text="joaodavi@email.com"
+                    android:text=""
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
 
@@ -180,7 +197,7 @@
                             android:id="@+id/txtNomeConta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="João Davi Silva"
+                            android:text="—"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
@@ -237,9 +254,18 @@
                             android:id="@+id/txtEmailConta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="joaodavi@email.com"
+                            android:text="—"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/txtEmailExtra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:textColor="@color/green_positive"
+                            android:textSize="12sp"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
@@ -294,7 +320,7 @@
                             android:id="@+id/txtTelefoneConta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="(11) 99999-4321"
+                            android:text="—"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 

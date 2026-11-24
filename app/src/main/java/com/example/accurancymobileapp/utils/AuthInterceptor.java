@@ -337,7 +337,11 @@ public class AuthInterceptor implements Interceptor {
 
         return path.endsWith("auth/login") ||
                 path.endsWith("auth/registrarNovoUsuario") ||
-                path.endsWith("auth/refresh");
+                path.endsWith("auth/refresh") ||
+                path.endsWith("auth/loginGoogle") ||
+                path.endsWith("auth/googleConfig") ||
+                path.endsWith("auth/verify-email") ||
+                path.endsWith("auth/resend-verification");
     }
 
     private Response createUnauthorizedResponse(Request request) {

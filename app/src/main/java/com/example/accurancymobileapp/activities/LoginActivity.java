@@ -12,18 +12,27 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.response.LoginResponse;
+import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.utils.GoogleEntrar;
+import com.example.accurancymobileapp.utils.PerfilCallback;
+import com.example.accurancymobileapp.utils.ApiErros;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.utils.SessionManager;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -52,7 +61,23 @@ public class LoginActivity extends AppCompatActivity {
     View layoutRegister;
 
     private boolean senhaVisivel = false;
+    private boolean googleEmAndamento = false;
     private SessionManager sessionManager;
+
+    /** The verification screen answers with the confirmed e-mail so the login field is already filled. */
+    private final ActivityResultLauncher<Intent> verificacaoLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            resultado -> {
+                if (resultado.getResultCode() == RESULT_OK && resultado.getData() != null) {
+                    String confirmado = resultado.getData()
+                            .getStringExtra(VerificarEmailActivity.EXTRA_EMAIL);
+                    mostrarAbaEntrar();
+                    if (confirmado != null) editEmail.setText(confirmado);
+                    editSenha.setText("");
+                    editSenha.requestFocus();
+                    Toast.makeText(this, "E-mail confirmado. Agora é só entrar.", Toast.LENGTH_LONG).show();
+                }
+            });
 
 
     @Override
@@ -129,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
                 if(email.isEmpty()){
-                    editEmail.setError("Informe o E-mail.");
+                    txtEmailCadastro.setError("Informe o E-mail.");
                     return;
                 }
                 if(senhaCadastro.isEmpty()){
@@ -204,14 +229,7 @@ public class LoginActivity extends AppCompatActivity {
         tabEntrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                layoutLogin.setVisibility(View.VISIBLE);
-                layoutRegister.setVisibility(View.GONE);
-
-                tabEntrar.setBackgroundResource(R.drawable.bg_tab_active);
-                tabCadastrar.setBackgroundResource(0);
-
-                tabCadastrar.setTextColor(getColor(R.color.text_secondary));
-                tabEntrar.setTextColor(getColor(R.color.text_primary));
+                mostrarAbaEntrar();
             }
         });
 
@@ -219,9 +237,7 @@ public class LoginActivity extends AppCompatActivity {
         btnGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Toast.makeText(LoginActivity.this,
-                        "Login com Google (em breve)", Toast.LENGTH_SHORT).show();
+                entrarComGoogle();
             }
         });
 
@@ -253,7 +269,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Método de login
-    private void fazerLogin(String email, String senha) {
+    private void fazerLogin(final String email, String senha) {
         User user = new User();
         user.setEmail_usuario(email);
         user.setSenha_usuario(senha);
@@ -291,6 +307,15 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 LoginResponse login = response.body();
+
+                if (login.isEmailNaoVerificado()) {
+                    // Right password, but the e-mail was never confirmed: ask for the code (a new one is sent).
+                    Toast.makeText(LoginActivity.this,
+                            login.getMessage() != null ? login.getMessage() : "Confirme seu e-mail para entrar.",
+                            Toast.LENGTH_LONG).show();
+                    abrirVerificacao(login.getEmailUsuario() != null ? login.getEmailUsuario() : email, true);
+                    return;
+                }
 
                 if (login.isSuccess()) {
                     User usuario = login.getUser();
@@ -352,6 +377,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this,
                             mensagemDoCorpo(corpo, "Usuario cadastrado"), Toast.LENGTH_LONG).show();
 
+                    final String emailCadastrado = email;
                     txtNome.setText("");
                     txtCelular.setText("");
                     txtEmailCadastro.setText("");
@@ -367,6 +393,8 @@ public class LoginActivity extends AppCompatActivity {
                     tabCadastrar.setTextColor(getColor(R.color.text_secondary));
                     tabEntrar.setTextColor(getColor(R.color.text_primary));
 
+                    // The API already e-mailed the code: ask for it now.
+                    abrirVerificacao(emailCadastrado, false);
                 }
                 else{
                     JsonObject corpo = null;
@@ -409,6 +437,108 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         return padrao;
+    }
+
+    private void mostrarAbaEntrar() {
+        layoutLogin.setVisibility(View.VISIBLE);
+        layoutRegister.setVisibility(View.GONE);
+
+        tabEntrar.setBackgroundResource(R.drawable.bg_tab_active);
+        tabCadastrar.setBackgroundResource(0);
+
+        tabCadastrar.setTextColor(getColor(R.color.text_secondary));
+        tabEntrar.setTextColor(getColor(R.color.text_primary));
+    }
+
+    private void abrirVerificacao(String email, boolean enviarCodigoAoAbrir) {
+        Intent it = new Intent(this, VerificarEmailActivity.class);
+        it.putExtra(VerificarEmailActivity.EXTRA_EMAIL, email);
+        it.putExtra(VerificarEmailActivity.EXTRA_ENVIAR_AO_ABRIR, enviarCodigoAoAbrir);
+        verificacaoLauncher.launch(it);
+    }
+
+    /** Google flow: client id from the API, Google account card, id_token to the API, session. */
+    private void entrarComGoogle() {
+        if (googleEmAndamento) return;
+        googleEmAndamento = true;
+        btnGoogle.setEnabled(false);
+        btnGoogle.setAlpha(0.6f);
+
+        final ApiService api = RetrofitClient.getApiService(this);
+        api.googleConfig().enqueue(new PerfilCallback(this) {
+            @Override
+            public void aoSucesso(PerfilResponse resposta) {
+                String clientId = resposta.getClientId();
+                if (clientId == null || clientId.trim().isEmpty()) {
+                    terminarGoogle("Login com Google indisponível no momento.");
+                    return;
+                }
+                GoogleEntrar.iniciar(LoginActivity.this, clientId.trim(), new GoogleEntrar.Resultado() {
+                    @Override
+                    public void aoObterToken(String idToken) {
+                        enviarTokenGoogle(api, idToken);
+                    }
+
+                    @Override
+                    public void aoCancelar() {
+                        terminarGoogle(null);
+                    }
+
+                    @Override
+                    public void aoFalhar(String mensagem) {
+                        terminarGoogle(mensagem);
+                    }
+                });
+            }
+
+            @Override
+            public void aoErro(String mensagem) {
+                terminarGoogle(mensagem);
+            }
+        });
+    }
+
+    private void enviarTokenGoogle(ApiService api, String idToken) {
+        Map<String, String> corpo = new HashMap<>();
+        corpo.put("id_token", idToken);
+        api.loginGoogle(corpo).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                if (isFinishing() || isDestroyed()) return;
+                LoginResponse login = response.body();
+                if (response.isSuccessful() && login != null && login.isSuccess()
+                        && login.getToken() != null && login.getRefreshToken() != null) {
+                    sessionManager.saveTokens(login.getToken(), login.getRefreshToken());
+                    String nome = login.getUser() != null ? login.getUser().getNome_usuario() : null;
+                    Toast.makeText(LoginActivity.this,
+                            nome != null && !nome.isEmpty() ? "Bem-vindo " + nome : "Bem-vindo!",
+                            Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(LoginActivity.this, MainPageActivity.class));
+                    finish();
+                    return;
+                }
+                String mensagem = login != null && login.getMessage() != null
+                        ? login.getMessage()
+                        : ApiErros.mensagem(response.errorBody(),
+                        "Não foi possível entrar com o Google (erro " + response.code() + ").");
+                terminarGoogle(mensagem);
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable erro) {
+                if (isFinishing() || isDestroyed()) return;
+                terminarGoogle("Sem conexão com o servidor. Verifique a internet e tente de novo.");
+            }
+        });
+    }
+
+    private void terminarGoogle(String mensagemOuNulo) {
+        googleEmAndamento = false;
+        btnGoogle.setEnabled(true);
+        btnGoogle.setAlpha(1f);
+        if (mensagemOuNulo != null) {
+            Toast.makeText(this, mensagemOuNulo, Toast.LENGTH_LONG).show();
+        }
     }
 
     public void isLoggedVerify(){
