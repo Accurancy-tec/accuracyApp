@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -156,7 +157,8 @@ public class TutorialOverlay extends FrameLayout {
             View ponto = new View(getContext());
             GradientDrawable fundo = new GradientDrawable();
             fundo.setCornerRadius(8 * dp);
-            fundo.setColor(atual ? 0xFF3B82F6 : (i < ativo ? 0xFF1E4FA8 : 0xFF334155));
+            int cor = atual ? R.color.primary_blue : (i < ativo ? R.color.primaria_forte : R.color.borda_forte);
+            fundo.setColor(ContextCompat.getColor(getContext(), cor));
             ponto.setBackground(fundo);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     (int) ((atual ? 20 : 7) * dp), (int) (7 * dp));

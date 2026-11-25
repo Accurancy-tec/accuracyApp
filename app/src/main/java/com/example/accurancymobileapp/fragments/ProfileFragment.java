@@ -1,10 +1,13 @@
 package com.example.accurancymobileapp.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -23,17 +26,22 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.activities.AjudaActivity;
 import com.example.accurancymobileapp.activities.LoginActivity;
+import com.example.accurancymobileapp.activities.NotificacoesActivity;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.utils.ContadorNotificacoes;
 import com.example.accurancymobileapp.utils.Esqueleto;
 import com.example.accurancymobileapp.utils.FotoPerfil;
 import com.example.accurancymobileapp.utils.PerfilCache;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 import com.example.accurancymobileapp.utils.SessionManager;
+import com.example.accurancymobileapp.utils.TemaApp;
 import com.example.accurancymobileapp.utils.TutorialTour;
+import com.google.android.material.materialswitch.MaterialSwitch;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -41,8 +49,9 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 
 /**
- * Profile tab: shows the account data from the API, lets the person change the name, phone, photo,
- * e-mail and password, and sign out.
+ * Profile tab: shows the account data from the API (each line opens a small card with the
+ * information), lets the person change the name, phone, photo, e-mail, password and the app
+ * theme, opens help and notifications, and signs out.
  */
 public class ProfileFragment extends Fragment {
 
@@ -53,10 +62,13 @@ public class ProfileFragment extends Fragment {
     private String urlFotoMostrada;
 
     private TextView txtNomePerfil, txtEmailPerfil, txtIniciais, txtNomeConta, txtEmailConta,
-            txtEmailExtra, txtTelefoneConta;
+            txtEmailExtra, txtTelefoneConta, txtTemaAtual, badgeNotificacoes;
     private ImageView imgFoto;
     private ProgressBar progressoFoto;
     private ImageButton btnAlterarFoto;
+    private View sino;
+    private MaterialSwitch switchTemaEscuro;
+    private boolean trocandoTema = false;
 
     private final ActivityResultLauncher<String> seletorFoto = registerForActivityResult(
             new ActivityResultContracts.GetContent(), uri -> {
@@ -83,35 +95,76 @@ public class ProfileFragment extends Fragment {
         progressoFoto = view.findViewById(R.id.progressoFoto);
         btnAlterarFoto = view.findViewById(R.id.btnAlterarFoto);
 
+        sino = view.findViewById(R.id.btnNotificacoes);
+        badgeNotificacoes = view.findViewById(R.id.tvBadgeNotificacoes);
+        txtTemaAtual = view.findViewById(R.id.txtTemaAtual);
+        switchTemaEscuro = view.findViewById(R.id.switchTemaEscuro);
+
         view.findViewById(R.id.btnEditarPerfil).setOnClickListener(v -> abrirEdicao());
-        view.findViewById(R.id.itemNome).setOnClickListener(v -> abrirEdicao());
-        view.findViewById(R.id.itemTelefone).setOnClickListener(v -> abrirEdicao());
-        view.findViewById(R.id.itemEmail).setOnClickListener(v -> abrirTrocaEmail());
-        view.findViewById(R.id.itemAlterarSenha).setOnClickListener(v -> abrirTrocaSenha());
-        view.findViewById(R.id.itemSeguranca).setOnClickListener(v -> abrirTrocaSenha());
+        view.findViewById(R.id.itemNome).setOnClickListener(v -> mostrarInfoNome());
+        view.findViewById(R.id.itemEmail).setOnClickListener(v -> mostrarInfoEmail());
+        view.findViewById(R.id.itemTelefone).setOnClickListener(v -> mostrarInfoTelefone());
+        view.findViewById(R.id.itemAparencia).setOnClickListener(v -> trocarTema());
+        view.findViewById(R.id.itemPerguntasFrequentes).setOnClickListener(
+                v -> startActivity(AjudaActivity.intent(requireContext(), false)));
+        view.findViewById(R.id.itemFaleConosco).setOnClickListener(
+                v -> startActivity(AjudaActivity.intent(requireContext(), true)));
         view.findViewById(R.id.itemReverTutorial).setOnClickListener(
                 v -> TutorialTour.iniciar(requireActivity(), false));
+        view.findViewById(R.id.itemAlterarSenha).setOnClickListener(v -> abrirTrocaSenha());
+        view.findViewById(R.id.itemSair).setOnClickListener(v -> logoutSession());
+        sino.setOnClickListener(v -> startActivity(new Intent(requireContext(), NotificacoesActivity.class)));
         btnAlterarFoto.setOnClickListener(v -> seletorFoto.launch("image/*"));
         imgFoto.setOnClickListener(v -> seletorFoto.launch("image/*"));
-        view.findViewById(R.id.itemNotificacoes).setOnClickListener(v -> emBreve("Notificações"));
-        view.findViewById(R.id.btnNotificacoes).setOnClickListener(v -> emBreve("Notificações"));
-        view.findViewById(R.id.itemAparencia).setOnClickListener(v -> emBreve("Aparência"));
-        view.findViewById(R.id.itemSair).setOnClickListener(v -> logoutSession());
 
-        // Something changed in one of the cards (data saved, e-mail changed, password changed).
+        // Something changed in one of the cards (data saved, e-mail changed, password changed),
+        // or the info card asked for one of the edit cards.
         getParentFragmentManager().setFragmentResultListener(PerfilSheetBase.RESULTADO_CHAVE,
                 getViewLifecycleOwner(), (chave, resultado) -> {
                     String acao = resultado.getString(PerfilSheetBase.RESULTADO_ACAO, "");
-                    if (PerfilSheetBase.ACAO_SAIR.equals(acao)) {
-                        logoutSession();
-                    } else {
-                        carregarPerfil();
+                    switch (acao) {
+                        case PerfilSheetBase.ACAO_SAIR:
+                            logoutSession();
+                            break;
+                        case PerfilSheetBase.ACAO_EDITAR_DADOS:
+                            abrirEdicao();
+                            break;
+                        case PerfilSheetBase.ACAO_ALTERAR_EMAIL:
+                            abrirTrocaEmail();
+                            break;
+                        default:
+                            carregarPerfil();
                     }
                 });
 
+        mostrarTema();
         usuario = PerfilCache.obter();
         mostrarUsuario();
         carregarPerfil();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ContadorNotificacoes.atualizar(this, sino, badgeNotificacoes);
+    }
+
+    // ---------------------------------------------------------------- theme
+
+    private void mostrarTema() {
+        boolean escuro = !TemaApp.claroAtivo(requireContext());
+        txtTemaAtual.setText(TemaApp.nomeAtual(requireContext()));
+        switchTemaEscuro.setChecked(escuro);
+        switchTemaEscuro.setContentDescription("Tema escuro");
+    }
+
+    /** Liga ou desliga o tema escuro. O switch anima antes de as telas serem recriadas com a nova paleta. */
+    private void trocarTema() {
+        if (trocandoTema) return;
+        trocandoTema = true;
+        switchTemaEscuro.setChecked(!switchTemaEscuro.isChecked());
+        Context contexto = requireContext().getApplicationContext();
+        new Handler(Looper.getMainLooper()).postDelayed(() -> TemaApp.alternar(contexto), 220L);
     }
 
     // ------------------------------------------------------------------ data
@@ -231,9 +284,9 @@ public class ProfileFragment extends Fragment {
         String iniciais = iniciaisDe(nome);
         int padding = Math.round(24 * getResources().getDisplayMetrics().density);
         if (iniciais.isEmpty()) {
-            imgFoto.setImageResource(android.R.drawable.ic_menu_myplaces);
+            imgFoto.setImageResource(R.drawable.ic_pessoa);
             imgFoto.setImageTintList(ColorStateList.valueOf(
-                    ContextCompat.getColor(requireContext(), R.color.text_primary)));
+                    ContextCompat.getColor(requireContext(), R.color.white)));
             imgFoto.setPadding(padding, padding, padding, padding);
             imgFoto.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             txtIniciais.setVisibility(View.GONE);
@@ -335,8 +388,42 @@ public class ProfileFragment extends Fragment {
                 .show(getParentFragmentManager(), AlterarSenhaBottomSheet.TAG_FRAGMENT);
     }
 
-    private void emBreve(String recurso) {
-        Toast.makeText(requireContext(), recurso + " (em breve)", Toast.LENGTH_SHORT).show();
+    // ----------------------------------------------------- info cards (mini janela)
+
+    private void mostrarInfo(InfoPerfilBottomSheet cartao) {
+        if (getParentFragmentManager().findFragmentByTag(InfoPerfilBottomSheet.TAG_FRAGMENT) != null) return;
+        cartao.show(getParentFragmentManager(), InfoPerfilBottomSheet.TAG_FRAGMENT);
+    }
+
+    private void mostrarInfoNome() {
+        if (!perfilPronto()) return;
+        String nome = valor(usuario.getNome_usuario());
+        mostrarInfo(InfoPerfilBottomSheet.nova(R.drawable.ic_pessoa, "Nome",
+                nome.isEmpty() ? "Nenhum nome cadastrado" : nome, null,
+                "É como você aparece no Accuracy, no app e no site.",
+                "Editar nome", PerfilSheetBase.ACAO_EDITAR_DADOS));
+    }
+
+    private void mostrarInfoEmail() {
+        if (!perfilPronto()) return;
+        String email = valor(usuario.getEmail_usuario());
+        mostrarInfo(InfoPerfilBottomSheet.nova(R.drawable.ic_email, "E-mail",
+                email.isEmpty() ? "—" : email,
+                usuario.isGoogleVinculado() ? "Conta Google vinculada" : null,
+                "Usado para entrar na conta e para receber os códigos de confirmação. "
+                        + "Para trocar, confirmamos pelo e-mail atual.",
+                "Alterar e-mail", PerfilSheetBase.ACAO_ALTERAR_EMAIL));
+    }
+
+    private void mostrarInfoTelefone() {
+        if (!perfilPronto()) return;
+        String telefone = valor(usuario.getTelefone_usuario());
+        boolean semTelefone = telefone.isEmpty();
+        mostrarInfo(InfoPerfilBottomSheet.nova(R.drawable.ic_telefone, "Telefone",
+                semTelefone ? "Nenhum telefone cadastrado" : telefone, null,
+                "Opcional. Fica guardado só na sua conta e não aparece para outras pessoas.",
+                semTelefone ? "Adicionar telefone" : "Editar telefone",
+                PerfilSheetBase.ACAO_EDITAR_DADOS));
     }
 
     // ---------------------------------------------------------------- logout

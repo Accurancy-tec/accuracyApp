@@ -29,7 +29,7 @@ public class ShimmerView extends View {
                 a.recycle();
             }
         }
-        shimmer = new ShimmerDrawable(raio);
+        shimmer = new ShimmerDrawable(contexto, raio);
         setBackground(shimmer);
     }
 

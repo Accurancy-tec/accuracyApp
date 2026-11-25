@@ -1,11 +1,13 @@
 package com.example.accurancymobileapp.utils;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.example.accurancymobileapp.R;
 
 /**
  * Pull-to-refresh (drag down from the top) with the app's colors. The screen passes what must be
@@ -18,8 +20,8 @@ public final class PuxarParaAtualizar {
 
     public PuxarParaAtualizar(@NonNull SwipeRefreshLayout layout, @NonNull Runnable aoAtualizar) {
         this.layout = layout;
-        layout.setColorSchemeColors(0xFF3989FF);
-        layout.setProgressBackgroundColorSchemeColor(0xFF0B1729);
+        layout.setColorSchemeColors(ContextCompat.getColor(layout.getContext(), R.color.link));
+        layout.setProgressBackgroundColorSchemeColor(ContextCompat.getColor(layout.getContext(), R.color.card_background));
         layout.setOnRefreshListener(aoAtualizar::run);
     }
 

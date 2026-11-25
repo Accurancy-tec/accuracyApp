@@ -64,6 +64,8 @@ public class MarketListActivity extends AppCompatActivity {
 
     private boolean carregando;
     private boolean temProximaPagina;
+    /** FIIs: a API informa se consegue filtrar por tipo de fundo e ordenar por DY, P/VP e investidores. */
+    private boolean filtrosFiiCompletos = true;
 
     private String searchTerm;
     private String segmentType;
@@ -330,6 +332,16 @@ public class MarketListActivity extends AppCompatActivity {
 
                         AcaoResponse.Paginacao paginacao = resultado.getPaginacao();
 
+                        if (marketType == MarketType.FIIS) {
+                            filtrosFiiCompletos = resultado.temFiltrosDetalhados();
+                            if (!filtrosFiiCompletos && segmentType != null) {
+                                segmentType = null;
+                                Toast.makeText(MarketListActivity.this,
+                                        "O filtro por tipo de fundo está indisponível agora. Mostrando todos os FIIs.",
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+
                         paginaAtual = Math.max(1, paginacao.getPaginaAtual());
                         totalPaginas = Math.max(
                                 paginaAtual,
@@ -403,7 +415,8 @@ public class MarketListActivity extends AppCompatActivity {
 
         boolean isFii = marketType == MarketType.FIIS;
         boolean isFuturo = marketType == MarketType.FUTUROS;
-        boolean temSegmento = isFii || isFuturo; // crypto has no segment filter
+        // Crypto has no segment filter; FIIs only when the API can apply it.
+        boolean temSegmento = (isFii && filtrosFiiCompletos) || isFuturo;
         rgSegmentType.setVisibility(temSegmento ? View.VISIBLE : View.GONE);
         tvDescricaoSegmento.setVisibility(temSegmento ? View.VISIBLE : View.GONE);
         tvDescricaoSegmento.setText(isFuturo ? "Segmento do contrato" : "Tipo de fundo");
@@ -412,6 +425,10 @@ public class MarketListActivity extends AppCompatActivity {
         configurarOpcoesDeOrdenacao(content, isFii);
         selecionarSegmentoAtual(rgSegmentType);
         selecionarOrdenacaoAtual(rgSortBy, isFii);
+        if (isFii && !filtrosFiiCompletos) {
+            int marcada = rgSortBy.getCheckedRadioButtonId();
+            if (marcada != R.id.rbSortName && marcada != R.id.rbSortPrice) rgSortBy.check(R.id.rbSortVolume);
+        }
         rgSortOrder.check(
                 "asc".equals(sortOrder)
                         ? R.id.rbSortOrderAsc
@@ -530,11 +547,16 @@ public class MarketListActivity extends AppCompatActivity {
                 R.id.rbSortMarketCap
         };
 
+        boolean fiiCompleto = isFii && filtrosFiiCompletos;
         for (int id : fiiOnlyIds) {
-            content.findViewById(id).setVisibility(isFii ? View.VISIBLE : View.GONE);
+            content.findViewById(id).setVisibility(fiiCompleto ? View.VISIBLE : View.GONE);
         }
         for (int id : stockOnlyIds) {
             content.findViewById(id).setVisibility(isFii ? View.GONE : View.VISIBLE);
+        }
+        if (isFii && !filtrosFiiCompletos) {
+            // Lista padrão: a API ordena só por nome, preço ou volume.
+            content.findViewById(R.id.rbSortVolume).setVisibility(View.VISIBLE);
         }
     }
 
@@ -652,6 +674,7 @@ public class MarketListActivity extends AppCompatActivity {
         if (selectedId == R.id.rbSortName) return "name";
         if (selectedId == R.id.rbSortPrice) return isFii ? "price" : "close";
 
+        if (isFii && !filtrosFiiCompletos) return "volume";
         if (isFii) {
             if (selectedId == R.id.rbSortDividendYield) return "dividendYield12m";
             if (selectedId == R.id.rbSortPvp) return "priceToNav";

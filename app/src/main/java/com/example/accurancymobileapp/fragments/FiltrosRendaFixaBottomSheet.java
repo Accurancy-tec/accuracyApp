@@ -8,8 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.FiltroRendaFixa;
@@ -34,11 +36,11 @@ public class FiltrosRendaFixaBottomSheet extends BottomSheetDialogFragment {
     private static final String ARG_TIPOS = "tipos_disponiveis";
     private static final String ARG_INDEXADORES = "indexadores_disponiveis";
 
-    private static final int COR_FUNDO_NORMAL = 0xFF0B1729;
-    private static final int COR_FUNDO_SELECIONADO = 0xFF2563EB;
-    private static final int COR_BORDA_NORMAL = 0xFF293950;
-    private static final int COR_BORDA_SELECIONADO = 0xFF3989FF;
-    private static final int COR_TEXTO_NORMAL = 0xFFD1DCEB;
+    @ColorRes private static final int COR_FUNDO_NORMAL = R.color.superficie_campo;
+    @ColorRes private static final int COR_FUNDO_SELECIONADO = R.color.primary_blue;
+    @ColorRes private static final int COR_BORDA_NORMAL = R.color.borda;
+    @ColorRes private static final int COR_BORDA_SELECIONADO = R.color.link;
+    @ColorRes private static final int COR_TEXTO_NORMAL = R.color.text_primary;
 
     /** Implemented by the activity that owns the list. */
     public interface Listener {
@@ -166,11 +168,11 @@ public class FiltrosRendaFixaBottomSheet extends BottomSheetDialogFragment {
         chip.setEnsureMinTouchTargetSize(false);
         int[][] estados = {{android.R.attr.state_checked}, {}};
         chip.setChipBackgroundColor(new ColorStateList(estados,
-                new int[]{COR_FUNDO_SELECIONADO, COR_FUNDO_NORMAL}));
+                new int[]{cor(COR_FUNDO_SELECIONADO), cor(COR_FUNDO_NORMAL)}));
         chip.setChipStrokeColor(new ColorStateList(estados,
-                new int[]{COR_BORDA_SELECIONADO, COR_BORDA_NORMAL}));
+                new int[]{cor(COR_BORDA_SELECIONADO), cor(COR_BORDA_NORMAL)}));
         chip.setChipStrokeWidth(getResources().getDisplayMetrics().density);
-        chip.setTextColor(new ColorStateList(estados, new int[]{Color.WHITE, COR_TEXTO_NORMAL}));
+        chip.setTextColor(new ColorStateList(estados, new int[]{Color.WHITE, cor(COR_TEXTO_NORMAL)}));
         return chip;
     }
 
@@ -218,5 +220,9 @@ public class FiltrosRendaFixaBottomSheet extends BottomSheetDialogFragment {
             ((Listener) getActivity()).aoAplicarFiltros(filtro);
         }
         dismissAllowingStateLoss();
+    }
+
+    private int cor(@ColorRes int id) {
+        return ContextCompat.getColor(requireContext(), id);
     }
 }

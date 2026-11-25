@@ -1,9 +1,35 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
+    <!-- Um só tema para claro e escuro: as cores mudam pelos valores de values/ e values-night/. -->
     <style name="Base.Theme.AccurancyMobileApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-
+        <item name="colorPrimary">@color/primary_blue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/superficie_selecionada</item>
+        <item name="colorOnPrimaryContainer">@color/text_primary</item>
+        <item name="colorSecondary">@color/link</item>
+        <item name="colorSurface">@color/card_background</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/superficie_selecionada</item>
+        <item name="colorOnSecondaryContainer">@color/text_primary</item>
+        <!-- Superfícies do Material 3 na paleta do app (sem o lilás padrão) -->
+        <item name="colorSurfaceVariant">@color/card_background_2</item>
+        <item name="colorSurfaceContainerLowest">@color/card_background</item>
+        <item name="colorSurfaceContainerLow">@color/card_background</item>
+        <item name="colorSurfaceContainer">@color/card_background_2</item>
+        <item name="colorSurfaceContainerHigh">@color/card_background</item>
+        <item name="colorSurfaceContainerHighest">@color/trilho</item>
+        <item name="colorOutline">@color/borda_forte</item>
+        <item name="colorOutlineVariant">@color/borda</item>
+        <item name="colorError">@color/negativo_destaque</item>
+        <item name="android:colorBackground">@color/bg_deep</item>
+        <item name="android:windowBackground">@color/bg_deep</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_placeholder</item>
+        <item name="android:windowLightStatusBar">@bool/barras_sistema_claras</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">@bool/barras_sistema_claras</item>
     </style>
 
     <style name="AporteLabel">
@@ -11,7 +37,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">14dp</item>
         <item name="android:layout_marginBottom">6dp</item>
-        <item name="android:textColor">#8A94A6</item>
+        <item name="android:textColor">@color/texto_fraco</item>
         <item name="android:textSize">10sp</item>
     </style>
 
@@ -23,18 +49,18 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">#60A5FA</item>
+        <item name="android:textColor">@color/link</item>
         <item name="android:textSize">13sp</item>
-        <item name="backgroundTint">#111A2B</item>
-        <item name="strokeColor">#1E3A8A</item>
+        <item name="backgroundTint">@color/card_background</item>
+        <item name="strokeColor">@color/primary_blue</item>
         <item name="strokeWidth">1dp</item>
         <item name="cornerRadius">10dp</item>
     </style>
 
     <style name="AporteChip.Selected">
-        <item name="backgroundTint">#1D3A8A</item>
-        <item name="strokeColor">#3B82F6</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundTint">@color/superficie_selecionada</item>
+        <item name="strokeColor">@color/primary_blue</item>
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <!-- Bottom sheet cards (slide-up): transparent window so the rounded card drawable shows. -->

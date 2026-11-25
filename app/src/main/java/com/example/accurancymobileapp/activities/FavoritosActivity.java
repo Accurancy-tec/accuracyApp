@@ -13,8 +13,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -105,10 +107,10 @@ public class FavoritosActivity extends AppCompatActivity {
             chip.setCheckedIconVisible(false);
             chip.setTextSize(12f);
             chip.setEnsureMinTouchTargetSize(false);
-            chip.setChipBackgroundColor(new ColorStateList(estados, new int[]{0xFF2563EB, 0xFF0B1729}));
-            chip.setChipStrokeColor(new ColorStateList(estados, new int[]{0xFF3989FF, 0xFF293950}));
+            chip.setChipBackgroundColor(new ColorStateList(estados, new int[]{cor(R.color.primary_blue), cor(R.color.superficie_campo)}));
+            chip.setChipStrokeColor(new ColorStateList(estados, new int[]{cor(R.color.link), cor(R.color.borda)}));
             chip.setChipStrokeWidth(getResources().getDisplayMetrics().density);
-            chip.setTextColor(new ColorStateList(estados, new int[]{Color.WHITE, 0xFFD1DCEB}));
+            chip.setTextColor(new ColorStateList(estados, new int[]{Color.WHITE, cor(R.color.text_primary)}));
             chips.addView(chip);
         }
         ((Chip) chips.getChildAt(0)).setChecked(true);
@@ -241,5 +243,9 @@ public class FavoritosActivity extends AppCompatActivity {
                         carregar();
                     }
                 });
+    }
+
+    private int cor(@ColorRes int id) {
+        return ContextCompat.getColor(this, id);
     }
 }

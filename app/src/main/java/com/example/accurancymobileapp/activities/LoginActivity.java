@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -152,18 +153,21 @@ public class LoginActivity extends AppCompatActivity {
                     txtNome.setError("Informe o nome");
                     return;
                 }
-                if(celular.isEmpty()){
-                    txtCelular.setError("Informe o Celular.");
+                // Celular é opcional; se preenchido, precisa ter DDD + número.
+                String digitosCelular = celular.replaceAll("\\D", "");
+                if(!celular.isEmpty() && (digitosCelular.length() < 10 || digitosCelular.length() > 11)){
+                    txtCelular.setError("Use DDD + número (10 ou 11 dígitos) ou deixe em branco.");
                     return;
                 }
-                if(email.isEmpty()){
-                    txtEmailCadastro.setError("Informe o E-mail.");
+                if(email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                    txtEmailCadastro.setError("Informe um e-mail válido.");
                     return;
                 }
-                if(senhaCadastro.isEmpty()){
-                    txtSenhaCadastro.setError("Informe a senha.");
+                if(senhaCadastro.length() < 8){
+                    txtSenhaCadastro.setError("A senha precisa ter pelo menos 8 caracteres.");
                     return;
                 }
+                celular = digitosCelular;
                 if(confirmarSenhaCadastro.isEmpty()){
                     txtConfirmarSenha.setError("Confirme a senha.");
                     return;
@@ -224,7 +228,7 @@ public class LoginActivity extends AppCompatActivity {
                 tabCadastrar.setBackgroundResource(R.drawable.bg_tab_active);
                 tabEntrar.setBackgroundResource(0);
 
-                tabCadastrar.setTextColor(getColor(R.color.text_primary));
+                tabCadastrar.setTextColor(getColor(R.color.white));
                 tabEntrar.setTextColor(getColor(R.color.text_secondary));
             }
         });
@@ -394,7 +398,7 @@ public class LoginActivity extends AppCompatActivity {
                     tabCadastrar.setBackgroundResource(0);
 
                     tabCadastrar.setTextColor(getColor(R.color.text_secondary));
-                    tabEntrar.setTextColor(getColor(R.color.text_primary));
+                    tabEntrar.setTextColor(getColor(R.color.white));
 
                     // The API already e-mailed the code: ask for it now.
                     abrirVerificacao(emailCadastrado, false);
@@ -450,7 +454,7 @@ public class LoginActivity extends AppCompatActivity {
         tabCadastrar.setBackgroundResource(0);
 
         tabCadastrar.setTextColor(getColor(R.color.text_secondary));
-        tabEntrar.setTextColor(getColor(R.color.text_primary));
+        tabEntrar.setTextColor(getColor(R.color.white));
     }
 
     private void abrirVerificacao(String email, boolean enviarCodigoAoAbrir) {

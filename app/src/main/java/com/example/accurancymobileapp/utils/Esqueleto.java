@@ -49,7 +49,7 @@ public final class Esqueleto {
                 i.setImageAlpha(0);
             }
             v.setTag(R.id.tag_esqueleto, o);
-            ShimmerDrawable shimmer = new ShimmerDrawable(6f * densidade);
+            ShimmerDrawable shimmer = new ShimmerDrawable(v.getContext(), 6f * densidade);
             v.setBackground(shimmer);
             shimmer.start();
         }

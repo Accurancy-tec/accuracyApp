@@ -2,7 +2,6 @@ package com.example.accurancymobileapp.utils;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -13,9 +12,11 @@ import android.widget.ImageView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import java.util.Locale;
 import java.util.regex.Pattern;
+import com.example.accurancymobileapp.R;
 
 /**
  * Icon used by the asset rows when there is no logo: the first two letters of the symbol
@@ -23,7 +24,6 @@ import java.util.regex.Pattern;
  */
 public final class SiglaIcone {
 
-    private static final int COR_TEXTO = Color.parseColor("#57A6FF");
     private static final Pattern PARECE_SIMBOLO = Pattern.compile("^[A-Z0-9.\\-=^]{2,12}$");
 
     private SiglaIcone() { }
@@ -46,7 +46,7 @@ public final class SiglaIcone {
         if (sigla == null) {
             imageView.setImageResource(placeholder);
         } else {
-            imageView.setImageDrawable(new SiglaDrawable(sigla));
+            imageView.setImageDrawable(new SiglaDrawable(sigla, ContextCompat.getColor(imageView.getContext(), R.color.link)));
         }
     }
 
@@ -65,9 +65,9 @@ public final class SiglaIcone {
         private final String texto;
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        SiglaDrawable(String texto) {
+        SiglaDrawable(String texto, int cor) {
             this.texto = texto;
-            paint.setColor(COR_TEXTO);
+            paint.setColor(cor);
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             paint.setTextAlign(Paint.Align.CENTER);
         }

@@ -1,7 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -31,6 +31,8 @@ import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
+import com.example.accurancymobileapp.utils.EscolhaCarteira;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -58,9 +60,9 @@ public class BuyAssetActivity extends AppCompatActivity {
     private static final String CURRENCY_SIMULATION_NOTICE = "Operação simulada com a cotação atual da moeda, em reais. Nenhuma ordem real de câmbio é enviada.";
     private static final String FUTURES_SIMULATION_NOTICE = "Operação simulada com o preço de ajuste do contrato, sem margem, alavancagem ou ajuste diário. Nenhuma ordem será enviada à B3.";
 
-    private static final int COLOR_POSITIVE = Color.rgb(43, 224, 163);
-    private static final int COLOR_NEGATIVE = Color.rgb(255, 82, 105);
-    private static final int COLOR_NEUTRAL = Color.WHITE;
+    @ColorRes private static final int COLOR_POSITIVE = R.color.positivo_destaque;
+    @ColorRes private static final int COLOR_NEGATIVE = R.color.negativo_destaque;
+    @ColorRes private static final int COLOR_NEUTRAL = R.color.text_primary;
 
     private View buyAssetRoot;
 
@@ -144,8 +146,9 @@ public class BuyAssetActivity extends AppCompatActivity {
 
         WindowInsetsControllerCompat controller =
                 WindowCompat.getInsetsController(window, window.getDecorView());
-        controller.setAppearanceLightStatusBars(false);
-        controller.setAppearanceLightNavigationBars(false);
+        boolean barrasClaras = getResources().getBoolean(R.bool.barras_sistema_claras);
+        controller.setAppearanceLightStatusBars(barrasClaras);
+        controller.setAppearanceLightNavigationBars(barrasClaras);
 
         final int initialLeft = buyAssetRoot.getPaddingLeft();
         final int initialTop = buyAssetRoot.getPaddingTop();
@@ -221,13 +224,13 @@ public class BuyAssetActivity extends AppCompatActivity {
                     Math.abs(dailyChangePercent)
             );
             tvBuyDailyChange.setText(prefix + formattedChange);
-            tvBuyDailyChange.setTextColor(
+            tvBuyDailyChange.setTextColor(getColor(
                     dailyChangePercent > 0.0 ? COLOR_POSITIVE
                             : dailyChangePercent < 0.0 ? COLOR_NEGATIVE : COLOR_NEUTRAL
-            );
+            ));
         } else {
             tvBuyDailyChange.setText("—");
-            tvBuyDailyChange.setTextColor(COLOR_NEUTRAL);
+            tvBuyDailyChange.setTextColor(getColor(COLOR_NEUTRAL));
         }
 
         if (isSellOperation()) {
@@ -242,7 +245,7 @@ public class BuyAssetActivity extends AppCompatActivity {
             btnSubmitBuyOrder.setText("Confirmar venda simulada");
         } else {
             tvBuyAvailableBalance.setText(
-                    "Saldo para investir: " + formatCurrency(availableBalance)
+                    "Saldo geral: " + formatCurrency(availableBalance)
             );
             tvBuyQuantityDescription.setText(isFractionalAsset()
                     ? "Informe quanto deseja comprar (até 8 casas decimais)."
@@ -353,7 +356,7 @@ public class BuyAssetActivity extends AppCompatActivity {
             );
         } else {
             tvBuySimulationNotice.setText(validationMessage);
-            tvBuySimulationNotice.setTextColor(COLOR_NEGATIVE);
+            tvBuySimulationNotice.setTextColor(getColor(COLOR_NEGATIVE));
         }
 
         btnDecreaseBuyQuantity.setEnabled(quantity.signum() > 0 && !operationInProgress);
@@ -394,16 +397,9 @@ public class BuyAssetActivity extends AppCompatActivity {
                 return "Quantidade indisponível. Você possui "
                         + formatQuantity(sellableQuantity) + " unidade(s) para vender.";
             }
-        } else if (availableBalance >= 0.0 && Double.isFinite(availableBalance)) {
-            BigDecimal total = calculateSubtotal(quantity)
-                    .add(calculateEstimatedFee(calculateSubtotal(quantity)));
-            BigDecimal balance = BigDecimal.valueOf(availableBalance)
-                    .setScale(2, RoundingMode.HALF_UP);
-            if (total.compareTo(balance) > 0) {
-                return "Saldo insuficiente. Total estimado: " + formatCurrency(total)
-                        + " | Disponível: " + formatCurrency(balance) + ".";
-            }
         }
+        // O saldo é conferido depois que a carteira de destino é conhecida (ver chooseWalletAndRegister):
+        // carteira real usa o saldo geral; carteira simulada, o saldo da própria simulação.
 
         return null;
     }
@@ -421,14 +417,13 @@ public class BuyAssetActivity extends AppCompatActivity {
             return;
         }
 
-        if (walletId > 0) {
-            registerOperation(operationType, quantity, walletId);
-            return;
-        }
-
         chooseWalletAndRegister(quantity);
     }
 
+    /**
+     * Descobre a carteira de destino (a recebida da tela anterior ou a escolhida aqui, já marcando a
+     * carteira em foco), confere o dinheiro disponível nela e só então registra a operação.
+     */
     private void chooseWalletAndRegister(BigDecimal quantity) {
         setOperationInProgress(true);
         new WalletRepository(this).buscarWallets(new WalletRepository.WalletListCallback() {
@@ -447,30 +442,20 @@ public class BuyAssetActivity extends AppCompatActivity {
                     return;
                 }
 
-                Wallet[] options = wallets.toArray(new Wallet[0]);
-                CharSequence[] walletNames = new CharSequence[options.length];
-                for (int i = 0; i < options.length; i++) {
-                    walletNames[i] = options[i].getNome_carteira()
-                            + " · " + options[i].getTipo_carteira();
+                if (walletId > 0) {
+                    for (Wallet option : wallets) {
+                        if (option.getId_carteira() == walletId) {
+                            confirmBalanceAndRegister(option, quantity);
+                            return;
+                        }
+                    }
                 }
 
-                new AlertDialog.Builder(BuyAssetActivity.this)
-                        .setTitle("Escolha a carteira")
-                        .setItems(walletNames, (dialog, which) -> {
-                            if (which >= 0 && which < options.length) {
-                                registerOperation(
-                                        operationType,
-                                        quantity,
-                                        options[which].getId_carteira()
-                                );
-                            } else {
-                                setOperationInProgress(false);
-                            }
-                        })
-                        .setNegativeButton("Cancelar", (dialog, which) ->
-                                setOperationInProgress(false))
-                        .setOnCancelListener(dialog -> setOperationInProgress(false))
-                        .show();
+                EscolhaCarteira.mostrar(BuyAssetActivity.this,
+                        isSellOperation() ? "Vender de qual carteira?" : "Registrar em qual carteira?",
+                        wallets, knownGeneralBalance(),
+                        wallet -> confirmBalanceAndRegister(wallet, quantity),
+                        () -> setOperationInProgress(false));
             }
 
             @Override
@@ -482,6 +467,33 @@ public class BuyAssetActivity extends AppCompatActivity {
                 Toast.makeText(BuyAssetActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    /** Saldo geral recebido da tela anterior, ou null quando ele não veio. */
+    private BigDecimal knownGeneralBalance() {
+        return availableBalance >= 0.0 && Double.isFinite(availableBalance)
+                ? BigDecimal.valueOf(availableBalance).setScale(2, RoundingMode.HALF_UP)
+                : null;
+    }
+
+    private void confirmBalanceAndRegister(Wallet wallet, BigDecimal quantity) {
+        if (!isSellOperation()) {
+            BigDecimal total = calculateSubtotal(quantity).add(calculateEstimatedFee(calculateSubtotal(quantity)));
+            String missing = EscolhaCarteira.faltaSaldo(wallet, knownGeneralBalance(), total);
+            if (missing != null) {
+                setOperationInProgress(false);
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle(wallet.isSimulada() ? "Saldo da simulação insuficiente" : "Saldo insuficiente")
+                        .setMessage("Total estimado: " + formatCurrency(total) + "\n" + missing
+                                + (wallet.isSimulada()
+                                ? "\n\nDeposite mais na simulação (na tela da carteira) ou diminua a quantidade."
+                                : "\n\nAdicione saldo no Início ou diminua a quantidade."))
+                        .setPositiveButton("Entendi", null)
+                        .show();
+                return;
+            }
+        }
+        registerOperation(operationType, quantity, wallet.getId_carteira());
     }
 
     private void registerOperation(String type, BigDecimal quantity, int selectedWalletId) {

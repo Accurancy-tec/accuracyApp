@@ -4,43 +4,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#081426">
+    android:background="@color/bg_deep">
 
-    <!-- Cabeçalho: voltar, título e ações -->
-    <LinearLayout
-        android:id="@+id/cabecalhoCarteiras"
-        android:layout_width="0dp"
-        android:layout_height="52dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-
-    </LinearLayout>
-
-    <!-- Resumo do patrimônio -->
+    <!-- Resumo das carteiras reais (calculado pela API em /carteiras/resumo) -->
     <LinearLayout
         android:id="@+id/resumoPatrimonio"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="28dp"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/cabecalhoCarteiras"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total em carteiras"
-            android:textColor="#A8B5C8"
+            android:text="Patrimônio nas carteiras reais"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
         <TextView
@@ -48,44 +32,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="R$ 48.392"
-            android:textColor="#F4F7FC"
-            android:textSize="38sp"
+            android:text="R$ --"
+            android:textColor="@color/text_primary"
+            android:textSize="34sp"
             android:textStyle="bold" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvRendimentoTotal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="▲ "
-                android:textColor="#20D6A0"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvRendimentoTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="R$ 4.192"
-                android:textColor="#20D6A0"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="de rendimento total"
-                android:textColor="#D8E0EC"
-                android:textSize="14sp" />
-
-        </LinearLayout>
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvPercentualTotal"
@@ -97,10 +55,20 @@
             android:paddingTop="5dp"
             android:paddingEnd="12dp"
             android:paddingBottom="5dp"
-            android:text="+10,2% desde o início"
-            android:textColor="#20D6A0"
+            android:textColor="@color/positivo_destaque"
             android:textSize="13sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvResumoSimulacoes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -114,16 +82,16 @@
         android:layout_marginEnd="20dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/resumoPatrimonio"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/resumoPatrimonio">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Carteiras"
-            android:textColor="#F4F7FC"
+            android:text="Suas carteiras"
+            android:textColor="@color/text_primary"
             android:textSize="19sp"
             android:textStyle="bold" />
 
@@ -131,28 +99,28 @@
             android:id="@+id/btnCriarWallet"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
             android:paddingStart="12dp"
             android:paddingEnd="4dp"
             android:text="+ Criar carteira"
-            android:textColor="#63A8FF"
+            android:textColor="@color/link"
             android:textSize="14sp"
             android:textStyle="bold" />
 
     </LinearLayout>
-
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshCarteiras"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/cabecalhoListaCarteiras"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/cabecalhoListaCarteiras">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvMinhasWallets"
@@ -176,24 +144,26 @@
         android:orientation="vertical"
         android:padding="24dp"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/cabecalhoListaCarteiras"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/cabecalhoListaCarteiras">
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_item_icon"
+            android:importantForAccessibility="no"
+            android:padding="14dp"
+            android:src="@drawable/ic_adicionar"
+            app:tint="@color/blue_primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="＋"
-            android:textColor="#63A8FF"
-            android:textSize="42sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:text="Você ainda não tem carteiras"
-            android:textColor="#F4F7FC"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -202,8 +172,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:gravity="center"
-            android:text="Crie sua primeira carteira para organizar seus investimentos."
-            android:textColor="#9CAAC0"
+            android:text="Crie uma carteira real, que usa o seu saldo, ou uma simulada, com o valor que quiser para testar."
+            android:textColor="@color/text_secondary"
             android:textSize="13sp" />
 
         <TextView
@@ -218,7 +188,7 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:text="Criar minha carteira"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="bold" />
 

@@ -27,7 +27,7 @@
             <View
                 android:layout_width="3dp"
                 android:layout_height="12dp"
-                android:background="#31D9B5" />
+                android:background="@color/positivo_destaque" />
 
             <TextView
                 android:id="@+id/tvIndexador"
@@ -36,7 +36,7 @@
                 android:layout_marginStart="6dp"
                 android:layout_weight="1"
                 android:text="LCA"
-                android:textColor="#9BAAC0"
+                android:textColor="@color/text_secondary"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="LCA Pós-Fixado"
-            android:textColor="#F1F5FC"
+            android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -82,7 +82,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:text="▮▮ Nível 1"
-                android:textColor="#AABBD0"
+                android:textColor="@color/text_secondary"
                 android:textSize="10sp" />
 
             <TextView
@@ -95,7 +95,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:text="♥ Garantia FGC"
-                android:textColor="#AABBD0"
+                android:textColor="@color/text_secondary"
                 android:textSize="10sp" />
 
             <TextView
@@ -108,7 +108,7 @@
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:text="Isento de IR"
-                android:textColor="#AABBD0"
+                android:textColor="@color/text_secondary"
                 android:textSize="10sp"
                 android:visibility="gone" />
 
@@ -120,7 +120,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#1E3048" />
+        android:background="@color/divider" />
 
     <!-- Informações financeiras -->
     <LinearLayout
@@ -144,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Rentabilidade"
-                android:textColor="#8D9DB3"
+                android:textColor="@color/texto_fraco"
                 android:textSize="11sp" />
 
             <TextView
@@ -152,7 +152,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="88% CDI"
-                android:textColor="#31D9B5"
+                android:textColor="@color/positivo_destaque"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -171,7 +171,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Resgate"
-                android:textColor="#8D9DB3"
+                android:textColor="@color/texto_fraco"
                 android:textSize="11sp" />
 
             <TextView
@@ -179,7 +179,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="No vencimento"
-                android:textColor="#DCE5F2"
+                android:textColor="@color/text_primary"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -198,7 +198,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Aplicação mínima"
-                android:textColor="#8D9DB3"
+                android:textColor="@color/texto_fraco"
                 android:textSize="11sp" />
 
             <TextView
@@ -206,7 +206,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="R$ 1.052,00"
-                android:textColor="#DCE5F2"
+                android:textColor="@color/text_primary"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 

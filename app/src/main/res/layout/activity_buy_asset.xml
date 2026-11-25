@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="Cotação não disponível"
-            android:textColor="#DCE7FF"
+            android:textColor="@color/texto_sobre_destaque"
             android:textSize="11sp" />
 
         <LinearLayout
@@ -98,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Preço atual"
-                    android:textColor="#DCE7FF"
+                    android:textColor="@color/texto_sobre_destaque"
                     android:textSize="12sp" />
 
                 <TextView
@@ -122,7 +122,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Variação no dia"
-                    android:textColor="#DCE7FF"
+                    android:textColor="@color/texto_sobre_destaque"
                     android:textSize="12sp" />
 
                 <TextView
@@ -367,7 +367,7 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="18dp"
                     android:layout_marginBottom="14dp"
-                    android:background="#24374F" />
+                    android:background="@color/divider" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -390,7 +390,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="—"
-                        android:textColor="#FFFFFF"
+                        android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                 </LinearLayout>

@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#0A1628"
+    android:background="@color/superficie_campo"
     android:fillViewport="true"
     android:maxHeight="620dp">
 
@@ -20,14 +20,14 @@
             android:layout_height="4dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="18dp"
-            android:background="#53647D" />
+            android:background="@color/borda_forte" />
 
         <TextView
             android:id="@+id/tvTituloFiltros"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Filtros e ordenação"
-            android:textColor="#F1F5FC"
+            android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
             android:text="Tipo de fundo"
-            android:textColor="#AAB8CC"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:textStyle="bold" />
 
@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="Ordenar por"
-            android:textColor="#AAB8CC"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:textStyle="bold" />
 
@@ -165,7 +165,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:text="Ordem"
-            android:textColor="#AAB8CC"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:textStyle="bold" />
 
@@ -203,10 +203,10 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:backgroundTint="#20334B"
+                android:backgroundTint="@color/card_background_2"
                 android:text="Limpar"
                 android:textAllCaps="false"
-                android:textColor="#F1F5FC" />
+                android:textColor="@color/text_primary" />
 
             <Button
                 android:id="@+id/btnAplicarFiltros"
@@ -214,7 +214,7 @@
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:backgroundTint="#2563EB"
+                android:backgroundTint="@color/primary_blue"
                 android:text="Aplicar filtros"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF" />

@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -121,7 +122,7 @@ public class FormAdicionarSaldoActivity extends AppCompatActivity {
                 R.drawable.bg_valor_rapido_selecionado
         );
 
-        selecionado.setTextColor(0xFF60A5FA);
+        selecionado.setTextColor(ContextCompat.getColor(this, R.color.link));
 
         selecionado.setScaleX(0.94f);
         selecionado.setScaleY(0.94f);
@@ -148,7 +149,7 @@ public class FormAdicionarSaldoActivity extends AppCompatActivity {
                     R.drawable.bg_valor_rapido
             );
 
-            botao.setTextColor(0xFFB3C7D9);
+            botao.setTextColor(ContextCompat.getColor(this, R.color.texto_suave));
             botao.setScaleX(1f);
             botao.setScaleY(1f);
         }

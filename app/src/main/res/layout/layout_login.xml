@@ -122,7 +122,7 @@
         android:radius="10dp"
         android:stateListAnimator="@null"
         android:text="Entrar na conta"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="bold" />
 

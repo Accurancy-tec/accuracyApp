@@ -1,6 +1,7 @@
 package com.example.accurancymobileapp.ui;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
@@ -16,6 +17,8 @@ import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import com.example.accurancymobileapp.R;
 
 /**
  * Rounded bar with a light band sweeping across it: the "loading" placeholder.
@@ -23,22 +26,24 @@ import androidx.annotation.Nullable;
  */
 public class ShimmerDrawable extends Drawable implements Animatable {
 
-    public static final int COR_BASE = 0xFF162840;
-    public static final int COR_BRILHO = 0xFF26406A;
     private static final long PERIODO_MS = 1300L;
 
     private final Paint pincel = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF retangulo = new RectF();
     private final Matrix matriz = new Matrix();
     private final float raio;
+    private final int corBase;
+    private final int corBrilho;
     private LinearGradient gradiente;
     private float larguraBanda = 1f;
     @Nullable
     private ValueAnimator animador;
 
     /** @param raioPx corner radius in pixels; a value above half the size makes a pill/circle */
-    public ShimmerDrawable(float raioPx) {
+    public ShimmerDrawable(Context contexto, float raioPx) {
         this.raio = raioPx;
+        this.corBase = ContextCompat.getColor(contexto, R.color.esqueleto_base);
+        this.corBrilho = ContextCompat.getColor(contexto, R.color.esqueleto_brilho);
     }
 
     @Override
@@ -47,7 +52,7 @@ public class ShimmerDrawable extends Drawable implements Animatable {
         retangulo.set(limites);
         larguraBanda = Math.max(limites.width(), 120f);
         gradiente = new LinearGradient(0, 0, larguraBanda, 0,
-                new int[]{COR_BASE, COR_BRILHO, COR_BASE},
+                new int[]{corBase, corBrilho, corBase},
                 new float[]{0f, 0.5f, 1f}, Shader.TileMode.CLAMP);
         pincel.setShader(gradiente);
     }

@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".AccuracyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -82,6 +83,13 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.FormAdicionarSaldoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.NotificacoesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AjudaActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

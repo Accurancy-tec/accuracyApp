@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_carteira_item"
+    android:foreground="?attr/selectableItemBackground"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -13,42 +14,53 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_tag_carteira"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:paddingStart="10dp"
         android:paddingTop="6dp"
         android:paddingEnd="10dp"
         android:paddingBottom="6dp"
-        android:text="Renda fixa"
-        android:textColor="#63A8FF"
+        android:textColor="@color/link"
         android:textSize="12sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
-    <!-- Saldo -->
+    <!-- Real ou simulada -->
+    <TextView
+        android:id="@+id/tvTipoCarteiraItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="11sp" />
+
+    <!-- Patrimônio -->
     <TextView
         android:id="@+id/tvSaldoCarteira"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="R$ 0,00"
-        android:textColor="#F4F7FC"
-        android:textSize="22sp"
-        android:textStyle="bold"/>
+        android:textColor="@color/text_primary"
+        android:textSize="21sp"
+        android:textStyle="bold" />
 
     <!-- Rendimento -->
     <TextView
         android:id="@+id/tvRendimentoCarteira"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="▲ +0,0%"
-        android:textColor="#20D6A0"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/text_secondary"
         android:textSize="13sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <!-- Meta e progresso -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -57,31 +69,27 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Meta R$ 50.000,00"
-            android:textColor="#9CAAC0"
-            android:textSize="12sp"/>
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/tvProgressoCarteira"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="58%"
-            android:textColor="#D8E0EC"
+            android:textColor="@color/text_primary"
             android:textSize="12sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvCarteiraSemMeta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Carteira sem meta"
-            android:gravity="center"
-            android:visibility="gone"
-            android:textColor="@color/text_primary"
-            android:textSize="12sp"/>
+            android:text="Sem meta definida"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:visibility="gone" />
 
     </LinearLayout>
-
 
     <ProgressBar
         android:id="@+id/progressoMetaCarteira"
@@ -90,7 +98,6 @@
         android:layout_height="6dp"
         android:layout_marginTop="8dp"
         android:max="100"
-        android:progress="58"
-        android:progressDrawable="@drawable/progresso_carteira"/>
+        android:progressDrawable="@drawable/progresso_carteira" />
 
 </LinearLayout>

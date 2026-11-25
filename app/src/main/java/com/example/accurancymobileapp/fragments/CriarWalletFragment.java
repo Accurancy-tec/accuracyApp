@@ -2,207 +2,160 @@ package com.example.accurancymobileapp.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import android.util.Log;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.FormCriarWalletActivity;
 import com.example.accurancymobileapp.adapter.CriarWalletAdapter;
 import com.example.accurancymobileapp.adapter.EspacamentoCarteiras;
 import com.example.accurancymobileapp.model.Wallet;
-import com.example.accurancymobileapp.network.repository.WalletRepository;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
+import com.example.accurancymobileapp.network.client.RetrofitClient;
+import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
+import com.example.accurancymobileapp.utils.CallbackDaTela;
+import com.example.accurancymobileapp.utils.Esqueleto;
+import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 
-import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-
+/**
+ * Aba Carteira: patrimônio das carteiras reais (simulações à parte), as carteiras em grade
+ * e o atalho para criar uma nova. Tudo vem de /carteiras/resumo.
+ */
 public class CriarWalletFragment extends Fragment {
 
-    private WalletRepository walletRepository;
-    private RecyclerView rvMinhasWallets;
-    private TextView btnCriarWallet;
+    private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
+
     private CriarWalletAdapter walletAdapter;
-    private ImageButton btnVoltar;
-    private List<Wallet> listaWallets = new ArrayList<>();
-    private SwipeRefreshLayout swipeRefreshCarteiras;
+    private PuxarParaAtualizar puxar;
+    private final List<Wallet> listaWallets = new ArrayList<>();
+    private TextView tvTotal, tvRendimento, tvPercentual, tvSimulacoes;
+    private View listaVazia, swipe;
+    private boolean carregou = false;
 
     public CriarWalletFragment() {
         super(R.layout.fragment_criar_wallet);
     }
 
-   @Override
-   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
-     super.onViewCreated(view, savedInstanceState);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        tvTotal = view.findViewById(R.id.tvTotalCarteiras);
+        tvRendimento = view.findViewById(R.id.tvRendimentoTotal);
+        tvPercentual = view.findViewById(R.id.tvPercentualTotal);
+        tvSimulacoes = view.findViewById(R.id.tvResumoSimulacoes);
+        listaVazia = view.findViewById(R.id.layoutCarteirasVazio);
+        swipe = view.findViewById(R.id.swipeRefreshCarteiras);
 
-     rvMinhasWallets = view.findViewById(R.id.rvMinhasWallets);
-     btnCriarWallet = view.findViewById(R.id.btnCriarWallet);
-     btnVoltar = view.findViewById(R.id.btnVoltar);
-     swipeRefreshCarteiras = view.findViewById(R.id.swipeRefreshCarteiras);
-     walletRepository = new WalletRepository(requireContext());
-
-
-     configurarRecyclerView();
-     carregarWallets();
-
-     btnCriarWallet.setOnClickListener(v -> {
-         Intent it = new Intent(requireContext(), FormCriarWalletActivity.class);
-         startActivity(it);
-     });
-
-     swipeRefreshCarteiras.setOnRefreshListener(() -> {
-         carregarCarteiras();
-     });
-
-   }
-
-   private void configurarRecyclerView(){
-        rvMinhasWallets.setLayoutManager( new LinearLayoutManager(requireContext()));
-
+        RecyclerView rvMinhasWallets = view.findViewById(R.id.rvMinhasWallets);
         rvMinhasWallets.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-
         rvMinhasWallets.addItemDecoration(new EspacamentoCarteiras(dpParaPx(12), dpParaPx(12)));
-        walletAdapter = new CriarWalletAdapter(
-                listaWallets,
-                wallet -> abrirWallet(wallet));
-
+        walletAdapter = new CriarWalletAdapter(listaWallets, this::abrirWallet);
         rvMinhasWallets.setAdapter(walletAdapter);
 
-   }
+        puxar = new PuxarParaAtualizar((SwipeRefreshLayout) swipe, this::carregarCarteiras);
 
-   /*private void abrirDialogoCriarWallet(){
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_criar_wallet, null);
+        View.OnClickListener criar = v -> startActivity(new Intent(requireContext(), FormCriarWalletActivity.class));
+        view.findViewById(R.id.btnCriarWallet).setOnClickListener(criar);
+        view.findViewById(R.id.btnCriarPrimeiraCarteira).setOnClickListener(criar);
 
-       TextInputEditText nomeWallet = dialogView.findViewById(R.id.nomeWallet);
-       AutoCompleteTextView tipoWallet = dialogView.findViewById(R.id.tipoWallet);
+        Esqueleto.iniciar(tvTotal, tvRendimento);
+    }
 
-       String[] tiposWallet = {"Real", "Simulada"};
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Também cobre a volta do formulário de nova carteira e da tela de uma carteira.
+        carregarCarteiras();
+    }
 
-       ArrayAdapter<String> tipoCarteiraAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, tiposWallet);
+    private static String reais(double valor) {
+        return NumberFormat.getCurrencyInstance(PT_BR).format(valor);
+    }
 
-       tipoWallet.setAdapter(tipoCarteiraAdapter);
+    private void carregarCarteiras() {
+        puxar.iniciar();
+        RetrofitClient.getApiService(requireContext()).resumoPatrimonio(null)
+                .enqueue(new CallbackDaTela<ResumoPatrimonioResponse>(this) {
+                    @Override
+                    public void aoSucesso(@NonNull ResumoPatrimonioResponse resposta) {
+                        puxar.concluir();
+                        mostrar(resposta);
+                    }
 
-       // Não exigir caracteres para mostrar as opções
-       tipoWallet.setThreshold(0);
+                    @Override
+                    public void aoErro(@NonNull String mensagem) {
+                        puxar.concluir();
+                        if (!carregou) {
+                            tvTotal.setText("—");
+                            tvRendimento.setText("");
+                                            }
+                        Toast.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
 
-        // Abrir as opções ao clicar
-       tipoWallet.setOnClickListener(v -> {
-           tipoWallet.showDropDown();
-       });
+    private void mostrar(ResumoPatrimonioResponse resposta) {
+        Esqueleto.parar(tvTotal, tvRendimento);
+        ResumoPatrimonioResponse.Real real = resposta.getReal();
+        ResumoPatrimonioResponse.Simulado simulado = resposta.getSimulado();
 
+        tvTotal.setText(reais(real.valorMercado));
+        if (real.totalInvestido > 0) {
+            boolean ganho = real.lucroPrejuizo >= 0;
+            int cor = ContextCompat.getColor(requireContext(), ganho ? R.color.positivo_destaque : R.color.negativo_destaque);
+            tvRendimento.setText((ganho ? "▲ " : "▼ ") + reais(Math.abs(real.lucroPrejuizo))
+                    + (ganho ? " de ganho" : " de perda") + " sobre " + reais(real.totalInvestido) + " investidos");
+            tvRendimento.setTextColor(cor);
+            tvPercentual.setText(String.format(PT_BR, "%+.2f%% de rentabilidade", real.rentabilidadePercentual));
+            tvPercentual.setTextColor(cor);
+            tvPercentual.setBackgroundResource(ganho ? R.drawable.bg_carteira_percentual : R.drawable.bg_tag_negativo);
+            tvPercentual.setVisibility(View.VISIBLE);
+        } else {
+            tvRendimento.setText(real.quantidadeCarteiras > 0
+                    ? "Nenhum ativo comprado nas carteiras reais ainda"
+                    : "Crie uma carteira real para acompanhar seus investimentos");
+            tvRendimento.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary));
+            tvPercentual.setVisibility(View.GONE);
+        }
 
-        // Também abrir quando receber foco
-       tipoWallet.setOnFocusChangeListener((v, hasFocus) -> {
-           if (hasFocus) {
-               tipoWallet.showDropDown();
-           }
-       });
+        if (simulado.quantidadeCarteiras > 0) {
+            tvSimulacoes.setText((simulado.quantidadeCarteiras == 1 ? "1 simulação" : simulado.quantidadeCarteiras + " simulações")
+                    + ": " + reais(simulado.patrimonioTotal) + " · fora do patrimônio");
+            tvSimulacoes.setVisibility(View.VISIBLE);
+        } else {
+            tvSimulacoes.setVisibility(View.GONE);
+        }
+        Esqueleto.parar(tvTotal, tvRendimento);
 
-       AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
-               .setView(dialogView)
-               .setNegativeButton("Cancelar", null)
-               .setPositiveButton("Criar", null)
-               .create();
+        listaWallets.clear();
+        listaWallets.addAll(resposta.getCarteiras());
+        walletAdapter.notifyDataSetChanged();
+        boolean vazio = listaWallets.isEmpty();
+        listaVazia.setVisibility(vazio ? View.VISIBLE : View.GONE);
+        swipe.setVisibility(vazio ? View.INVISIBLE : View.VISIBLE);
+        carregou = true;
+    }
 
-       dialog.setOnShowListener(dialogInterface -> {
-           Button btnCriar = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-
-           btnCriar.setOnClickListener(v -> {
-               String nome = nomeWallet.getText().toString().trim();
-               String tipo = tipoWallet.getText().toString().trim();
-
-               if(nome.isEmpty()){
-                   nomeWallet.setError("Digite o nome da carteira");
-                   return;
-               }
-               if(tipo.isEmpty()){
-                   tipoWallet.setError("Selecione um tipo");
-                   return;
-               }
-               criarWallet(nome, tipo, meta, estilo);
-
-               Log.d("CARTEIRA", "TIPO: " + tipo);
-
-               dialog.dismiss();
-           });
-       });
-
-       dialog.show();
-
-   }*/
-
-   private void criarWallet(String nome, String tipo, BigDecimal meta, String estilo){
-       walletRepository.criarNovaWallet(nome, tipo, meta, estilo, new WalletRepository.WalletCallback() {
-           @Override
-           public void onSuccess(String mensagem) {
-               Toast.makeText(
-                       requireContext(),
-                       mensagem,
-                       Toast.LENGTH_SHORT
-               ).show();
-
-
-           }
-
-           @Override
-           public void onError(String message) {
-               Toast.makeText(
-                       requireContext(),
-                       message,
-                       Toast.LENGTH_SHORT
-               ).show();
-           }
-       });
-
-       Log.d("CARTEIRA", "Nome:" + nome + "| Tipo: " + tipo);
-   }
-
-   private void carregarWallets(){
-        walletRepository.buscarWallets(new WalletRepository.WalletListCallback() {
-            @Override
-            public void onSuccess(List<Wallet> wallets) {
-                listaWallets.clear();
-                listaWallets.addAll(wallets);
-
-                walletAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onError(String message) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
-            }
-        });
-   }
-
-   private void abrirWallet(Wallet wallet){
+    private void abrirWallet(Wallet wallet) {
         Bundle bundle = new Bundle();
-        int idCarteira = wallet.getId_carteira();
-
-        bundle.putInt("id_carteira", idCarteira);
+        bundle.putInt("id_carteira", wallet.getId_carteira());
         bundle.putString("nome_wallet", wallet.getNome_carteira());
         bundle.putString("tipo_carteira", wallet.getTipo_carteira());
 
         WalletFragment fragment = new WalletFragment();
-
         fragment.setArguments(bundle);
 
         requireActivity()
@@ -211,37 +164,9 @@ public class CriarWalletFragment extends Fragment {
                 .replace(R.id.frameContent, fragment)
                 .addToBackStack(null)
                 .commit();
+    }
 
-   }
-
-   private int dpParaPx(int dp){
+    private int dpParaPx(int dp) {
         return (int) (dp * getResources().getDisplayMetrics().density + 0.5f);
-   }
-
-   private void carregarCarteiras(){
-       walletRepository.buscarWallets(new WalletRepository.WalletListCallback() {
-           @Override
-           public void onSuccess(List<Wallet> wallets) {
-               listaWallets.clear();
-               listaWallets.addAll(wallets);
-
-               walletAdapter.notifyDataSetChanged();
-
-               swipeRefreshCarteiras.setRefreshing(false);
-           }
-
-           @Override
-           public void onError(String message) {
-               Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
-               swipeRefreshCarteiras.setRefreshing(false);
-           }
-       });
-   }
-
-   @Override
-    public void onResume(){
-       super.onResume();
-
-       carregarCarteiras();
-   }
+    }
 }

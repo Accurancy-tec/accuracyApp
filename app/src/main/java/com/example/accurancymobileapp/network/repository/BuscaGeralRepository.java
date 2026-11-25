@@ -79,12 +79,12 @@ public class BuscaGeralRepository {
     private static List<TituloRendaFixa> cacheTitulos;
     private static long cacheTitulosEm;
 
-    private final MarketListRepository mercados;
+    private final Context contexto;
     private final RendaFixaRepository rendaFixa;
     private int versao = 0;
 
     public BuscaGeralRepository(Context contexto) {
-        mercados = new MarketListRepository(contexto);
+        this.contexto = contexto.getApplicationContext();
         rendaFixa = new RendaFixaRepository(contexto);
     }
 
@@ -159,7 +159,9 @@ public class BuscaGeralRepository {
                 pendentes[0]--;
                 continue;
             }
-            mercados.listarAtivos(tipo, 1, RESULTADOS_POR_CATEGORIA, termo, null,
+            // Um repositório por mercado: cada um cancela só a própria chamada anterior. Com um só,
+            // a consulta de um mercado cancelava a do outro e a busca nunca terminava de carregar.
+            new MarketListRepository(contexto).listarAtivos(tipo, 1, RESULTADOS_POR_CATEGORIA, termo, null,
                     ordenacaoPadrao(tipo), tipo == MarketType.FUTUROS ? "asc" : "desc",
                     new MarketListRepository.MarketListCallback() {
                         @Override
@@ -179,7 +181,11 @@ public class BuscaGeralRepository {
                         @Override
                         public void onError(String mensagem) {
                             if (minhaVersao != versao) return;
-                            falhas[0]++;
+                            // A listagem de futuros não está no plano atual da brapi (HTTP 403):
+                            // isso é "sem resultados", não uma falha a avisar em toda busca.
+                            boolean foraDoPlano = tipo == MarketType.FUTUROS
+                                    && mensagem != null && mensagem.contains("403");
+                            if (!foraDoPlano) falhas[0]++;
                             pendentes[0]--;
                             avisar.run();
                         }

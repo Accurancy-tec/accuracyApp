@@ -1,6 +1,5 @@
 package com.example.accurancymobileapp.activities;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,7 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.ColorRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -23,6 +24,7 @@ import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
+import com.example.accurancymobileapp.utils.EscolhaCarteira;
 import com.example.accurancymobileapp.utils.MascaraMonetaria;
 
 import java.math.BigDecimal;
@@ -42,10 +44,10 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
 
     private static final String TAG = "RF_APLICACAO";
     private static final BigDecimal VALOR_MAXIMO = new BigDecimal("10000000.00");
-    private static final int COR_CHIP_SELECIONADO = 0xFF60A5FA;
-    private static final int COR_CHIP_NORMAL = 0xFFB3C7D9;
-    private static final int COR_ERRO = 0xFFFF5265;
-    private static final int COR_AVISO = 0xFF829BB9;
+    @ColorRes private static final int COR_CHIP_SELECIONADO = R.color.link;
+    @ColorRes private static final int COR_CHIP_NORMAL = R.color.texto_suave;
+    @ColorRes private static final int COR_ERRO = R.color.negativo_destaque;
+    @ColorRes private static final int COR_AVISO = R.color.texto_fraco;
 
     private final NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
@@ -135,7 +137,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
     private void selecionarValor(TextView chip, BigDecimal valor) {
         limparSelecaoChips();
         chip.setBackgroundResource(R.drawable.bg_valor_rapido_selecionado);
-        chip.setTextColor(COR_CHIP_SELECIONADO);
+        chip.setTextColor(cor(COR_CHIP_SELECIONADO));
 
         atualizandoCampo = true;
         etValorAplicacao.setText(formatoMoeda.format(valor));
@@ -149,7 +151,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
         TextView[] chips = {btnAplicarMinimo, btnAplicar500, btnAplicar1000, btnAplicar5000};
         for (TextView chip : chips) {
             chip.setBackgroundResource(R.drawable.bg_valor_rapido);
-            chip.setTextColor(COR_CHIP_NORMAL);
+            chip.setTextColor(cor(COR_CHIP_NORMAL));
         }
     }
 
@@ -223,13 +225,13 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
 
         if (valido) {
             tvAplicarAviso.setText(" ");
-            tvAplicarAviso.setTextColor(COR_AVISO);
+            tvAplicarAviso.setTextColor(cor(COR_AVISO));
         } else if (valor.compareTo(BigDecimal.ZERO) > 0 || tituloVencido()) {
             tvAplicarAviso.setText(problema);
-            tvAplicarAviso.setTextColor(COR_ERRO);
+            tvAplicarAviso.setTextColor(cor(COR_ERRO));
         } else {
             tvAplicarAviso.setText("Aplicação mínima: " + formatoMoeda.format(aplicacaoMinima));
-            tvAplicarAviso.setTextColor(COR_AVISO);
+            tvAplicarAviso.setTextColor(cor(COR_AVISO));
         }
 
         boolean habilitado = valido && !requisicaoEmAndamento;
@@ -262,27 +264,12 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
                     return;
                 }
                 if (wallets.size() == 1) {
-                    registrar(valor, wallets.get(0).getId_carteira());
+                    conferirSaldoERegistrar(valor, wallets.get(0));
                     return;
                 }
-
-                Wallet[] opcoes = wallets.toArray(new Wallet[0]);
-                CharSequence[] nomes = new CharSequence[opcoes.length];
-                for (int i = 0; i < opcoes.length; i++) {
-                    nomes[i] = opcoes[i].getNome_carteira() + " · " + opcoes[i].getTipo_carteira();
-                }
-                new AlertDialog.Builder(AplicarRendaFixaActivity.this)
-                        .setTitle("Escolha a carteira")
-                        .setItems(nomes, (dialog, which) -> {
-                            if (which >= 0 && which < opcoes.length) {
-                                registrar(valor, opcoes[which].getId_carteira());
-                            } else {
-                                definirEmAndamento(false);
-                            }
-                        })
-                        .setNegativeButton("Cancelar", (dialog, which) -> definirEmAndamento(false))
-                        .setOnCancelListener(dialog -> definirEmAndamento(false))
-                        .show();
+                EscolhaCarteira.mostrar(AplicarRendaFixaActivity.this, "Aplicar em qual carteira?", wallets, null,
+                        carteira -> conferirSaldoERegistrar(valor, carteira),
+                        () -> definirEmAndamento(false));
             }
 
             @Override
@@ -295,6 +282,17 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
                 Toast.makeText(AplicarRendaFixaActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    /** Na simulação, confere o saldo dela antes de enviar; nas reais quem confere é o servidor. */
+    private void conferirSaldoERegistrar(BigDecimal valor, Wallet carteira) {
+        String falta = EscolhaCarteira.faltaSaldo(carteira, null, valor);
+        if (falta != null) {
+            definirEmAndamento(false);
+            Toast.makeText(this, falta, Toast.LENGTH_LONG).show();
+            return;
+        }
+        registrar(valor, carteira.getId_carteira());
     }
 
     private void registrar(BigDecimal valor, int idCarteira) {
@@ -337,5 +335,9 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
         requisicaoEmAndamento = emAndamento;
         btnConfirmarAplicacao.setText(emAndamento ? "Registrando aplicação…" : "Confirmar aplicação");
         atualizarResumo();
+    }
+
+    private int cor(@ColorRes int id) {
+        return ContextCompat.getColor(this, id);
     }
 }

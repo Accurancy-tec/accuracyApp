@@ -1,8 +1,8 @@
 package com.example.accurancymobileapp.network.service;
 
 import com.example.accurancymobileapp.model.AdicionarSaldoRequest;
+import com.example.accurancymobileapp.model.NovaCarteiraRequest;
 import com.example.accurancymobileapp.model.User;
-import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.response.AcaoResponse;
 import com.example.accurancymobileapp.response.AdicionarSaldoResponse;
@@ -11,10 +11,16 @@ import com.example.accurancymobileapp.response.AporteResponse;
 import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
+import com.example.accurancymobileapp.response.DepositoSimulacaoResponse;
 import com.example.accurancymobileapp.response.FavoritosResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
+import com.example.accurancymobileapp.response.NoticiasResponse;
+import com.example.accurancymobileapp.response.NotificacoesResponse;
 import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.response.PerguntasResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.example.accurancymobileapp.response.RespostaSimples;
+import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.response.TitulosRendaFixaResponse;
 
@@ -102,7 +108,7 @@ public interface ApiService {
     Call<ApiResponse> buscarLista(@Query("Choise") String escolha);
 
     @POST("carteiras/criar-carteira")
-    Call<CriarWalletResponse> criarNovaWallet(@Body Wallet wallet);
+    Call<CriarWalletResponse> criarNovaWallet(@Body NovaCarteiraRequest carteira);
 
     @GET("carteiras/buscar-carteiras")
     Call<BuscarWalletsResponse> buscarWallets();
@@ -231,7 +237,7 @@ public interface ApiService {
     Call<TitulosRendaFixaResponse> listarTitulosRendaFixa();
 
     @POST("carteiras/excluir-carteira")
-    Call<ApiResponse> excluirCarteira(
+    Call<RespostaSimples> excluirCarteira(
             @Query("id_carteira") int idCarteira
     );
 
@@ -243,4 +249,39 @@ public interface ApiService {
     /** Current balance of the logged user (same payload shape as adicionar-saldo). */
     @GET("carteiras/saldo")
     Call<AdicionarSaldoResponse> buscarSaldo();
+
+    // ---- Notificações ----
+
+    @GET("notificacoes/listar")
+    Call<NotificacoesResponse> listarNotificacoes(@Query("limite") int limite);
+
+    @GET("notificacoes/contador")
+    Call<NotificacoesResponse> contarNotificacoes();
+
+    /** Corpo com "id_notificacao" marca uma; corpo vazio marca todas. */
+    @POST("notificacoes/marcar-lidas")
+    Call<NotificacoesResponse> marcarNotificacoesLidas(@Body Map<String, Object> corpo);
+
+    // ---- Fale com a equipe ----
+
+    @POST("auth/perguntaEnviar")
+    Call<RespostaSimples> enviarPergunta(@Body Map<String, String> corpo);
+
+    @POST("auth/perguntaListar")
+    Call<PerguntasResponse> listarPerguntas();
+
+    // ---- Patrimônio e simulações ----
+
+    /** Saldo geral, totais (reais e simuladas separados) e cada carteira calculada. */
+    @GET("carteiras/resumo")
+    Call<ResumoPatrimonioResponse> resumoPatrimonio(@Query("id_carteira") Integer idCarteira);
+
+    /** Corpo: id_carteira e valor. Só para carteiras simuladas. */
+    @POST("carteiras/depositar-simulacao")
+    Call<DepositoSimulacaoResponse> depositarSimulacao(@Body Map<String, Object> corpo);
+
+    // ---- Notícias (públicas) ----
+
+    @GET("noticias/listar")
+    Call<NoticiasResponse> listarNoticias(@Query("limite") int limite);
 }
