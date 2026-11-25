@@ -13,6 +13,7 @@ import com.example.accurancymobileapp.response.BuscarWalletsResponse;
 import com.example.accurancymobileapp.response.CriarWalletResponse;
 import com.example.accurancymobileapp.response.FavoritosResponse;
 import com.example.accurancymobileapp.response.LoginResponse;
+import com.example.accurancymobileapp.response.PerfilResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.response.TitulosRendaFixaResponse;
@@ -20,10 +21,13 @@ import com.example.accurancymobileapp.response.TitulosRendaFixaResponse;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
+import retrofit2.http.Part;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -37,6 +41,47 @@ public interface ApiService {
 
     @POST("auth/refresh")
     Call<LoginResponse> refreshToken(@Body Map<String, String> body);
+
+    // ---- E-mail verification and Google sign-in (no token needed) ----
+
+    @POST("auth/verify-email")
+    Call<PerfilResponse> verificarEmail(@Body Map<String, String> body);
+
+    @POST("auth/resend-verification")
+    Call<PerfilResponse> reenviarVerificacao(@Body Map<String, String> body);
+
+    @POST("auth/googleConfig")
+    Call<PerfilResponse> googleConfig();
+
+    @POST("auth/loginGoogle")
+    Call<LoginResponse> loginGoogle(@Body Map<String, String> body);
+
+    // ---- Profile (token needed) ----
+
+    @POST("auth/perfilObter")
+    Call<PerfilResponse> perfilObter();
+
+    @POST("auth/perfilAtualizar")
+    Call<PerfilResponse> perfilAtualizar(@Body Map<String, String> body);
+
+    @Multipart
+    @POST("auth/perfilFoto")
+    Call<PerfilResponse> perfilFoto(@Part MultipartBody.Part foto);
+
+    @POST("auth/perfilSolicitarTrocaSenha")
+    Call<PerfilResponse> perfilSolicitarTrocaSenha();
+
+    @POST("auth/perfilConfirmarTrocaSenha")
+    Call<PerfilResponse> perfilConfirmarTrocaSenha(@Body Map<String, String> body);
+
+    @POST("auth/perfilSolicitarTrocaEmail")
+    Call<PerfilResponse> perfilSolicitarTrocaEmail(@Body Map<String, String> body);
+
+    @POST("auth/perfilAutorizarTrocaEmail")
+    Call<PerfilResponse> perfilAutorizarTrocaEmail(@Body Map<String, String> body);
+
+    @POST("auth/perfilConfirmarTrocaEmail")
+    Call<PerfilResponse> perfilConfirmarTrocaEmail(@Body Map<String, String> body);
 
     @POST("aportes/registrar-aporte")
     Call<ApiResponse> registerAporte(@Body clsAportes aporte);

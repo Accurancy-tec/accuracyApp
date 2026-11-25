@@ -43,6 +43,7 @@ import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.ui.StockChartHelper;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.Esqueleto;
 import com.example.accurancymobileapp.utils.FavoritoUi;
 import com.example.accurancymobileapp.utils.FavoritosCache;
 
@@ -499,6 +500,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
         carregandoCotacao = true;
         tvStatusMercado.setText("Atualizando cotação…");
+        // First load: shimmering bars where the price and the change will appear.
+        if (!(precoAtual > 0)) {
+            Esqueleto.iniciar(tvPrecoAtualAtivo, tvVariacaoPrecoAtivo);
+        }
 
         quoteRepository.buscarCotacoes(
                 ticker,
@@ -507,6 +512,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                     @Override
                     public void onSucesso(List<QuoteData> quotes) {
                         carregandoCotacao = false;
+                        // Before any text or color is set: the placeholder gives back the original look.
+                        Esqueleto.parar(tvPrecoAtualAtivo, tvVariacaoPrecoAtivo);
                         finalizarAtualizacaoPuxar();
 
                         if (isFinishing() || isDestroyed()
@@ -590,6 +597,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                     @Override
                     public void onErro(String mensagem) {
                         carregandoCotacao = false;
+                        Esqueleto.parar(tvPrecoAtualAtivo, tvVariacaoPrecoAtivo);
                         finalizarAtualizacaoPuxar();
 
                         if (isFinishing() || isDestroyed()) {

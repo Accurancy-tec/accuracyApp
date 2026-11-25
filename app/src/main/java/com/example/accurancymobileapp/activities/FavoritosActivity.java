@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.activities;
 
+import com.example.accurancymobileapp.adapter.EsqueletoAdapter;
 import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -148,9 +149,10 @@ public class FavoritosActivity extends AppCompatActivity {
     }
 
     private void mostrarCarregando() {
-        progresso.setVisibility(View.VISIBLE);
+        progresso.setVisibility(View.GONE);
         estadoVazio.setVisibility(View.GONE);
-        lista.setVisibility(View.GONE);
+        lista.setVisibility(View.VISIBLE);
+        EsqueletoAdapter.mostrar(lista, R.layout.item_esqueleto_linha, 6);
     }
 
     private void mostrarLista() {
@@ -163,6 +165,7 @@ public class FavoritosActivity extends AppCompatActivity {
             }
         }
         adapter.atualizar(filtrados);
+        EsqueletoAdapter.ocultar(lista, adapter);
         if (filtrados.isEmpty()) {
             if (todos.isEmpty()) {
                 mostrarEstado("Nenhum favorito ainda",
@@ -178,6 +181,7 @@ public class FavoritosActivity extends AppCompatActivity {
     }
 
     private void mostrarEstado(String titulo, String mensagem, boolean comTentarNovamente) {
+        EsqueletoAdapter.ocultar(lista, adapter);
         progresso.setVisibility(View.GONE);
         lista.setVisibility(View.GONE);
         tvTituloVazio.setText(titulo);

@@ -78,6 +78,23 @@
                         android:src="@android:drawable/ic_menu_myplaces"
                         app:tint="@color/text_primary" />
 
+                    <TextView
+                        android:id="@+id/txtIniciaisPerfil"
+                        android:layout_width="112dp"
+                        android:layout_height="112dp"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:textSize="38sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <ProgressBar
+                        android:id="@+id/progressoFoto"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone" />
+
                     <ImageButton
                         android:id="@+id/btnAlterarFoto"
                         android:layout_width="36dp"
@@ -96,7 +113,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
-                    android:text="João Davi"
+                    android:text=""
                     android:textColor="@color/text_primary"
                     android:textSize="23sp"
                     android:textStyle="bold" />
@@ -106,7 +123,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
-                    android:text="joaodavi@email.com"
+                    android:text=""
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
 
@@ -180,7 +197,7 @@
                             android:id="@+id/txtNomeConta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="João Davi Silva"
+                            android:text="—"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
@@ -237,9 +254,18 @@
                             android:id="@+id/txtEmailConta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="joaodavi@email.com"
+                            android:text="—"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/txtEmailExtra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:textColor="@color/green_positive"
+                            android:textSize="12sp"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
@@ -294,7 +320,7 @@
                             android:id="@+id/txtTelefoneConta"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="(11) 99999-4321"
+                            android:text="—"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
 
@@ -494,6 +520,60 @@
                         app:tint="@color/text_secondary" />
 
                 </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/itemReverTutorial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_card_perfil"
+                android:gravity="center_vertical"
+                android:minHeight="76dp"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_item_icon"
+                    android:contentDescription="Rever tutorial"
+                    android:padding="11dp"
+                    android:src="@android:drawable/ic_menu_help"
+                    app:tint="@color/blue_primary" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rever tutorial"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Um tour rápido pelo app"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="Abrir tutorial"
+                    android:src="@android:drawable/ic_media_next"
+                    app:tint="@color/text_secondary" />
 
             </LinearLayout>
 

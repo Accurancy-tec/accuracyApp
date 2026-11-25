@@ -47,7 +47,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Usuário"
+                        android:text="Olá"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -66,6 +66,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/cardSaldoTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -86,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="R$ 48.392,17"
+                    android:text="R$ --"
                     android:textColor="@android:color/white"
                     android:textSize="32sp"
                     android:textStyle="bold" />
@@ -123,7 +124,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="R$ 41.000,00"
+                            android:text="R$ --"
                             android:textColor="@android:color/white"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -189,7 +190,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="+R$ 4.192,00"
+                            android:text="—"
                             android:textColor="#34D399"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -212,7 +213,7 @@
                 android:textColor="@color/green_positive"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/cardSaldoDisponivel"
@@ -341,10 +342,25 @@
 
             </LinearLayout>
 
-            <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/ctvChart"
+            <FrameLayout
+                android:id="@+id/blocoGraficoEvolucao"
                 android:layout_width="match_parent"
-                android:layout_height="220dp" />
+                android:layout_height="220dp">
+
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/ctvChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <!-- Placeholder while the chart loads -->
+                <com.example.accurancymobileapp.ui.ShimmerView
+                    android:id="@+id/esqueletoGrafico"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="8dp"
+                    android:visibility="gone"
+                    app:raioShimmer="14dp" />
+            </FrameLayout>
 
 
             <LinearLayout

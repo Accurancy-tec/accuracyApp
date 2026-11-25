@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.Acao;
+import com.example.accurancymobileapp.utils.DestaqueLinha;
 import com.example.accurancymobileapp.utils.FavoritoUi;
 import com.example.accurancymobileapp.utils.FavoritosCache;
 import com.example.accurancymobileapp.utils.SiglaIcone;
@@ -52,6 +53,22 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
         this.categoriaFavoritos = categoria;
         this.favoritoListener = listener;
         notifyDataSetChanged();
+    }
+
+    private String simboloDestacado;
+
+    /** Marks the row of this symbol (a search opened the list for it); null clears the mark. */
+    public void destacar(String simbolo) {
+        this.simboloDestacado = simbolo;
+    }
+
+    /** Position of the row with this symbol, or -1. */
+    public int posicaoDe(String simbolo) {
+        if (simbolo == null) return -1;
+        for (int i = 0; i < acoes.size(); i++) {
+            if (simbolo.equalsIgnoreCase(acoes.get(i).getStock())) return i;
+        }
+        return -1;
     }
 
     public void atualizarLista(List<Acao> novasAcoes) {
@@ -123,6 +140,9 @@ public class AcoesAdapter extends RecyclerView.Adapter<AcoesAdapter.ViewHolder> 
                         FavoritosCache.contem(acao.getStock(), categoriaFavoritos));
             });
         }
+        DestaqueLinha.aplicar(holder.itemView,
+                simboloDestacado != null && simboloDestacado.equalsIgnoreCase(acao.getStock()),
+                R.drawable.bg_card_ativo);
         holder.itemView.setOnClickListener(v -> {
             int posicaoAtual = holder.getBindingAdapterPosition();
             if (listener != null && posicaoAtual != RecyclerView.NO_POSITION) {

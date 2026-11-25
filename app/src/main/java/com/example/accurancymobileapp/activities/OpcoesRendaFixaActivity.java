@@ -24,6 +24,7 @@ import com.example.accurancymobileapp.fragments.FiltrosRendaFixaBottomSheet;
 import com.example.accurancymobileapp.fragments.InvestirRendaFixaBottomSheet;
 import com.example.accurancymobileapp.model.FiltroRendaFixa;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.adapter.EsqueletoAdapter;
 import com.example.accurancymobileapp.adapter.TituloRendaFixaAdapter;
 import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.model.TituloRendaFixa;
@@ -44,6 +45,8 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
     public static final String FILTRO_TESOURO = "TESOURO";
     /** Optional Intent extra: id of a title whose application card opens as soon as the list loads. */
     public static final String EXTRA_ABRIR_TITULO_ID = "abrir_titulo_id";
+    /** Optional Intent extra: id of a title to scroll to and mark in the list (used by the general search). */
+    public static final String EXTRA_DESTACAR_TITULO_ID = "destacar_titulo_id";
 
     private final List<TituloRendaFixa> todosTitulos = new ArrayList<>();
     private String filtroGrupo;
@@ -59,6 +62,8 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
     RendaFixaRepository repositoryRF;
     private FavoritoRepository favoritoRepository;
     private int tituloParaAbrir;
+    private int tituloParaDestacar;
+    private boolean carregandoTitulos = false;
     TituloRendaFixaAdapter adapter;
 
     @Override
@@ -78,6 +83,7 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
         repositoryRF = new RendaFixaRepository(this);
         favoritoRepository = new FavoritoRepository(this);
         tituloParaAbrir = getIntent().getIntExtra(EXTRA_ABRIR_TITULO_ID, 0);
+        tituloParaDestacar = getIntent().getIntExtra(EXTRA_DESTACAR_TITULO_ID, 0);
 
         rvTitulosRendaFixa.setLayoutManager(new LinearLayoutManager(this));
         btnVoltarRendaFixa.setOnClickListener(v -> finish());
@@ -226,6 +232,7 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
 
     /** Applies the group (bank titles or Treasury) and the search text over the loaded titles. */
     private void aplicarFiltros() {
+        if (carregandoTitulos) return; // the placeholder rows are showing
         String busca = edtBuscarTitulo == null
                 ? ""
                 : edtBuscarTitulo.getText().toString().trim().toLowerCase(Locale.ROOT);
@@ -248,10 +255,7 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
         adapter.atualizarLista(filtrados);
 
         boolean vazio = filtrados.isEmpty();
-        if (progressRendaFixa.getVisibility() == View.VISIBLE) {
-            // Still loading: keep the spinner only, no empty message yet.
-            estadoVazio.setVisibility(View.GONE);
-        } else if (vazio && !todosTitulos.isEmpty()) {
+        if (vazio && !todosTitulos.isEmpty()) {
             mostrarEstadoVazio("Nenhum título encontrado",
                     filtroAtual.estaAtivo() ? "Nenhum título combina com os filtros escolhidos. Tente limpar os filtros."
                             : "Tente outra busca.", false);
@@ -276,10 +280,32 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
 
     private PuxarParaAtualizar puxar;
 
+    /** Scrolls to and marks the title a search pointed at, once. */
+    private void destacarTituloPedido() {
+        if (tituloParaDestacar == 0) return;
+        int id = tituloParaDestacar;
+        tituloParaDestacar = 0;
+        int posicao = adapter.posicaoDe(id);
+        if (posicao < 0) return; // hidden by a filter: nothing to mark
+        adapter.destacar(id);
+        adapter.notifyItemChanged(posicao);
+        RecyclerView.LayoutManager gerente = rvTitulosRendaFixa.getLayoutManager();
+        if (gerente instanceof LinearLayoutManager) {
+            rvTitulosRendaFixa.post(() -> ((LinearLayoutManager) gerente).scrollToPositionWithOffset(posicao, 0));
+        }
+    }
+
     private void carregarTitulosRendaFixa(){
         estadoVazio.setVisibility(View.GONE);
+        progressRendaFixa.setVisibility(View.GONE);
         // When the user pulled to refresh, the pull spinner is already on screen.
-        progressRendaFixa.setVisibility(puxar != null && puxar.atualizando() ? View.GONE : View.VISIBLE);
+        if (puxar == null || !puxar.atualizando()) {
+            carregandoTitulos = true;
+            rvTitulosRendaFixa.setVisibility(View.VISIBLE);
+            EsqueletoAdapter.mostrar(rvTitulosRendaFixa, R.layout.item_esqueleto_card, 5);
+        } else {
+            carregandoTitulos = true;
+        }
         repositoryRF.listarTitulosRendaFixa(new RendaFixaRepository.RendaFixaCallback() {
             @Override
             public void onSuccess(List<TituloRendaFixa> titulos) {
@@ -287,12 +313,14 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }
-                progressRendaFixa.setVisibility(View.GONE);
+                carregandoTitulos = false;
                 todosTitulos.clear();
                 if (titulos != null) {
                     todosTitulos.addAll(titulos);
                 }
                 aplicarFiltros();
+                EsqueletoAdapter.ocultar(rvTitulosRendaFixa, adapter);
+                destacarTituloPedido();
                 abrirTituloPedido();
             }
 
@@ -302,9 +330,10 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }
-                progressRendaFixa.setVisibility(View.GONE);
+                carregandoTitulos = false;
                 todosTitulos.clear();
                 adapter.atualizarLista(new ArrayList<>());
+                EsqueletoAdapter.ocultar(rvTitulosRendaFixa, adapter);
                 rvTitulosRendaFixa.setVisibility(View.INVISIBLE);
                 mostrarEstadoVazio("Não foi possível carregar os títulos",
                         message == null || message.trim().isEmpty()

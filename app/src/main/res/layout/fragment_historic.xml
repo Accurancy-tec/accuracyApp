@@ -329,6 +329,7 @@
 
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardGraficoHistorico"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
@@ -344,6 +345,15 @@
                     android:layout_height="150dp"
                     android:layout_marginTop="5dp"
                     android:layout_margin="15dp"/>
+
+                <!-- Placeholder while the history loads -->
+                <com.example.accurancymobileapp.ui.ShimmerView
+                    android:id="@+id/esqueletoGraficoHistorico"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_margin="15dp"
+                    android:visibility="gone"
+                    app:raioShimmer="12dp" />
 
             </com.google.android.material.card.MaterialCardView>
 

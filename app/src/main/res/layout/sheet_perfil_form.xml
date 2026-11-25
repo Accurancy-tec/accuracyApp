@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_card"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="5dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_sheet_handle" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
+
+            <TextView
+                android:id="@+id/tvPerfilSheetTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Título"
+                android:textColor="#F1F5F9"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvPerfilSheetSub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="18dp"
+                android:lineSpacingMultiplier="1.15"
+                android:textColor="#829BB9"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvPerfilRotulo1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:letterSpacing="0.08"
+                android:textColor="#829BB9"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etPerfilCampo1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_input"
+                android:importantForAutofill="no"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="13dp"
+                android:singleLine="true"
+                android:textColor="#F1F5F9"
+                android:textColorHint="#4B6179"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvPerfilRotulo2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:letterSpacing="0.08"
+                android:textColor="#829BB9"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etPerfilCampo2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_input"
+                android:importantForAutofill="no"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="13dp"
+                android:singleLine="true"
+                android:textColor="#F1F5F9"
+                android:textColorHint="#4B6179"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvPerfilRotulo3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:letterSpacing="0.08"
+                android:textColor="#829BB9"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etPerfilCampo3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_input"
+                android:importantForAutofill="no"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="13dp"
+                android:singleLine="true"
+                android:textColor="#F1F5F9"
+                android:textColorHint="#4B6179"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvPerfilErro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:textColor="#FF5265"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnPerfilPrimario"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/bg_btn_primary"
+                android:backgroundTint="@null"
+                android:stateListAnimator="@null"
+                android:textAllCaps="false"
+                android:textColor="#F1F5F9"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnPerfilSecundario"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:textColor="#60A5FA"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.fragments;
 
+import com.example.accurancymobileapp.adapter.EsqueletoAdapter;
 import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import android.os.Bundle;
 
@@ -41,6 +42,7 @@ public class WalletFragment extends Fragment {
     WalletRepository walletRepository;
     private PuxarParaAtualizar puxar;
     private boolean primeiraRetomada = true;
+    private boolean carregouAlgumaVez = false;
 
     public WalletFragment() {
         super(R.layout.fragment_wallet);
@@ -81,6 +83,12 @@ public class WalletFragment extends Fragment {
     }
 
     private void carregarInvestimentos() {
+        // Placeholder rows on the first load (not while pulling to refresh).
+        if (!carregouAlgumaVez && !puxar.atualizando()) {
+            txtCarteiraVazia.setVisibility(View.GONE);
+            recyclerInvestimentos.setVisibility(View.VISIBLE);
+            EsqueletoAdapter.mostrar(recyclerInvestimentos, R.layout.item_esqueleto_linha, 5);
+        }
         puxar.iniciar();
         AporteRepository aporteRepository = new AporteRepository(requireContext());
 
@@ -102,9 +110,10 @@ public class WalletFragment extends Fragment {
                     aportes = new ArrayList<>();
                 }
 
+                carregouAlgumaVez = true;
                 atualizarEstadoLista(aportes.size());
 
-                recyclerInvestimentos.setAdapter(new AporteAdapter(aportes));
+                EsqueletoAdapter.ocultar(recyclerInvestimentos, new AporteAdapter(aportes));
             }
 
             @Override
@@ -116,6 +125,7 @@ public class WalletFragment extends Fragment {
                     return;
                 }
 
+                EsqueletoAdapter.ocultar(recyclerInvestimentos, new AporteAdapter(new ArrayList<>()));
                 Toast.makeText(
                         requireContext(),
                         "Erro ao carregar aportes.",

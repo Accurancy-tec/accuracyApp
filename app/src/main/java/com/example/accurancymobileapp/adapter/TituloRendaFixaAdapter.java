@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.TituloRendaFixa;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.DestaqueLinha;
 import com.example.accurancymobileapp.utils.FavoritoUi;
 import com.example.accurancymobileapp.utils.FavoritosCache;
 
@@ -53,6 +54,21 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
 
     /** Highest row position that already played its entrance animation. */
     private int ultimaPosicaoAnimada = -1;
+
+    private int idDestacado = 0;
+
+    /** Marks the card of this title (a search opened the list for it); 0 clears the mark. */
+    public void destacar(int idTitulo) {
+        this.idDestacado = idTitulo;
+    }
+
+    /** Position of the title with this id, or -1. */
+    public int posicaoDe(int idTitulo) {
+        for (int i = 0; i < titulos.size(); i++) {
+            if (titulos.get(i).getIdTitulo() == idTitulo) return i;
+        }
+        return -1;
+    }
 
     public void atualizarLista(List<TituloRendaFixa> novaLista) {
         titulos.clear();
@@ -147,6 +163,9 @@ public class TituloRendaFixaAdapter extends RecyclerView.Adapter<TituloRendaFixa
             }
         });
         AnimacaoUtils.efeitoPressionar(holder.itemView);
+        DestaqueLinha.aplicar(holder.itemView,
+                idDestacado != 0 && titulo.getIdTitulo() == idDestacado,
+                R.drawable.bg_carteira_card);
 
         if (position > ultimaPosicaoAnimada) {
             ultimaPosicaoAnimada = position;

@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.AcoesAdapter;
+import com.example.accurancymobileapp.adapter.EsqueletoAdapter;
 import com.example.accurancymobileapp.model.Acao;
 import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.model.MarketType;
@@ -42,6 +43,10 @@ public class MarketListActivity extends AppCompatActivity {
 
     private static final String TAG = "MarketListActivity";
     public static final String EXTRA_MARKET_TYPE = "TAG";
+    /** Optional: text already typed in the search box when the list opens. */
+    public static final String EXTRA_BUSCA_INICIAL = "busca_inicial";
+    /** Optional: symbol to scroll to and mark once the list loads (used by the general search). */
+    public static final String EXTRA_DESTACAR = "destacar_simbolo";
 
     private static final int LIMITE_POR_PAGINA = 20;
     private static final long DEBOUNCE_DELAY_MS = 450L;
@@ -66,6 +71,7 @@ public class MarketListActivity extends AppCompatActivity {
     private String sortOrder = "desc";
 
     private Runnable pesquisaPendente;
+    private String destacarPendente;
 
     private ImageButton btnVoltar;
     private ImageButton btnFiltros;
@@ -113,6 +119,16 @@ public class MarketListActivity extends AppCompatActivity {
         favoritoRepository = new FavoritoRepository(this);
         adapter.habilitarFavoritos(marketType.getDetailCategory(), this::alternarFavorito);
         rvMarket.setAdapter(adapter);
+
+        // Opened from the general search: the box already holds the symbol (set before the watcher
+        // exists, so it does not trigger a second request) and that row gets marked after loading.
+        String buscaInicial = getIntent().getStringExtra(EXTRA_BUSCA_INICIAL);
+        if (buscaInicial != null && !buscaInicial.trim().isEmpty()) {
+            searchTerm = buscaInicial.trim();
+            edtBuscarAtivo.setText(searchTerm);
+            edtBuscarAtivo.setSelection(edtBuscarAtivo.getText().length());
+        }
+        destacarPendente = getIntent().getStringExtra(EXTRA_DESTACAR);
 
         configurarBotoes();
         configurarPesquisa();
@@ -269,6 +285,13 @@ public class MarketListActivity extends AppCompatActivity {
         carregando = true;
         atualizarControles();
 
+        // A mark from a search lasts until the person changes the list.
+        if (destacarPendente == null) adapter.destacar(null);
+        // Placeholder rows, unless the pull-to-refresh spinner is already showing.
+        if (!puxar.atualizando()) {
+            EsqueletoAdapter.mostrar(rvMarket, R.layout.item_esqueleto_linha, 8);
+        }
+
         marketListRepository.listarAtivos(
                 marketType,
                 requestedPage,
@@ -300,6 +323,7 @@ public class MarketListActivity extends AppCompatActivity {
                                     Toast.LENGTH_LONG
                             ).show();
                             temProximaPagina = false;
+                            EsqueletoAdapter.ocultar(rvMarket, adapter);
                             atualizarControles();
                             return;
                         }
@@ -314,7 +338,19 @@ public class MarketListActivity extends AppCompatActivity {
                         temProximaPagina = paginacao.isTemProximaPagina()
                                 || paginaAtual < totalPaginas;
 
+                        if (destacarPendente != null) {
+                            adapter.destacar(destacarPendente);
+                        }
                         adapter.atualizarLista(resultado.getAcoes());
+                        EsqueletoAdapter.ocultar(rvMarket, adapter);
+                        if (destacarPendente != null) {
+                            final int posicao = adapter.posicaoDe(destacarPendente);
+                            destacarPendente = null;
+                            if (posicao >= 0) {
+                                rvMarket.post(() -> ((LinearLayoutManager) rvMarket.getLayoutManager())
+                                        .scrollToPositionWithOffset(posicao, 0));
+                            }
+                        }
                         atualizarControles();
                         animarPaginaAtual();
                     }
@@ -333,6 +369,8 @@ public class MarketListActivity extends AppCompatActivity {
                         }
 
                         Log.e(TAG, mensagem);
+                        destacarPendente = null;
+                        EsqueletoAdapter.ocultar(rvMarket, adapter);
                         Toast.makeText(
                                 MarketListActivity.this,
                                 mensagem,
