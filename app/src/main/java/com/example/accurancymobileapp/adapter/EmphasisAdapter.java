@@ -4,6 +4,7 @@ package com.example.accurancymobileapp.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.clsAportes;
+import com.example.accurancymobileapp.utils.AssetLogo;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -54,12 +56,7 @@ public class EmphasisAdapter
         String tipo = aporte.getTipo();
         String recorrencia = aporte.getRecorrencia();
 
-        // Ícone com a primeira letra do ativo.
-        holder.txtIconAtivo.setText(
-                ativo != null && !ativo.trim().isEmpty()
-                        ? ativo.substring(0, 1).toUpperCase(Locale.ROOT)
-                        : "?"
-        );
+        AssetLogo.show(holder.imgHighlightLogo, ativo);
 
         // Nome e subtítulo.
         holder.txtNomeAtivo.setText(
@@ -157,13 +154,6 @@ public class EmphasisAdapter
                 )
         );
 
-        android.util.Log.d(
-                "EmphasisAdapter",
-                "Ativo=" + aporte.getAtivo()
-                        + " | Tipo=" + aporte.getTipo()
-                        + " | Recorrencia=" + aporte.getRecorrencia()
-                        + " | Rendimento=" + aporte.getRendimentoPercentual()
-        );
     }
 
     @Override
@@ -173,7 +163,7 @@ public class EmphasisAdapter
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView txtIconAtivo;
+        ImageView imgHighlightLogo;
         TextView txtNomeAtivo;
         TextView txtSubtituloAtivo;
         TextView txtValorAtivo;
@@ -182,7 +172,7 @@ public class EmphasisAdapter
         ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            txtIconAtivo = itemView.findViewById(R.id.txtIconAtivo);
+            imgHighlightLogo = itemView.findViewById(R.id.imgHighlightLogo);
             txtNomeAtivo = itemView.findViewById(R.id.txtNomeAtivo);
             txtSubtituloAtivo = itemView.findViewById(R.id.txtSubtituloAtivo);
             txtValorAtivo = itemView.findViewById(R.id.txtValorAtivo);
