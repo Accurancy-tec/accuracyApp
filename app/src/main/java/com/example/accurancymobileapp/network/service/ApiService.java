@@ -270,6 +270,10 @@ public interface ApiService {
             @Query("id_carteira") int idCarteira
     );
 
+    /** Body: id_carteira, nome_carteira (up to 60 characters). */
+    @POST("carteiras/renomear-carteira")
+    Call<RespostaSimples> renameWallet(@Body Map<String, Object> body);
+
     @POST("carteiras/adicionar-saldo")
     Call<AdicionarSaldoResponse> adicionarSaldo(
             @Query("valor")String valor

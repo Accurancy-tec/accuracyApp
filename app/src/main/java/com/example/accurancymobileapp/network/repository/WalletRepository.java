@@ -85,7 +85,30 @@ public class WalletRepository {
         });
     }
 
-    /** Carteira real com ativos não é excluída: a API responde 409 e a mensagem explica o motivo. */
+    public void renameWallet(int walletId, @NonNull String name, @NonNull WalletCallback callback) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("id_carteira", walletId);
+        body.put("nome_carteira", name);
+        apiService.renameWallet(body).enqueue(new Callback<RespostaSimples>() {
+            @Override
+            public void onResponse(@NonNull Call<RespostaSimples> call, @NonNull Response<RespostaSimples> response) {
+                RespostaSimples result = response.body();
+                if (!response.isSuccessful() || result == null || !result.ok()) {
+                    callback.onError(result != null ? result.texto("Não foi possível renomear a carteira.")
+                            : erroHttp(response, "Não foi possível renomear a carteira"));
+                    return;
+                }
+                callback.onSuccess(result.texto("Nome da carteira atualizado"));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<RespostaSimples> call, @NonNull Throwable t) {
+                callback.onError(SEM_CONEXAO);
+            }
+        });
+    }
+
+    /** The API sells the open positions and keeps the operations in the history; a real wallet with fixed income gets 409. */
     public void deletarWallet(int idCarteira, @NonNull WalletCallback callback) {
         apiService.excluirCarteira(idCarteira).enqueue(new Callback<RespostaSimples>() {
             @Override
