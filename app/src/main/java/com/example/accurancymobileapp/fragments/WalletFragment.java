@@ -417,7 +417,7 @@ public class WalletFragment extends Fragment {
         field.setSingleLine(true);
         field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         field.setText(nomeCarteira);
-        field.setSelection(field.length());
+        field.selectAll();
         layout.addView(field);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
