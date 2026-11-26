@@ -28,6 +28,7 @@ import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.EscolhaCarteira;
 import com.example.accurancymobileapp.utils.FavoritoUi;
 import com.example.accurancymobileapp.utils.FavoritosCache;
@@ -132,7 +133,7 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
         Object recebido = args == null ? null : args.getSerializable(ARG_TITULO);
         if (!(recebido instanceof TituloRendaFixa)) {
             Log.e(TAG, "Titulo nao informado ao card de aplicacao.");
-            Toast.makeText(requireContext(), "Não foi informado qual título aplicar.", Toast.LENGTH_LONG).show();
+            Aviso.makeText(requireContext(), "Não foi informado qual título aplicar.", Toast.LENGTH_LONG).show();
             dismissAllowingStateLoss();
             return;
         }
@@ -209,7 +210,7 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
                             return;
                         }
                         FavoritoUi.aplicar(btnFavorito, estadoAnterior);
-                        Toast.makeText(requireContext(), mensagem, Toast.LENGTH_SHORT).show();
+                        Aviso.makeText(requireContext(), mensagem, Toast.LENGTH_SHORT).show();
                     }
                 }));
     }

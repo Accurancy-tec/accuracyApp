@@ -1,5 +1,6 @@
 package com.example.accurancymobileapp.fragments;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ public abstract class PerfilSheetBase extends CartaoDeslizante {
     protected Button btnPrimario;
     private final TextView[] rotulos = new TextView[3];
     private final EditText[] campos = new EditText[3];
+    private Typeface fonteDosCampos;
     private String textoPrimario = "";
     private boolean ocupado = false;
 
@@ -63,6 +65,7 @@ public abstract class PerfilSheetBase extends CartaoDeslizante {
         campos[0] = view.findViewById(R.id.etPerfilCampo1);
         campos[1] = view.findViewById(R.id.etPerfilCampo2);
         campos[2] = view.findViewById(R.id.etPerfilCampo3);
+        fonteDosCampos = campos[0].getTypeface();
         esconderCampos();
         onPronto(savedInstanceState);
     }
@@ -77,6 +80,8 @@ public abstract class PerfilSheetBase extends CartaoDeslizante {
         campo.setVisibility(View.VISIBLE);
         campo.setHint(dica);
         campo.setInputType(inputType);
+        // A password input type switches the field to a monospace font; keep the app font.
+        campo.setTypeface(fonteDosCampos);
         campo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLen)});
         campo.setText("");
     }

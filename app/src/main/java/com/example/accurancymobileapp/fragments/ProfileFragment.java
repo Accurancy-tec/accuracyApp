@@ -27,12 +27,15 @@ import androidx.fragment.app.Fragment;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.AjudaActivity;
+import com.example.accurancymobileapp.activities.DispositivosActivity;
 import com.example.accurancymobileapp.activities.LoginActivity;
 import com.example.accurancymobileapp.activities.NotificacoesActivity;
 import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.response.RespostaSimples;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.ContadorNotificacoes;
 import com.example.accurancymobileapp.utils.Esqueleto;
 import com.example.accurancymobileapp.utils.FotoPerfil;
@@ -42,6 +45,9 @@ import com.example.accurancymobileapp.utils.SessionManager;
 import com.example.accurancymobileapp.utils.TemaApp;
 import com.example.accurancymobileapp.utils.TutorialTour;
 import com.google.android.material.materialswitch.MaterialSwitch;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -112,6 +118,8 @@ public class ProfileFragment extends Fragment {
         view.findViewById(R.id.itemReverTutorial).setOnClickListener(
                 v -> TutorialTour.iniciar(requireActivity(), false));
         view.findViewById(R.id.itemAlterarSenha).setOnClickListener(v -> abrirTrocaSenha());
+        view.findViewById(R.id.itemAparelhos).setOnClickListener(
+                v -> startActivity(new Intent(requireContext(), DispositivosActivity.class)));
         view.findViewById(R.id.itemSair).setOnClickListener(v -> logoutSession());
         sino.setOnClickListener(v -> startActivity(new Intent(requireContext(), NotificacoesActivity.class)));
         btnAlterarFoto.setOnClickListener(v -> seletorFoto.launch("image/*"));
@@ -193,7 +201,7 @@ public class ProfileFragment extends Fragment {
                     txtNomeConta.setText("—");
                     txtEmailConta.setText("—");
                     txtTelefoneConta.setText("—");
-                    Toast.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
+                    Aviso.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -331,13 +339,13 @@ public class ProfileFragment extends Fragment {
                             colocarBitmap(local);
                         }
                         carregarPerfil();
-                        Toast.makeText(requireContext(), "Foto atualizada.", Toast.LENGTH_SHORT).show();
+                        Aviso.makeText(requireContext(), "Foto atualizada.", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void aoErro(String mensagem) {
                         definirEnviandoFoto(false);
-                        Toast.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
+                        Aviso.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
                     }
                 });
             }
@@ -347,7 +355,7 @@ public class ProfileFragment extends Fragment {
                 enviandoFoto = false;
                 if (!isAdded() || getView() == null) return;
                 definirEnviandoFoto(false);
-                Toast.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
+                Aviso.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -364,7 +372,7 @@ public class ProfileFragment extends Fragment {
 
     private boolean perfilPronto() {
         if (usuario == null) {
-            Toast.makeText(requireContext(), "Aguarde o perfil carregar.", Toast.LENGTH_SHORT).show();
+            Aviso.makeText(requireContext(), "Aguarde o perfil carregar.", Toast.LENGTH_SHORT).show();
             carregarPerfil();
             return false;
         }
@@ -435,11 +443,34 @@ public class ProfileFragment extends Fragment {
     }
 
     public void logoutSession() {
-        new SessionManager(requireContext()).logout();
+        SessionManager sessao = new SessionManager(requireContext());
+        encerrarSessaoNoServidor(sessao.getRefreshToken());
+        sessao.logout();
 
         Intent it = new Intent(requireContext(), LoginActivity.class);
         it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         startActivity(it);
+    }
+
+    /**
+     * Closes this device's session on the API too, so it leaves the connected devices list.
+     * If the request fails the phone is signed out anyway (the session expires on its own).
+     */
+    private void encerrarSessaoNoServidor(@Nullable String refreshToken) {
+        if (refreshToken == null || refreshToken.isEmpty()) return;
+        Map<String, String> corpo = new HashMap<>();
+        corpo.put("refresh_token", refreshToken);
+        RetrofitClient.getApiService(requireContext().getApplicationContext()).sair(corpo)
+                .enqueue(new retrofit2.Callback<RespostaSimples>() {
+                    @Override
+                    public void onResponse(@NonNull Call<RespostaSimples> call,
+                                           @NonNull retrofit2.Response<RespostaSimples> response) {
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<RespostaSimples> call, @NonNull Throwable t) {
+                    }
+                });
     }
 }

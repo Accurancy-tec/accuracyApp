@@ -24,6 +24,7 @@ import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.EscolhaCarteira;
 import com.example.accurancymobileapp.utils.MascaraMonetaria;
 
@@ -78,7 +79,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
         Object recebido = getIntent().getSerializableExtra(EXTRA_TITULO);
         if (!(recebido instanceof TituloRendaFixa)) {
             Log.e(TAG, "Titulo nao informado na Intent.");
-            Toast.makeText(this, "Não foi informado qual título aplicar.", Toast.LENGTH_LONG).show();
+            Aviso.makeText(this, "Não foi informado qual título aplicar.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -246,7 +247,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
         BigDecimal valor = valorDigitado();
         String problema = validar(valor);
         if (problema != null) {
-            Toast.makeText(this, problema, Toast.LENGTH_SHORT).show();
+            Aviso.makeText(this, problema, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -259,7 +260,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
                 }
                 if (wallets == null || wallets.isEmpty()) {
                     definirEmAndamento(false);
-                    Toast.makeText(AplicarRendaFixaActivity.this,
+                    Aviso.makeText(AplicarRendaFixaActivity.this,
                             "Crie uma carteira antes de aplicar em renda fixa.", Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -279,7 +280,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
                 }
                 Log.e(TAG, "Falha ao listar carteiras: " + message);
                 definirEmAndamento(false);
-                Toast.makeText(AplicarRendaFixaActivity.this, message, Toast.LENGTH_LONG).show();
+                Aviso.makeText(AplicarRendaFixaActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -289,7 +290,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
         String falta = EscolhaCarteira.faltaSaldo(carteira, null, valor);
         if (falta != null) {
             definirEmAndamento(false);
-            Toast.makeText(this, falta, Toast.LENGTH_LONG).show();
+            Aviso.makeText(this, falta, Toast.LENGTH_LONG).show();
             return;
         }
         registrar(valor, carteira.getId_carteira());
@@ -313,7 +314,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
                     return;
                 }
                 Log.d(TAG, "Aplicacao registrada: titulo=" + titulo.getIdTitulo());
-                Toast.makeText(AplicarRendaFixaActivity.this,
+                Aviso.makeText(AplicarRendaFixaActivity.this,
                         "Aplicação realizada com sucesso (operação simulada).", Toast.LENGTH_LONG).show();
                 setResult(RESULT_OK);
                 finish();
@@ -326,7 +327,7 @@ public class AplicarRendaFixaActivity extends AppCompatActivity {
                 }
                 Log.w(TAG, "Aplicacao recusada: " + mensagem);
                 definirEmAndamento(false);
-                Toast.makeText(AplicarRendaFixaActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                Aviso.makeText(AplicarRendaFixaActivity.this, mensagem, Toast.LENGTH_LONG).show();
             }
         });
     }

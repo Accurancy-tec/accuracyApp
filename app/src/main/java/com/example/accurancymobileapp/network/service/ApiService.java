@@ -21,6 +21,7 @@ import com.example.accurancymobileapp.response.PerguntasResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.RespostaSimples;
 import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
+import com.example.accurancymobileapp.response.SessoesResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.response.TitulosRendaFixaResponse;
 
@@ -61,6 +62,33 @@ public interface ApiService {
 
     @POST("auth/loginGoogle")
     Call<LoginResponse> loginGoogle(@Body Map<String, String> body);
+
+    // ---- Forgot password (no token needed) ----
+
+    /** Body: email_usuario. The answer is the same whether or not the account exists. */
+    @POST("auth/recuperarSenha")
+    Call<PerfilResponse> recuperarSenha(@Body Map<String, String> body);
+
+    /** Body: email_usuario, codigo and nova_senha. Signs the account out everywhere. */
+    @POST("auth/redefinirSenha")
+    Call<PerfilResponse> redefinirSenha(@Body Map<String, String> body);
+
+    // ---- Connected devices (token needed) ----
+
+    @POST("auth/sessoes")
+    Call<SessoesResponse> listarSessoes();
+
+    /** Body: id_sessao. */
+    @POST("auth/sessaoEncerrar")
+    Call<SessoesResponse> encerrarSessao(@Body Map<String, Object> corpo);
+
+    /** Body: manter_atual (true keeps this device signed in). */
+    @POST("auth/sessoesEncerrar")
+    Call<SessoesResponse> encerrarSessoes(@Body Map<String, Object> corpo);
+
+    /** Logout. Body: refresh_token. Works even after the access token expired. */
+    @POST("auth/sair")
+    Call<RespostaSimples> sair(@Body Map<String, String> corpo);
 
     // ---- Profile (token needed) ----
 

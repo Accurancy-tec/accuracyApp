@@ -379,6 +379,28 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <View style="@style/LinhaOpcaoDivisor" />
+
+                <LinearLayout
+                    android:id="@+id/itemAparelhos"
+                    style="@style/LinhaOpcao">
+
+                    <ImageView
+                        style="@style/LinhaOpcaoIcone"
+                        android:src="@drawable/ic_celular" />
+
+                    <LinearLayout style="@style/LinhaOpcaoTextos">
+
+                        <TextView
+                            style="@style/LinhaOpcaoTitulo"
+                            android:text="Aparelhos conectados" />
+
+                        <TextView
+                            style="@style/LinhaOpcaoDetalhe"
+                            android:text="Veja onde a conta está aberta e desconecte" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout

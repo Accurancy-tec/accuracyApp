@@ -22,6 +22,7 @@ import com.example.accurancymobileapp.utils.Esqueleto;
 import com.example.accurancymobileapp.model.Aporte;
 import com.example.accurancymobileapp.network.repository.HistoricRepository;
 import com.example.accurancymobileapp.ui.ChartHelper;
+import com.example.accurancymobileapp.utils.Aviso;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -134,7 +135,7 @@ public class HistoricFragment extends Fragment {
                 puxar.concluir();
                 if (!isAdded()) return;
                 Log.e("HISTORICO_APORTES", message == null ? "Erro sem mensagem" : message);
-                Toast.makeText(requireContext(), "Não foi possível carregar o histórico.", Toast.LENGTH_SHORT).show();
+                Aviso.makeText(requireContext(), "Não foi possível carregar o histórico.", Toast.LENGTH_SHORT).show();
                 aplicarFiltros();
                 terminarCarregando();
             }

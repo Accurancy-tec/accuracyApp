@@ -100,4 +100,8 @@
     <color name="negativo_sobre_destaque">#FFFFC2C7</color>
     <color name="linha_sobre_destaque">#33FFFFFF</color>
     <color name="fundo_sobre_destaque">#26FFFFFF</color>
+
+    <!-- Aviso (substitui o Toast): escuro no tema claro, claro no tema escuro -->
+    <color name="aviso_fundo">#F01E293B</color>
+    <color name="aviso_texto">#FFF8FAFC</color>
 </resources>

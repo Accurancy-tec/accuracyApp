@@ -31,6 +31,7 @@ import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.EscolhaCarteira;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -43,6 +44,8 @@ import java.util.Locale;
 public class BuyAssetActivity extends AppCompatActivity {
 
     public static final String EXTRA_TIPO_OPERACAO = "tipo_operacao";
+    /** Nome da carteira de onde sai a venda (escolhida antes, na tela do ativo). */
+    public static final String EXTRA_NOME_CARTEIRA = "nome_carteira";
 
     private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
     private static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(PT_BR);
@@ -103,7 +106,7 @@ public class BuyAssetActivity extends AppCompatActivity {
         readIntentData();
 
         if (ticker == null || ticker.trim().isEmpty()) {
-            Toast.makeText(this, "Não foi informado qual ativo operar.", Toast.LENGTH_LONG).show();
+            Aviso.makeText(this, "Não foi informado qual ativo operar.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -234,8 +237,12 @@ public class BuyAssetActivity extends AppCompatActivity {
         }
 
         if (isSellOperation()) {
+            String walletName = getIntent().getStringExtra(EXTRA_NOME_CARTEIRA);
             tvBuyAvailableBalance.setText(
-                    "Disponível para venda: " + formatQuantity(availableAssetQuantity) + unitSuffix()
+                    (walletName == null || walletName.isEmpty()
+                            ? "Disponível para venda: "
+                            : "Disponível em " + walletName + ": ")
+                            + formatQuantity(availableAssetQuantity) + unitSuffix()
             );
             tvBuyQuantityDescription.setText(isFractionalAsset()
                     ? "Informe quanto deseja vender (até 8 casas decimais)."
@@ -309,7 +316,7 @@ public class BuyAssetActivity extends AppCompatActivity {
         }
 
         if (isSellOperation() && updatedQuantity.compareTo(getSellableQuantity()) > 0) {
-            Toast.makeText(
+            Aviso.makeText(
                     this,
                     "Você não possui essa quantidade disponível para venda.",
                     Toast.LENGTH_SHORT
@@ -412,7 +419,7 @@ public class BuyAssetActivity extends AppCompatActivity {
         BigDecimal quantity = getRequestedQuantity();
         String validationMessage = getValidationMessage(quantity);
         if (validationMessage != null) {
-            Toast.makeText(this, validationMessage, Toast.LENGTH_LONG).show();
+            Aviso.makeText(this, validationMessage, Toast.LENGTH_LONG).show();
             refreshOrderPreview();
             return;
         }
@@ -434,7 +441,7 @@ public class BuyAssetActivity extends AppCompatActivity {
                 }
                 if (wallets == null || wallets.isEmpty()) {
                     setOperationInProgress(false);
-                    Toast.makeText(
+                    Aviso.makeText(
                             BuyAssetActivity.this,
                             "Crie uma carteira antes de registrar uma operação.",
                             Toast.LENGTH_LONG
@@ -464,7 +471,7 @@ public class BuyAssetActivity extends AppCompatActivity {
                     return;
                 }
                 setOperationInProgress(false);
-                Toast.makeText(BuyAssetActivity.this, message, Toast.LENGTH_LONG).show();
+                Aviso.makeText(BuyAssetActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -534,7 +541,7 @@ public class BuyAssetActivity extends AppCompatActivity {
                             return;
                         }
 
-                        Toast.makeText(
+                        Aviso.makeText(
                                 BuyAssetActivity.this,
                                 message + " (operação simulada)",
                                 Toast.LENGTH_LONG
@@ -552,7 +559,7 @@ public class BuyAssetActivity extends AppCompatActivity {
                             return;
                         }
                         setOperationInProgress(false);
-                        Toast.makeText(BuyAssetActivity.this, message, Toast.LENGTH_LONG).show();
+                        Aviso.makeText(BuyAssetActivity.this, message, Toast.LENGTH_LONG).show();
                     }
                 }
         );

@@ -31,6 +31,7 @@ import com.example.accurancymobileapp.model.TituloRendaFixa;
 import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import android.widget.Toast;
 import com.example.accurancymobileapp.network.repository.RendaFixaRepository;
+import com.example.accurancymobileapp.utils.Aviso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +163,7 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
                     public void onError(boolean estadoAnterior, String mensagem) {
                         if (isFinishing() || isDestroyed()) return;
                         adapter.notifyItemChanged(posicao);
-                        Toast.makeText(OpcoesRendaFixaActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                        Aviso.makeText(OpcoesRendaFixaActivity.this, mensagem, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -178,7 +179,7 @@ public class OpcoesRendaFixaActivity extends AppCompatActivity
                 return;
             }
         }
-        Toast.makeText(this, "Este título não está mais disponível.", Toast.LENGTH_SHORT).show();
+        Aviso.makeText(this, "Este título não está mais disponível.", Toast.LENGTH_SHORT).show();
     }
 
     private void abrirAplicacao(TituloRendaFixa titulo) {

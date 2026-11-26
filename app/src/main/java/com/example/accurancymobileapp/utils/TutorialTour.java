@@ -39,27 +39,53 @@ public final class TutorialTour {
         }
     }
 
-    /** Cinco passos curtos: o essencial para começar, sem repetir o que cada tela já explica. */
+    /** O caminho completo: saldo, carteiras, comprar, vender, histórico e perfil. */
     private static final Passo[] PASSOS = new Passo[]{
             new Passo("Seu patrimônio",
-                    "Aqui fica o total das suas carteiras reais somado ao saldo livre. As carteiras simuladas "
-                            + "aparecem logo abaixo, separadas, para não misturar dinheiro de teste.",
+                    "Patrimônio total é o saldo livre somado ao valor atual das carteiras reais. "
+                            + "Investido é quanto você pagou pelos ativos que ainda tem; Resultado é quanto "
+                            + "eles ganharam ou perderam desde a compra.",
                     R.id.nav_home, R.id.cardSaldoTotal),
-            new Passo("Comece por uma carteira",
-                    "Uma carteira real usa o seu saldo. Uma simulada tem um valor só dela, que você escolhe, "
-                            + "para testar estratégias sem mexer no resto.",
+            new Passo("Saldo para investir",
+                    "O dinheiro do Accuracy é fictício. Toque em \"Adicionar saldo\" para colocar dinheiro "
+                            + "na conta: ele paga as compras das carteiras reais.",
+                    R.id.nav_home, R.id.cardSaldoDisponivel),
+            new Passo("Dois tipos de carteira",
+                    "Real: usa o saldo da conta e entra no patrimônio. Simulada: tem um valor só dela, "
+                            + "escolhido na criação, para testar estratégias sem mexer no seu saldo. "
+                            + "Toque aqui para criar a primeira.",
                     R.id.nav_home, R.id.cardCriarCarteira),
-            new Passo("Acompanhe a evolução",
-                    "Toque e arraste no gráfico para ver o valor exato de cada dia. "
-                            + "Os botões 1M, 6M e 1A mudam o período.",
-                    R.id.nav_home, R.id.blocoGraficoEvolucao),
-            new Passo("Escolha o que comprar",
-                    "Busque pelo código ou nome (PETR4, MXRF11, Bitcoin, Tesouro...) ou navegue pelas "
-                            + "categorias. Ao tocar no ativo, você vê os detalhes e compra.",
+            new Passo("Suas carteiras",
+                    "Cada cartão mostra se a carteira é real ou simulada, o patrimônio e o resultado. "
+                            + "Ao abrir uma, você vê as operações dela; numa simulada também dá para depositar "
+                            + "mais dinheiro e tocar em \"Simular investimento\".",
+                    R.id.nav_wallet, R.id.btnCriarWallet),
+            new Passo("Encontre um ativo",
+                    "Busque pelo código ou pelo nome (PETR4, MXRF11, Bitcoin, Tesouro...). "
+                            + "Os resultados aparecem por categoria enquanto você digita.",
                     R.id.nav_aporte, R.id.containerBuscaGeral),
+            new Passo("Ou escolha por categoria",
+                    "Renda fixa, Tesouro Direto, Bolsa de Valores, Criptomoedas, Contratos Futuros e "
+                            + "Moedas: cada categoria tem sua lista, com filtros e ordenação.",
+                    R.id.nav_aporte, R.id.containerCardsProdutos),
+            new Passo("Como comprar",
+                    "1. Abra o ativo e toque em \"Comprar\".\n"
+                            + "2. Escolha a quantidade: o app mostra o total estimado, já com as taxas.\n"
+                            + "3. Confirme e escolha a carteira. Cada opção mostra quanto dinheiro tem: o saldo "
+                            + "geral nas reais e o saldo da própria simulação nas simuladas.",
+                    R.id.nav_aporte, 0),
+            new Passo("Como vender",
+                    "Abra o ativo e toque em \"Vender\". Primeiro você escolhe a carteira (só aparecem as "
+                            + "que têm o ativo) e depois a quantidade. O valor da venda volta para o saldo de "
+                            + "onde o dinheiro saiu.",
+                    R.id.nav_aporte, 0),
+            new Passo("Seu histórico",
+                    "Aqui ficam os totais de compras, vendas e dividendos do período (1S, 1M ou 1A), o "
+                            + "gráfico das movimentações e a lista de todas as operações, com filtro por tipo.",
+                    R.id.nav_historic, R.id.resumoHistorico),
             new Passo("Ajuda e preferências",
-                    "No Perfil você troca o tema entre claro e escuro, tira dúvidas nas perguntas frequentes, "
-                            + "fala com a equipe e pode rever este tour quando quiser.",
+                    "No Perfil você troca o tema entre claro e escuro, vê as perguntas frequentes, fala "
+                            + "com a equipe e pode rever este tour quando quiser.",
                     R.id.nav_profile, R.id.itemAparencia),
     };
 

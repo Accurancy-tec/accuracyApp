@@ -43,9 +43,12 @@ import com.example.accurancymobileapp.response.AssetPositionResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.ui.StockChartHelper;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.Esqueleto;
 import com.example.accurancymobileapp.utils.FavoritoUi;
 import com.example.accurancymobileapp.utils.FavoritosCache;
+import com.example.accurancymobileapp.utils.CarteiraEmFoco;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.NumberFormat;
 import java.time.Instant;
@@ -119,6 +122,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
     private double precoAtual = 0.0;
     private double quantidadePosicao = 0.0;
+    /** Posição em cada carteira que tem o ativo; a venda começa pela escolha da carteira. */
+    private final List<AssetPositionResponse.PosicaoCarteira> posicoesPorCarteira = new ArrayList<>();
     private double precoMedio = 0.0;
     private double variacaoDiaria = Double.NaN;
 
@@ -143,7 +148,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         idCarteira = getIntent().getIntExtra(EXTRA_ID_CARTEIRA, -1);
 
         if (ticker == null || ticker.trim().isEmpty()) {
-            Toast.makeText(
+            Aviso.makeText(
                     this,
                     "Não foi informado qual ativo abrir.",
                     Toast.LENGTH_LONG
@@ -222,7 +227,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                     public void onError(boolean estadoAnterior, String mensagem) {
                         if (isFinishing() || isDestroyed()) return;
                         FavoritoUi.aplicar(btnFavoritarAtivo, estadoAnterior);
-                        Toast.makeText(DetalhesAtivoActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                        Aviso.makeText(DetalhesAtivoActivity.this, mensagem, Toast.LENGTH_SHORT).show();
                     }
                 }));
     }
@@ -613,7 +618,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
                         atualizarResumoPosicao();
 
-                        Toast.makeText(
+                        Aviso.makeText(
                                 DetalhesAtivoActivity.this,
                                 mensagem,
                                 Toast.LENGTH_LONG
@@ -1023,7 +1028,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
     private void abrirTelaOperacao(String tipo) {
         if (!Double.isFinite(precoAtual) || precoAtual <= 0.0) {
-            Toast.makeText(
+            Aviso.makeText(
                     this,
                     ehFuturoAtivo()
                             ? "Este contrato não tem preço de ajuste em reais disponível; não é possível simular a operação."
@@ -1036,7 +1041,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         }
 
         if ("Venda".equals(tipo) && quantidadePosicao <= 0.0) {
-            Toast.makeText(
+            Aviso.makeText(
                     this,
                     "Você não possui unidades deste ativo disponíveis para venda.",
                     Toast.LENGTH_LONG
@@ -1046,6 +1051,56 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
             return;
         }
 
+        if ("Venda".equals(tipo) && !posicoesPorCarteira.isEmpty()) {
+            escolherCarteiraParaVenda();
+            return;
+        }
+
+        abrirOperacao(tipo, idCarteira, quantidadePosicao, null);
+    }
+
+    /**
+     * Venda: primeiro a carteira (só as que têm o ativo), depois a quantidade na tela seguinte.
+     * Aberta a partir de uma carteira, vende direto dela.
+     */
+    private void escolherCarteiraParaVenda() {
+        if (idCarteira > 0) {
+            for (AssetPositionResponse.PosicaoCarteira posicao : posicoesPorCarteira) {
+                if (posicao.getIdCarteira() == idCarteira) {
+                    abrirOperacao("Venda", idCarteira, posicao.getQuantidade(), posicao.getNome());
+                    return;
+                }
+            }
+            Aviso.makeText(this, "Esta carteira não tem unidades deste ativo para vender.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        AssetPositionResponse.PosicaoCarteira[] opcoes =
+                posicoesPorCarteira.toArray(new AssetPositionResponse.PosicaoCarteira[0]);
+        CharSequence[] nomes = new CharSequence[opcoes.length];
+        int emFoco = CarteiraEmFoco.obter(this);
+        int marcada = 0;
+        for (int i = 0; i < opcoes.length; i++) {
+            double quantidade = opcoes[i].getQuantidade();
+            nomes[i] = opcoes[i].getNome() + " · " + (opcoes[i].isSimulada() ? "simulada" : "real")
+                    + " — " + formatarQuantidade(quantidade) + (quantidade == 1 ? " unidade" : " unidades");
+            if (opcoes[i].getIdCarteira() == emFoco) marcada = i;
+        }
+        final int[] escolhida = {marcada};
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Vender de qual carteira?")
+                .setSingleChoiceItems(nomes, marcada, (dialogo, qual) -> escolhida[0] = qual)
+                .setPositiveButton("Continuar", (dialogo, qual) -> {
+                    AssetPositionResponse.PosicaoCarteira posicao = opcoes[escolhida[0]];
+                    abrirOperacao("Venda", posicao.getIdCarteira(), posicao.getQuantidade(), posicao.getNome());
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void abrirOperacao(String tipo, int carteiraDestino, double quantidadeDisponivel,
+                               @Nullable String nomeCarteira) {
         Intent asset = new Intent(
                 DetalhesAtivoActivity.this,
                 BuyAssetActivity.class
@@ -1054,7 +1109,8 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
         asset.putExtra(EXTRA_TICKER, ticker);
         asset.putExtra(EXTRA_NOME, nomeAtivo);
         asset.putExtra(EXTRA_CATEGORIA, categoriaAtivo);
-        asset.putExtra(EXTRA_ID_CARTEIRA, idCarteira);
+        asset.putExtra(EXTRA_ID_CARTEIRA, carteiraDestino);
+        if (nomeCarteira != null) asset.putExtra(BuyAssetActivity.EXTRA_NOME_CARTEIRA, nomeCarteira);
         asset.putExtra(
                 EXTRA_SALDO,
                 saldoAtual >= 0 ? saldoAtual : getIntent().getDoubleExtra(EXTRA_SALDO, -1.0)
@@ -1065,7 +1121,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 EXTRA_ULTIMA_ATUALIZACAO_COMPRA,
                 tvUltimaAtualizacao.getText().toString()
         );
-        asset.putExtra(EXTRA_QUANTIDADE_DISPONIVEL_COMPRA, quantidadePosicao);
+        asset.putExtra(EXTRA_QUANTIDADE_DISPONIVEL_COMPRA, quantidadeDisponivel);
         asset.putExtra(BuyAssetActivity.EXTRA_TIPO_OPERACAO, tipo);
 
         startActivity(asset);
@@ -1130,6 +1186,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
     private void limparResumoPosicao() {
         quantidadePosicao = 0.0;
         precoMedio = 0.0;
+        posicoesPorCarteira.clear();
         atualizarBotaoDividendo();
 
         tvPrecoMedio.setText("—");
@@ -1174,6 +1231,9 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                                 ? averagePrice
                                 : 0.0;
 
+                        posicoesPorCarteira.clear();
+                        posicoesPorCarteira.addAll(position.getCarteiras());
+
                         atualizarResumoPosicao();
                     }
 
@@ -1192,7 +1252,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
                         limparResumoPosicao();
 
-                        Toast.makeText(
+                        Aviso.makeText(
                                 DetalhesAtivoActivity.this,
                                 "Não foi possível consultar sua posição.",
                                 Toast.LENGTH_SHORT

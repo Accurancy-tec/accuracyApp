@@ -16,6 +16,7 @@ import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 
 import java.util.HashMap;
@@ -52,7 +53,7 @@ public class VerificarEmailActivity extends AppCompatActivity {
 
         email = getIntent().getStringExtra(EXTRA_EMAIL);
         if (email == null || email.trim().isEmpty()) {
-            Toast.makeText(this, "E-mail não informado.", Toast.LENGTH_LONG).show();
+            Aviso.makeText(this, "E-mail não informado.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -101,7 +102,7 @@ public class VerificarEmailActivity extends AppCompatActivity {
         chamadaAtual.enqueue(new PerfilCallback(this) {
             @Override
             public void aoSucesso(PerfilResponse resposta) {
-                Toast.makeText(VerificarEmailActivity.this,
+                Aviso.makeText(VerificarEmailActivity.this,
                         resposta.texto("E-mail confirmado!"), Toast.LENGTH_LONG).show();
                 Intent resultado = new Intent();
                 resultado.putExtra(EXTRA_EMAIL, email);
@@ -128,7 +129,7 @@ public class VerificarEmailActivity extends AppCompatActivity {
             @Override
             public void aoSucesso(PerfilResponse resposta) {
                 reenviando = false;
-                Toast.makeText(VerificarEmailActivity.this,
+                Aviso.makeText(VerificarEmailActivity.this,
                         "Enviamos um novo código para o seu e-mail.", Toast.LENGTH_SHORT).show();
                 iniciarContagem();
             }

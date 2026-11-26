@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 
 import java.util.HashMap;
@@ -71,7 +72,7 @@ public class AlterarSenhaBottomSheet extends PerfilSheetBase {
                 ocupado(false);
                 boolean reenvio = etapa == 1;
                 if (!reenvio) mostrarEtapaCodigo();
-                Toast.makeText(requireContext(),
+                Aviso.makeText(requireContext(),
                         resposta.texto("Enviamos um código para o seu e-mail."), Toast.LENGTH_SHORT).show();
             }
 
@@ -109,7 +110,7 @@ public class AlterarSenhaBottomSheet extends PerfilSheetBase {
         api.perfilConfirmarTrocaSenha(corpo).enqueue(new PerfilCallback(this) {
             @Override
             public void aoSucesso(PerfilResponse resposta) {
-                Toast.makeText(requireContext(),
+                Aviso.makeText(requireContext(),
                         "Senha alterada. Entre novamente com a nova senha.", Toast.LENGTH_LONG).show();
                 concluir(ACAO_SAIR);
             }

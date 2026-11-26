@@ -23,6 +23,7 @@ import com.example.accurancymobileapp.model.Notificacao;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.response.NotificacoesResponse;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.CallbackDaTela;
 import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import com.google.android.material.button.MaterialButton;
@@ -112,7 +113,7 @@ public class NotificacoesActivity extends AppCompatActivity {
                     EsqueletoAdapter.ocultar(lista, adapter);
                     mostrarEstado(R.drawable.ic_bell, "Não foi possível carregar", mensagem, true);
                 } else {
-                    Toast.makeText(NotificacoesActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                    Aviso.makeText(NotificacoesActivity.this, mensagem, Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -195,7 +196,7 @@ public class NotificacoesActivity extends AppCompatActivity {
             @Override
             public void aoErro(@NonNull String mensagem) {
                 atualizarResumo();
-                Toast.makeText(NotificacoesActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                Aviso.makeText(NotificacoesActivity.this, mensagem, Toast.LENGTH_LONG).show();
             }
         });
     }

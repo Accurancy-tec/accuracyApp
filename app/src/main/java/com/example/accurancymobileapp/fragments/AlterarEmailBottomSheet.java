@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 
 import java.util.HashMap;
@@ -160,7 +161,7 @@ public class AlterarEmailBottomSheet extends PerfilSheetBase {
         api.perfilConfirmarTrocaEmail(corpo).enqueue(new PerfilCallback(this) {
             @Override
             public void aoSucesso(PerfilResponse resposta) {
-                Toast.makeText(requireContext(), "E-mail alterado com sucesso.", Toast.LENGTH_LONG).show();
+                Aviso.makeText(requireContext(), "E-mail alterado com sucesso.", Toast.LENGTH_LONG).show();
                 concluir(ACAO_RECARREGAR);
             }
 

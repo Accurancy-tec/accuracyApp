@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.NovaCarteiraRequest;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.MascaraMonetaria;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -177,7 +178,7 @@ public class FormCriarWalletActivity extends AppCompatActivity {
             public void onSuccess(String mensagem) {
                 if (isFinishing() || isDestroyed()) return;
                 definirEnviando(false);
-                Toast.makeText(FormCriarWalletActivity.this,
+                Aviso.makeText(FormCriarWalletActivity.this,
                         simulada ? "Simulação criada. Bons testes!" : "Carteira criada.", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();

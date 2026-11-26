@@ -97,7 +97,10 @@ public class AuthInterceptor implements Interceptor {
 
             Log.d("AUTH", "Refresh Token inválido ou expirado.");
 
-            forceLogout();
+            // A API marca o 401 de "aparelho desconectado" (tela Aparelhos conectados).
+            forceLogout(corpoErro401.contains("\"sessao_encerrada\":true")
+                    ? "Este aparelho foi desconectado da sua conta. Entre de novo."
+                    : "Sua sessão expirou. Entre de novo.");
 
             return createUnauthorizedResponse(
                     original
@@ -341,7 +344,10 @@ public class AuthInterceptor implements Interceptor {
                 path.endsWith("auth/loginGoogle") ||
                 path.endsWith("auth/googleConfig") ||
                 path.endsWith("auth/verify-email") ||
-                path.endsWith("auth/resend-verification");
+                path.endsWith("auth/resend-verification") ||
+                path.endsWith("auth/recuperarSenha") ||
+                path.endsWith("auth/redefinirSenha") ||
+                path.endsWith("auth/sair");
     }
 
     private Response createUnauthorizedResponse(Request request) {
@@ -364,7 +370,7 @@ public class AuthInterceptor implements Interceptor {
                 .build();
     }
 
-    private synchronized void forceLogout() {
+    private synchronized void forceLogout(String aviso) {
 
         if (redirecionando) {
 
@@ -381,6 +387,10 @@ public class AuthInterceptor implements Interceptor {
                         LoginActivity.class
                 );
 
+        intent.putExtra(LoginActivity.EXTRA_AVISO, aviso);
+        // Os pedidos em andamento falham agora e as telas deles estão fechando:
+        // só o aviso do login (que explica o motivo) aparece.
+        Aviso.silenciarExceto(LoginActivity.class, 4000L);
         intent.addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK |
                         Intent.FLAG_ACTIVITY_CLEAR_TASK

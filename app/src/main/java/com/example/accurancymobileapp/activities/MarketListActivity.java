@@ -33,6 +33,7 @@ import com.example.accurancymobileapp.model.MarketType;
 import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.network.repository.MarketListRepository;
 import com.example.accurancymobileapp.response.AcaoResponse;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
@@ -100,7 +101,7 @@ public class MarketListActivity extends AppCompatActivity {
         );
 
         if (marketType == null) {
-            Toast.makeText(
+            Aviso.makeText(
                     this,
                     "Tipo de mercado inválido.",
                     Toast.LENGTH_SHORT
@@ -319,7 +320,7 @@ public class MarketListActivity extends AppCompatActivity {
                         if (resultado == null
                                 || resultado.getPaginacao() == null
                                 || resultado.getAcoes() == null) {
-                            Toast.makeText(
+                            Aviso.makeText(
                                     MarketListActivity.this,
                                     "A API retornou dados incompletos.",
                                     Toast.LENGTH_LONG
@@ -336,7 +337,7 @@ public class MarketListActivity extends AppCompatActivity {
                             filtrosFiiCompletos = resultado.temFiltrosDetalhados();
                             if (!filtrosFiiCompletos && segmentType != null) {
                                 segmentType = null;
-                                Toast.makeText(MarketListActivity.this,
+                                Aviso.makeText(MarketListActivity.this,
                                         "O filtro por tipo de fundo está indisponível agora. Mostrando todos os FIIs.",
                                         Toast.LENGTH_LONG).show();
                             }
@@ -383,7 +384,7 @@ public class MarketListActivity extends AppCompatActivity {
                         Log.e(TAG, mensagem);
                         destacarPendente = null;
                         EsqueletoAdapter.ocultar(rvMarket, adapter);
-                        Toast.makeText(
+                        Aviso.makeText(
                                 MarketListActivity.this,
                                 mensagem,
                                 Toast.LENGTH_LONG
@@ -735,7 +736,7 @@ public class MarketListActivity extends AppCompatActivity {
                     public void onError(boolean estadoAnterior, String mensagem) {
                         if (isFinishing() || isDestroyed()) return;
                         adapter.notifyItemChanged(posicao);
-                        Toast.makeText(MarketListActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                        Aviso.makeText(MarketListActivity.this, mensagem, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
