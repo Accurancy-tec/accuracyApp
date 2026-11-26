@@ -18,7 +18,9 @@ import com.example.accurancymobileapp.response.NoticiasResponse;
 import com.example.accurancymobileapp.response.NotificacoesResponse;
 import com.example.accurancymobileapp.response.PerfilResponse;
 import com.example.accurancymobileapp.response.PerguntasResponse;
+import com.example.accurancymobileapp.response.AnaliseIaResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
+import com.example.accurancymobileapp.response.RelatorioResponse;
 import com.example.accurancymobileapp.response.RespostaSimples;
 import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
 import com.example.accurancymobileapp.response.SessoesResponse;
@@ -312,4 +314,14 @@ public interface ApiService {
 
     @GET("noticias/listar")
     Call<NoticiasResponse> listarNoticias(@Query("limite") int limite);
+
+    // ---- Relatório ----
+
+    /** Numbers of the account for the last N days (1 to 365), observations and the last AI analysis. */
+    @GET("relatorios/resumo")
+    Call<RelatorioResponse> relatorio(@Query("dias") int dias);
+
+    /** Body: dias. Writes a new AI analysis (at most one every 30 minutes per account). */
+    @POST("relatorios/analise")
+    Call<AnaliseIaResponse> gerarAnaliseIa(@Body Map<String, Object> corpo);
 }

@@ -65,6 +65,7 @@
     <color name="red_negative">#FFF44336</color>
     <!-- Perdas em destaque e erros -->
     <color name="negativo_destaque">#FFFF626B</color>
+    <color name="atencao_destaque">#FFFBBF24</color>
     <!-- Avisos -->
     <color name="aviso">#FFFFC400</color>
     <!-- Botão Sair da conta -->

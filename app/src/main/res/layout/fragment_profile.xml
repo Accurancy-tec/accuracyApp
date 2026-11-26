@@ -283,6 +283,34 @@
 
             <TextView
                 style="@style/Secao"
+                android:text="Seus números" />
+
+            <LinearLayout style="@style/CartaoOpcoes">
+
+                <LinearLayout
+                    android:id="@+id/itemRelatorio"
+                    style="@style/LinhaOpcao">
+
+                    <ImageView
+                        style="@style/LinhaOpcaoIcone"
+                        android:src="@drawable/ic_relatorio" />
+
+                    <LinearLayout style="@style/LinhaOpcaoTextos">
+
+                        <TextView
+                            style="@style/LinhaOpcaoTitulo"
+                            android:text="Relatório da conta" />
+
+                        <TextView
+                            style="@style/LinhaOpcaoDetalhe"
+                            android:text="Resultado, distribuição, movimentação e análise" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/Secao"
                 android:text="Ajuda" />
 
             <LinearLayout style="@style/CartaoOpcoes">

@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.AjudaActivity;
 import com.example.accurancymobileapp.activities.DispositivosActivity;
+import com.example.accurancymobileapp.activities.RelatorioActivity;
 import com.example.accurancymobileapp.activities.LoginActivity;
 import com.example.accurancymobileapp.activities.NotificacoesActivity;
 import com.example.accurancymobileapp.model.User;
@@ -120,6 +121,8 @@ public class ProfileFragment extends Fragment {
         view.findViewById(R.id.itemAlterarSenha).setOnClickListener(v -> abrirTrocaSenha());
         view.findViewById(R.id.itemAparelhos).setOnClickListener(
                 v -> startActivity(new Intent(requireContext(), DispositivosActivity.class)));
+        view.findViewById(R.id.itemRelatorio).setOnClickListener(
+                v -> startActivity(new Intent(requireContext(), RelatorioActivity.class)));
         view.findViewById(R.id.itemSair).setOnClickListener(v -> logoutSession());
         sino.setOnClickListener(v -> startActivity(new Intent(requireContext(), NotificacoesActivity.class)));
         btnAlterarFoto.setOnClickListener(v -> seletorFoto.launch("image/*"));
