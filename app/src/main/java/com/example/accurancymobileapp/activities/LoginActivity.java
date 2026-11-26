@@ -1,6 +1,14 @@
 package com.example.accurancymobileapp.activities;
 
 import android.content.Intent;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.widget.CheckBox;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -31,6 +39,7 @@ import com.example.accurancymobileapp.model.User;
 import com.example.accurancymobileapp.utils.Aparelho;
 import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.SessionManager;
+import com.example.accurancymobileapp.utils.TermsGate;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -58,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText txtConfirmarSenha;
     Button   btnLogin;
     Button btnRegister;
+    CheckBox checkTerms;
     TextView btnEsqueciSenha;
     ImageView btnToggleSenha;
     TextView tabEntrar;
@@ -105,6 +115,8 @@ public class LoginActivity extends AppCompatActivity {
         txtConfirmarSenha = findViewById(R.id.txtConfirmarSenha);
         btnLogin = findViewById(R.id.btnLogin);
         btnRegister = findViewById(R.id.btnRegister);
+        checkTerms = findViewById(R.id.checkTerms);
+        setUpTermsText(findViewById(R.id.tvTermsText));
         btnEsqueciSenha = findViewById(R.id.btnEsqueciSenha);
         btnToggleSenha = findViewById(R.id.btnToggleSenha);
         tabEntrar = findViewById(R.id.tabEntrar);
@@ -193,6 +205,13 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(!senhaCadastro.equals(confirmarSenhaCadastro)){
                     txtConfirmarSenha.setError("As senhas não são iguais.");
+                    return;
+                }
+
+                if(!checkTerms.isChecked()){
+                    Aviso.makeText(LoginActivity.this,
+                            "Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.",
+                            Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -352,8 +371,39 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /** "Termos de Uso" and "Política de Privacidade" open the documents; the rest of the text toggles the checkbox. */
+    private void setUpTermsText(TextView text) {
+        String full = text.getText().toString();
+        SpannableString spannable = new SpannableString(full);
+        linkPart(spannable, full, "Termos de Uso", TermsGate.TERMS_URL);
+        linkPart(spannable, full, "Política de Privacidade", TermsGate.PRIVACY_URL);
+        text.setText(spannable);
+        text.setMovementMethod(LinkMovementMethod.getInstance());
+        text.setOnClickListener(v -> checkTerms.toggle());
+    }
+
+    private void linkPart(SpannableString spannable, String full, String part, String url) {
+        int start = full.indexOf(part);
+        if (start < 0) return;
+        spannable.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+                TermsGate.open(LoginActivity.this, url);
+            }
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint paint) {
+                super.updateDrawState(paint);
+                paint.setColor(ContextCompat.getColor(LoginActivity.this, R.color.primary_blue));
+                paint.setUnderlineText(false);
+                paint.setFakeBoldText(true);
+            }
+        }, start, start + part.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
     private void fazerRegistro(String nome, String telefone, String senha, String email){
         User user = new User(nome, telefone, senha, email);
+        user.setAceiteTermos(true);
 
         ApiService api = RetrofitClient.getClient(this).create(ApiService.class);
         api.registerNewUser(user).enqueue(new Callback<ResponseBody>() {

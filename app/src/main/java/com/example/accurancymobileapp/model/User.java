@@ -11,6 +11,8 @@ public class User {
     private Boolean google_vinculado;
     /** Only sent on login, so the API can name this phone in the connected devices list. */
     private String dispositivo;
+    /** Only sent on sign-up: the person accepted the Terms of Use and the Privacy Policy. */
+    private Boolean aceite_termos;
 
     public User(String nome_usuario, String telefone_usuario, String senha_usuario, String email_usuario) {
         this.nome_usuario = nome_usuario;
@@ -25,6 +27,10 @@ public class User {
 
     public User(){
 
+    }
+
+    public void setAceiteTermos(Boolean aceiteTermos) {
+        this.aceite_termos = aceiteTermos;
     }
 
     public int getId_usuario(){
