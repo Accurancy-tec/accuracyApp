@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/raizRelatorio"
+    android:id="@+id/reportRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_deep"
     android:orientation="vertical"
-    tools:context=".activities.RelatorioActivity">
+    tools:context=".activities.ReportActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
         android:paddingEnd="12dp">
 
         <ImageButton
-            android:id="@+id/btnVoltarRelatorio"
+            android:id="@+id/btnReportBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/bg_btn_icone"
@@ -37,7 +37,7 @@
             android:textStyle="bold" />
 
         <ImageButton
-            android:id="@+id/btnCompartilharRelatorio"
+            android:id="@+id/btnReportShare"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/bg_btn_icone"
@@ -58,7 +58,7 @@
         android:scrollbars="none">
 
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/grupoPeriodoRelatorio"
+            android:id="@+id/reportPeriodGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:chipSpacingHorizontal="8dp"
@@ -73,7 +73,7 @@
         android:layout_weight="1">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRelatorio"
+            android:id="@+id/reportSwipe"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -84,7 +84,7 @@
                 android:paddingBottom="24dp">
 
                 <LinearLayout
-                    android:id="@+id/conteudoRelatorio"
+                    android:id="@+id/reportContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -94,7 +94,7 @@
                     android:visibility="gone">
 
                     <TextView
-                        android:id="@+id/tvPeriodoRelatorio"
+                        android:id="@+id/tvReportPeriod"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
@@ -102,7 +102,7 @@
                         android:textSize="13sp" />
 
                     <GridLayout
-                        android:id="@+id/gradeNumerosRelatorio"
+                        android:id="@+id/reportNumbersGrid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
@@ -114,7 +114,7 @@
                         android:text="O que os números mostram" />
 
                     <LinearLayout
-                        android:id="@+id/listaObservacoes"
+                        android:id="@+id/reportNotesList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
@@ -124,9 +124,10 @@
 
                     <TextView
                         style="@style/Secao"
-                        android:text="Análise com IA" />
+                        android:text="Análise do Assistente Accuracy" />
 
                     <LinearLayout
+                        android:id="@+id/reportAnalysisCard"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
@@ -134,44 +135,43 @@
                         android:orientation="vertical"
                         android:padding="14dp">
 
-                        <TextView
-                            android:id="@+id/tvTextoIa"
+                        <LinearLayout
+                            android:id="@+id/reportDiagnosisList"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:lineSpacingMultiplier="1.2"
+                            android:orientation="vertical" />
+
+                        <LinearLayout
+                            android:id="@+id/reportParagraphsList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical" />
+
+                        <TextView
+                            android:id="@+id/tvReportStudyTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Para estudar agora"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                        <LinearLayout
+                            android:id="@+id/reportStudyList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
                             android:visibility="gone" />
 
                         <TextView
-                            android:id="@+id/tvStatusIa"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnGerarIa"
-                            style="@style/Widget.Material3.Button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="48dp"
                             android:layout_marginTop="10dp"
-                            android:text="Gerar análise"
-                            android:textAllCaps="false"
-                            android:textColor="@color/white"
-                            android:visibility="gone"
-                            app:backgroundTint="@color/btn_primary"
-                            app:cornerRadius="12dp"
-                            app:icon="@drawable/ic_ia"
-                            app:iconTint="@color/white" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
                             android:lineSpacingMultiplier="1.15"
-                            android:text="Escrita por IA a partir dos números deste relatório (sem nome, e-mail ou telefone). Pode conter erros e não é recomendação de investimento."
+                            android:text="Análise automática, feita com regras de educação financeira a partir dos números deste relatório. Não é recomendação de investimento."
                             android:textColor="@color/texto_fraco"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -181,7 +181,7 @@
                         android:text="Distribuição da carteira real" />
 
                     <LinearLayout
-                        android:id="@+id/listaDistribuicao"
+                        android:id="@+id/reportDistributionList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
@@ -194,7 +194,7 @@
                         android:text="Movimentação no período" />
 
                     <LinearLayout
-                        android:id="@+id/listaMovimentacao"
+                        android:id="@+id/reportTransactionsList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
@@ -207,7 +207,7 @@
                         android:text="Carteiras" />
 
                     <LinearLayout
-                        android:id="@+id/listaCarteirasRelatorio"
+                        android:id="@+id/reportWalletsList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
@@ -218,7 +218,7 @@
                         android:text="Maiores altas e quedas" />
 
                     <LinearLayout
-                        android:id="@+id/listaDestaques"
+                        android:id="@+id/reportHighlightsList"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
@@ -230,7 +230,7 @@
                         android:paddingBottom="6dp" />
 
                     <TextView
-                        android:id="@+id/tvAvisoRelatorio"
+                        android:id="@+id/tvReportDisclaimer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -241,7 +241,7 @@
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <LinearLayout
-            android:id="@+id/estadoRelatorio"
+            android:id="@+id/reportState"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -250,12 +250,12 @@
             android:paddingHorizontal="40dp">
 
             <ProgressBar
-                android:id="@+id/progressoRelatorio"
+                android:id="@+id/reportProgress"
                 android:layout_width="36dp"
                 android:layout_height="36dp" />
 
             <TextView
-                android:id="@+id/tvEstadoRelatorio"
+                android:id="@+id/tvReportState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -265,7 +265,7 @@
                 android:textSize="14sp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnTentarRelatorio"
+                android:id="@+id/btnReportRetry"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
