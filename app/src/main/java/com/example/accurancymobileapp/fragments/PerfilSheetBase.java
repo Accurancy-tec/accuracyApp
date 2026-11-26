@@ -1,7 +1,5 @@
 package com.example.accurancymobileapp.fragments;
 
-import android.app.Dialog;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
@@ -17,23 +15,23 @@ import androidx.annotation.Nullable;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 /**
  * Slide-up card with a title, up to three fields, an error line and two buttons.
  * Subclasses fill it in onPronto() and drive the steps. When something changes they tell the
  * profile screen through a fragment result (RESULTADO_CHAVE).
  */
-public abstract class PerfilSheetBase extends BottomSheetDialogFragment {
+public abstract class PerfilSheetBase extends CartaoDeslizante {
 
     /** Fragment result key the profile screen listens to. */
     public static final String RESULTADO_CHAVE = "perfil_resultado";
-    /** Bundle key of the result: ACAO_RECARREGAR or ACAO_SAIR. */
+    /** Bundle key of the result: one of the ACAO_* values. */
     public static final String RESULTADO_ACAO = "acao";
     public static final String ACAO_RECARREGAR = "recarregar";
     public static final String ACAO_SAIR = "sair";
+    /** Pedidos feitos pelo cartão de informação: abrir a edição de nome/telefone ou a troca de e-mail. */
+    public static final String ACAO_EDITAR_DADOS = "editar_dados";
+    public static final String ACAO_ALTERAR_EMAIL = "alterar_email";
 
     protected ApiService api;
     protected TextView tvTitulo, tvSub, tvErro, btnSecundario;
@@ -42,27 +40,6 @@ public abstract class PerfilSheetBase extends BottomSheetDialogFragment {
     private final EditText[] campos = new EditText[3];
     private String textoPrimario = "";
     private boolean ocupado = false;
-
-    @Override
-    public int getTheme() {
-        return R.style.ThemeOverlay_Accurancy_BottomSheet;
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
-        dialog.setOnShowListener(d -> {
-            View area = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
-            if (area != null) {
-                area.setBackgroundColor(Color.TRANSPARENT);
-                BottomSheetBehavior<View> comportamento = BottomSheetBehavior.from(area);
-                comportamento.setState(BottomSheetBehavior.STATE_EXPANDED);
-                comportamento.setSkipCollapsed(true);
-            }
-        });
-        return dialog;
-    }
 
     @Nullable
     @Override

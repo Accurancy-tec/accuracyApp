@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:text="Configure sua nova carteira de investimentos."
-        android:textColor="#AAB4C3"
+        android:textColor="@color/text_secondary"
         android:textSize="14sp" />
 
     <com.google.android.material.textfield.TextInputLayout

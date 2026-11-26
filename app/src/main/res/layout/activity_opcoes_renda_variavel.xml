@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#081426">
+    android:background="@color/superficie_campo">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
                 android:background="@drawable/bg_btn_icone"
                 android:contentDescription="Voltar"
                 android:src="@drawable/ic_arrow_back"
-                app:tint="#9BAAC0" />
+                app:tint="@color/text_secondary" />
 
             <TextView
                 android:layout_width="0dp"
@@ -39,7 +39,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Bolsa de Valores"
-                android:textColor="#F1F5FC"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -76,7 +76,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Escolha o tipo de ativo negociado na bolsa"
-                    android:textColor="#9BAAC0"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
 
                 <!-- Ações Nacionais -->
@@ -99,7 +99,7 @@
                         android:background="@drawable/bg_categoria_acoes"
                         android:gravity="center"
                         android:text="AÇ"
-                        android:textColor="#31D9B5"
+                        android:textColor="@color/positivo_destaque"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -114,7 +114,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Ações Nacionais"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -123,7 +123,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Empresas listadas na B3"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -133,7 +133,7 @@
                         android:layout_height="18dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#9BAAC0" />
+                        app:tint="@color/text_secondary" />
 
                 </LinearLayout>
 
@@ -157,7 +157,7 @@
                         android:background="@drawable/bg_categoria_fii"
                         android:gravity="center"
                         android:text="FII"
-                        android:textColor="#FFC400"
+                        android:textColor="@color/aviso"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -172,7 +172,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Fundos Imobiliários"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -181,7 +181,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="FIIs negociados na B3"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -191,7 +191,7 @@
                         android:layout_height="18dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#9BAAC0" />
+                        app:tint="@color/text_secondary" />
 
                 </LinearLayout>
 
@@ -230,7 +230,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Ações e ETFs Internacionais"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -239,7 +239,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="BDRs e ETFs de índices do exterior"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -249,7 +249,7 @@
                         android:layout_height="18dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chevron_right"
-                        app:tint="#9BAAC0" />
+                        app:tint="@color/text_secondary" />
 
                 </LinearLayout>
 

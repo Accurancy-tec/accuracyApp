@@ -1,6 +1,5 @@
 package com.example.accurancymobileapp.fragments;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -16,8 +15,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.model.TituloRendaFixa;
@@ -27,6 +28,7 @@ import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.EscolhaCarteira;
 import com.example.accurancymobileapp.utils.FavoritoUi;
 import com.example.accurancymobileapp.utils.FavoritosCache;
 import com.example.accurancymobileapp.utils.MascaraMonetaria;
@@ -47,10 +49,10 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
     private static final String TAG = "RF_APLICACAO";
 
     private static final BigDecimal VALOR_MAXIMO = new BigDecimal("10000000.00");
-    private static final int COR_CHIP_SELECIONADO = 0xFF60A5FA;
-    private static final int COR_CHIP_NORMAL = 0xFFB3C7D9;
-    private static final int COR_ERRO = 0xFFFF5265;
-    private static final int COR_AVISO = 0xFF829BB9;
+    @ColorRes private static final int COR_CHIP_SELECIONADO = R.color.link;
+    @ColorRes private static final int COR_CHIP_NORMAL = R.color.texto_suave;
+    @ColorRes private static final int COR_ERRO = R.color.negativo_destaque;
+    @ColorRes private static final int COR_AVISO = R.color.texto_fraco;
 
     /** Optional listener notified after a successful application. */
     public interface AoInvestirListener {
@@ -275,7 +277,7 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
     private void selecionarValor(TextView chip, BigDecimal valor) {
         limparSelecaoChips();
         chip.setBackgroundResource(R.drawable.bg_valor_rapido_selecionado);
-        chip.setTextColor(COR_CHIP_SELECIONADO);
+        chip.setTextColor(cor(COR_CHIP_SELECIONADO));
 
         atualizandoCampo = true;
         etValor.setText(formatoMoeda.format(valor));
@@ -289,7 +291,7 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
         TextView[] chips = {chipSaldoTotal, chipMinimo, chip500, chip1000};
         for (TextView chip : chips) {
             chip.setBackgroundResource(R.drawable.bg_valor_rapido);
-            chip.setTextColor(COR_CHIP_NORMAL);
+            chip.setTextColor(cor(COR_CHIP_NORMAL));
         }
     }
 
@@ -334,10 +336,7 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
         if (tituloVencido()) {
             return "Este título já venceu e não aceita novas aplicações.";
         }
-        // The server remains the source of truth; this only gives early, friendly feedback.
-        if (saldoDisponivel != null && valor.compareTo(saldoDisponivel) > 0) {
-            return "Saldo insuficiente. Seu saldo é " + formatoMoeda.format(saldoDisponivel) + ".";
-        }
+        // O saldo é conferido quando a carteira de destino é conhecida (simulada usa o saldo dela).
         return null;
     }
 
@@ -356,7 +355,7 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
 
     private void mostrarAviso(String texto, boolean erro) {
         tvAviso.setText(texto);
-        tvAviso.setTextColor(erro ? COR_ERRO : COR_AVISO);
+        tvAviso.setTextColor(cor(erro ? COR_ERRO : COR_AVISO));
     }
 
     private void atualizarEstado() {
@@ -406,27 +405,12 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
                     return;
                 }
                 if (wallets.size() == 1) {
-                    registrar(valor, wallets.get(0).getId_carteira());
+                    conferirSaldoERegistrar(valor, wallets.get(0));
                     return;
                 }
-
-                Wallet[] opcoes = wallets.toArray(new Wallet[0]);
-                CharSequence[] nomes = new CharSequence[opcoes.length];
-                for (int i = 0; i < opcoes.length; i++) {
-                    nomes[i] = opcoes[i].getNome_carteira() + " · " + opcoes[i].getTipo_carteira();
-                }
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("Escolha a carteira")
-                        .setItems(nomes, (dialog, which) -> {
-                            if (which >= 0 && which < opcoes.length) {
-                                registrar(valor, opcoes[which].getId_carteira());
-                            } else {
-                                definirEmAndamento(false);
-                            }
-                        })
-                        .setNegativeButton("Cancelar", (dialog, which) -> definirEmAndamento(false))
-                        .setOnCancelListener((DialogInterface dialog) -> definirEmAndamento(false))
-                        .show();
+                EscolhaCarteira.mostrar(requireContext(), "Aplicar em qual carteira?", wallets, saldoDisponivel,
+                        carteira -> conferirSaldoERegistrar(valor, carteira),
+                        () -> definirEmAndamento(false));
             }
 
             @Override
@@ -440,6 +424,17 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
                 AnimacaoUtils.tremer(campoValor);
             }
         });
+    }
+
+    private void conferirSaldoERegistrar(BigDecimal valor, Wallet carteira) {
+        String falta = EscolhaCarteira.faltaSaldo(carteira, saldoDisponivel, valor);
+        if (falta != null) {
+            definirEmAndamento(false);
+            mostrarAviso(falta, true);
+            AnimacaoUtils.tremer(campoValor);
+            return;
+        }
+        registrar(valor, carteira.getId_carteira());
     }
 
     private void registrar(BigDecimal valor, int idCarteira) {
@@ -501,5 +496,9 @@ public class InvestirRendaFixaBottomSheet extends BottomSheetDialogFragment {
         requisicaoEmAndamento = emAndamento;
         btnInvestir.setText(emAndamento ? "Registrando aplicação…" : "Investir");
         atualizarEstado();
+    }
+
+    private int cor(@ColorRes int id) {
+        return ContextCompat.getColor(requireContext(), id);
     }
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/bg_deep"
     tools:context=".activities.MainPageActivity">
 
@@ -13,130 +13,365 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/main"
-        android:clipToPadding="false"
-        android:fillViewport="true">
-
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/main"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="24dp">
-
-            <!-- ==================== CABEÇALHO ==================== -->
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="24dp">
+
+                <!-- ==================== CABEÇALHO ==================== -->
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvNomeUsuario"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Olá"
+                            android:textColor="@color/text_primary"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvSubtituloInicio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Seu resumo de hoje"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp">
+
+                        <ImageView
+                            android:id="@+id/btnNotificacoes"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:background="@drawable/bg_icon_button"
+                            android:clickable="true"
+                            android:contentDescription="Notificações"
+                            android:focusable="true"
+                            android:padding="10dp"
+                            android:src="@drawable/ic_bell"
+                            app:tint="@color/text_primary" />
+
+                        <TextView
+                            android:id="@+id/tvBadgeNotificacoes"
+                            style="@style/BadgeNotificacao"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginEnd="2dp" />
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <!-- ==================== PATRIMÔNIO (carteiras reais + saldo geral) ==================== -->
+
+                <LinearLayout
+                    android:id="@+id/cardSaldoTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_card_patrimonio"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <TextView
-                        android:id="@+id/tvNomeUsuario"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="Olá"
-                        android:textColor="@color/text_primary"
-                        android:textSize="20sp"
+                        android:letterSpacing="0.08"
+                        android:text="PATRIMÔNIO TOTAL"
+                        android:textColor="@color/texto_sobre_destaque"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tvSaldoTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="R$ --"
+                        android:textColor="@color/white"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvBadgeTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_chip_sobre_destaque"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@color/linha_sobre_destaque" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Investido"
+                                android:textColor="@color/texto_sobre_destaque"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvInvestido"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="R$ --"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center_vertical"
+                            android:background="@color/linha_sobre_destaque" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Saldo livre"
+                                android:textColor="@color/texto_sobre_destaque"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvSaldoLivre"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="R$ --"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center_vertical"
+                            android:background="@color/linha_sobre_destaque" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Resultado"
+                                android:textColor="@color/texto_sobre_destaque"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/tvRendimento"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="—"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Simulações: dinheiro de teste, mostrado à parte do patrimônio -->
+                <LinearLayout
+                    android:id="@+id/cardSimulacoes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_card_perfil"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_item_icon"
+                        android:importantForAccessibility="no"
+                        android:padding="9dp"
+                        android:src="@drawable/ic_flask"
+                        app:tint="@color/link" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvTituloSimulacoes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvValorSimulacoes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvResultadoSimulacoes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Saldo geral -->
+                <LinearLayout
+                    android:id="@+id/cardSaldoDisponivel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_card_saldo"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:id="@+id/ivIconeSaldo"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_icone_saldo"
+                        android:importantForAccessibility="no"
+                        android:padding="11dp"
+                        android:src="@drawable/ic_wallet_saldo"
+                        app:tint="@color/link" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Saldo disponível"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvSaldoDisponivel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="R$ --"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btnAdicionarSaldo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_btn_primary"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingHorizontal="14dp"
+                        android:text="+ Adicionar saldo"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/btnNotificacoes"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_icon_button"
-                    android:contentDescription="Notificações"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_bell" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cardSaldoTotal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/bg_card_patrimonio"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="0.08"
-                    android:text="SALDO TOTAL"
-                    android:textColor="#B3C7FF"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/tvSaldoTotal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="R$ --"
-                    android:textColor="@android:color/white"
-                    android:textSize="32sp"
-                    android:textStyle="bold" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="16dp"
-                    android:background="#33FFFFFF" />
-
+                <!-- ==================== 1. CRIAR CARTEIRA ==================== -->
 
                 <LinearLayout
+                    android:id="@+id/cardCriarCarteira"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/bg_card_perfil"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:weightSum="3">
+                    android:padding="16dp">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Investido"
-                            android:textColor="#B3C7FF"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvInvestido"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="R$ --"
-                            android:textColor="@android:color/white"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center_vertical"
-                        android:background="#33FFFFFF" />
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_item_icon"
+                        android:importantForAccessibility="no"
+                        android:padding="11dp"
+                        android:src="@drawable/ic_adicionar"
+                        app:tint="@color/blue_primary" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -148,279 +383,197 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Saldo livre"
-                            android:textColor="#B3C7FF"
-                            android:textSize="11sp" />
+                            android:text="Criar carteira"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/tvSaldoLivre"
+                            android:id="@+id/tvTextoCriarCarteira"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="R$ --"
-                            android:textColor="@android:color/white"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
+                            android:text="Real, com o seu saldo, ou simulada, com o valor que você escolher"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
                     </LinearLayout>
-
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center_vertical"
-                        android:background="#33FFFFFF" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="14dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Rendimento"
-                            android:textColor="#B3C7FF"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:id="@+id/tvRendimento"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="—"
-                            android:textColor="#34D399"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
                 </LinearLayout>
 
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvBadgeTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_tag_positivo"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="5dp"
-                android:text="▲ +10,2% total"
-                android:textColor="@color/green_positive"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
-
-            <LinearLayout
-                android:id="@+id/cardSaldoDisponivel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_card_saldo"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="12dp">
-
-                <!-- ÍCONE DA CARTEIRA -->
-
-                <ImageView
-                    android:id="@+id/ivIconeSaldo"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_icone_saldo"
-                    android:contentDescription="Ícone de saldo"
-                    android:padding="11dp"
-                    android:src="@drawable/ic_wallet_saldo"
-                    app:tint="#60A5FA" />
-
-                <!-- INFORMAÇÕES DO SALDO -->
+                <!-- ==================== 2. NOTÍCIAS ==================== -->
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvTituloNoticias"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Saldo disponível"
-                        android:textColor="#B3C7D9"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tvSaldoDisponivel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="R$ --"
+                        android:layout_weight="1"
+                        android:text="Notícias do mercado"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Deslize para ver mais"
+                        android:textColor="@color/texto_fraco"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- BOTÃO ADICIONAR SALDO -->
-
-                <TextView
-                    android:id="@+id/btnAdicionarSaldo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_btn_primary"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:paddingHorizontal="14dp"
-                    android:text="+ Adicionar saldo"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingBottom="12dp">
-
-                <TextView
-                    android:id="@+id/tvEvolucaoCarteira"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Evolução da carteira"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/btn1M"
-                    android:layout_width="48dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="6dp"
-                    android:background="@drawable/bg_periodo_normal"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:text="1M"
-                    android:textColor="@android:color/white"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/btn6M"
-                    android:layout_width="48dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="6dp"
-                    android:background="@drawable/bg_periodo_selecionado"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:text="6M"
-                    android:textColor="@android:color/white"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/btn1A"
-                    android:layout_width="48dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="6dp"
-                    android:background="@drawable/bg_periodo_normal"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:text="1A"
-                    android:textColor="@android:color/white"
-                    android:textSize="13sp" />
-
-            </LinearLayout>
-
-            <FrameLayout
-                android:id="@+id/blocoGraficoEvolucao"
-                android:layout_width="match_parent"
-                android:layout_height="220dp">
-
-                <androidx.compose.ui.platform.ComposeView
-                    android:id="@+id/ctvChart"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvNoticias"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <!-- Placeholder while the chart loads -->
-                <com.example.accurancymobileapp.ui.ShimmerView
-                    android:id="@+id/esqueletoGrafico"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginVertical="8dp"
-                    android:visibility="gone"
-                    app:raioShimmer="14dp" />
-            </FrameLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    tools:listitem="@layout/item_noticia" />
 
                 <TextView
-                    android:id="@+id/tvAtivosDestaque"
-                    android:layout_width="0dp"
+                    android:id="@+id/tvNoticiasVazio"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Ativos em destaque"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:background="@drawable/bg_card_perfil"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
 
+                <!-- ==================== 3. EVOLUÇÃO ==================== -->
 
-                <Spinner
-                    android:id="@+id/spFiltroDestaques"
-                    android:layout_width="154dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_spinner_destaques"
-                    android:dropDownWidth="170dp"
-                    android:dropDownVerticalOffset="4dp"
-                    android:paddingStart="4dp"
-                    android:paddingEnd="4dp"
-                    android:spinnerMode="dropdown" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvEvolucaoCarteira"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Evolução do patrimônio"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Toque no gráfico para ver o valor do dia"
+                            android:textColor="@color/texto_fraco"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btn1M"
+                        style="@style/BotaoPeriodo"
+                        android:text="1M" />
+
+                    <TextView
+                        android:id="@+id/btn6M"
+                        style="@style/BotaoPeriodo"
+                        android:text="6M" />
+
+                    <TextView
+                        android:id="@+id/btn1A"
+                        style="@style/BotaoPeriodo"
+                        android:text="1A" />
+
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/blocoGraficoEvolucao"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp">
+
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/ctvChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <!-- Placeholder while the chart loads -->
+                    <com.example.accurancymobileapp.ui.ShimmerView
+                        android:id="@+id/esqueletoGrafico"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginVertical="8dp"
+                        android:visibility="gone"
+                        app:raioShimmer="14dp" />
+                </FrameLayout>
+
+                <!-- ==================== DESTAQUES ==================== -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvAtivosDestaque"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Seus ativos em destaque"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <Spinner
+                        android:id="@+id/spFiltroDestaques"
+                        android:layout_width="154dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_spinner_destaques"
+                        android:dropDownWidth="170dp"
+                        android:dropDownVerticalOffset="4dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:spinnerMode="dropdown" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerInvestimentos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    tools:itemCount="4"
+                    tools:listitem="@layout/item_investiment" />
+
+                <TextView
+                    android:id="@+id/tvDestaquesVazio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_card_ativo"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:text="Faça seu primeiro aporte para ver seus ativos aqui."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
 
             </LinearLayout>
-
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerInvestimentos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never"
-                tools:itemCount="4"
-                tools:listitem="@layout/item_investiment" />
-
-            <TextView
-                android:id="@+id/tvDestaquesVazio"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_card_ativo"
-                android:gravity="center"
-                android:padding="20dp"
-                android:text="Faça seu primeiro aporte para ver seus ativos aqui."
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:visibility="gone" />
-
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

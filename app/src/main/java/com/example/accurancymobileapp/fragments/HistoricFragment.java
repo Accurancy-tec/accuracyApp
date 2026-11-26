@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.compose.ui.platform.ComposeView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +23,7 @@ import com.example.accurancymobileapp.model.Aporte;
 import com.example.accurancymobileapp.network.repository.HistoricRepository;
 import com.example.accurancymobileapp.ui.ChartHelper;
 
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -161,7 +163,45 @@ public class HistoricFragment extends Fragment {
             }
         }
         adapter.atualizarLista(paraLista);
+        atualizarResumo(doPeriodo);
         atualizarGrafico(doPeriodo);
+    }
+
+    /** Cartões do topo: totais das operações do período escolhido (todas as carteiras). */
+    private void atualizarResumo(List<Aporte> doPeriodo) {
+        View raiz = getView();
+        if (raiz == null) return;
+        double compras = 0, vendas = 0, dividendos = 0;
+        int qtdCompras = 0, qtdVendas = 0, qtdDividendos = 0;
+        for (Aporte aporte : doPeriodo) {
+            String tipo = aporte.getTipoAporte() == null ? "" : aporte.getTipoAporte();
+            double valor = aporte.getValorAporte();
+            if ("Compra".equalsIgnoreCase(tipo)) {
+                compras += valor;
+                qtdCompras++;
+            } else if ("Venda".equalsIgnoreCase(tipo)) {
+                vendas += valor;
+                qtdVendas++;
+            } else if ("Dividendo".equalsIgnoreCase(tipo)) {
+                dividendos += valor;
+                qtdDividendos++;
+            }
+        }
+        NumberFormat moeda = NumberFormat.getCurrencyInstance(ptBR);
+        ((TextView) raiz.findViewById(R.id.tvHistTotalCompras)).setText(moeda.format(compras));
+        ((TextView) raiz.findViewById(R.id.tvHistQtdCompras)).setText(contagem(qtdCompras, "compra", "compras", "nenhuma no período"));
+        ((TextView) raiz.findViewById(R.id.tvHistTotalVendas)).setText(moeda.format(vendas));
+        ((TextView) raiz.findViewById(R.id.tvHistQtdVendas)).setText(contagem(qtdVendas, "venda", "vendas", "nenhuma no período"));
+        ((TextView) raiz.findViewById(R.id.tvHistTotalDividendos)).setText(moeda.format(dividendos));
+        ((TextView) raiz.findViewById(R.id.tvHistQtdDividendos)).setText(contagem(qtdDividendos, "recebido", "recebidos", "nenhum no período"));
+        ((TextView) raiz.findViewById(R.id.tvHistTotalOperacoes)).setText(String.valueOf(doPeriodo.size()));
+        ((TextView) raiz.findViewById(R.id.tvHistPeriodoOperacoes)).setText(
+                periodoSelecionado == PeriodoHistorico.SEMANA ? "nos últimos 7 dias"
+                        : periodoSelecionado == PeriodoHistorico.MES ? "neste mês" : "neste ano");
+    }
+
+    private static String contagem(int quantidade, String singular, String plural, String nenhum) {
+        return quantidade == 0 ? nenhum : quantidade + " " + (quantidade == 1 ? singular : plural);
     }
 
     private List<Aporte> filtrarHistoricoPorPeriodo(List<Aporte> historico, PeriodoHistorico periodo) {
@@ -187,16 +227,20 @@ public class HistoricFragment extends Fragment {
     }
 
     private void selecionarFiltro(TextView selecionado) {
-        TextView[] filtros = {btnTodos, btnCompra, btnVenda};
-        for (TextView filtro : filtros) {
-            filtro.setBackgroundResource(filtro == selecionado ? R.drawable.bg_btn_primary : R.drawable.bg_icon_sair);
-        }
+        marcar(new TextView[]{btnTodos, btnCompra, btnVenda}, selecionado);
     }
 
     private void selecionarFiltroGrafico(TextView selecionado) {
-        TextView[] filtros = {btnSemana, btnMes, btnAno};
+        marcar(new TextView[]{btnSemana, btnMes, btnAno}, selecionado);
+    }
+
+    /** Selecionado: fundo azul e texto branco; os outros: sem fundo e texto secundário. */
+    private void marcar(TextView[] filtros, TextView selecionado) {
         for (TextView filtro : filtros) {
-            filtro.setBackgroundResource(filtro == selecionado ? R.drawable.bg_btn_primary : R.drawable.bg_icon_sair);
+            boolean marcado = filtro == selecionado;
+            filtro.setBackgroundResource(marcado ? R.drawable.bg_btn_primary : R.drawable.bg_icon_sair);
+            filtro.setTextColor(ContextCompat.getColor(requireContext(), marcado ? R.color.white : R.color.text_secondary));
+            filtro.setSelected(marcado);
         }
     }
 

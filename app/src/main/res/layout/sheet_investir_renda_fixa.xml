@@ -45,7 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Renda fixa"
-                        android:textColor="#31D9B5"
+                        android:textColor="@color/positivo_destaque"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
@@ -55,7 +55,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="Título"
-                        android:textColor="#F1F5F9"
+                        android:textColor="@color/text_primary"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
@@ -73,7 +73,7 @@
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="3dp"
                             android:text="Garantia FGC"
-                            android:textColor="#B3C7D9"
+                            android:textColor="@color/texto_suave"
                             android:textSize="10sp"
                             android:visibility="gone" />
 
@@ -86,7 +86,7 @@
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="3dp"
                             android:text="Isento de IR"
-                            android:textColor="#31D9B5"
+                            android:textColor="@color/positivo_destaque"
                             android:textSize="10sp"
                             android:visibility="gone" />
                     </LinearLayout>
@@ -116,7 +116,7 @@
                     android:focusable="true"
                     android:padding="9dp"
                     android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    app:tint="#9BAAC0" />
+                    app:tint="@color/text_secondary" />
             </RelativeLayout>
 
             <!-- Resumo do título -->
@@ -141,7 +141,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Rentabilidade"
-                        android:textColor="#8D9DB3"
+                        android:textColor="@color/texto_fraco"
                         android:textSize="10sp" />
 
                     <TextView
@@ -150,7 +150,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:text="—"
-                        android:textColor="#31D9B5"
+                        android:textColor="@color/positivo_destaque"
                         android:textSize="13sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -168,7 +168,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Vencimento"
-                        android:textColor="#8D9DB3"
+                        android:textColor="@color/texto_fraco"
                         android:textSize="10sp" />
 
                     <TextView
@@ -177,7 +177,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:text="—"
-                        android:textColor="#F1F5F9"
+                        android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -195,7 +195,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Resgate"
-                        android:textColor="#8D9DB3"
+                        android:textColor="@color/texto_fraco"
                         android:textSize="10sp" />
 
                     <TextView
@@ -206,7 +206,7 @@
                         android:ellipsize="end"
                         android:maxLines="2"
                         android:text="—"
-                        android:textColor="#F1F5F9"
+                        android:textColor="@color/text_primary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -219,7 +219,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Quanto você deseja investir?"
-                android:textColor="#F1F5F9"
+                android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -229,7 +229,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Saldo disponível: …"
-                android:textColor="#9BAAC0"
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
             <!-- Campo de valor -->
@@ -247,7 +247,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Digite o valor"
-                    android:textColor="#8D9DB3"
+                    android:textColor="@color/texto_fraco"
                     android:textSize="11sp" />
 
                 <EditText
@@ -262,7 +262,7 @@
                     android:paddingVertical="4dp"
                     android:singleLine="true"
                     android:text="R$ 0,00"
-                    android:textColor="#F1F5F9"
+                    android:textColor="@color/text_primary"
                     android:textSize="24sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -273,7 +273,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text=" "
-                android:textColor="#829BB9"
+                android:textColor="@color/texto_fraco"
                 android:textSize="12sp" />
 
             <!-- Atalhos -->
@@ -331,7 +331,7 @@
                 android:background="@drawable/bg_buy_asset_notice"
                 android:padding="10dp"
                 android:text="Operação simulada para fins educacionais. O valor sai do seu saldo e as condições do título ficam registradas no histórico."
-                android:textColor="#9CB4D2"
+                android:textColor="@color/texto_suave"
                 android:textSize="11sp" />
 
             <TextView

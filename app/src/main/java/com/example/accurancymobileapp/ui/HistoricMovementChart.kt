@@ -23,21 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.material3.Text
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.accurancymobileapp.R
 import kotlin.math.ceil
 import kotlin.math.max
-
-private val FundoHistorico = Color(0xFF0D1D30)
-private val AzulCompra = Color(0xFF3B82F6)
-private val VermelhoVenda = Color(0xFFFF7278)
-private val TextoHistorico = Color(0xFF91A4BD)
-private val GradeHistorico = Color(0x1FFFFFFF)
 
 @Composable
 fun HistoricMovementChart(
@@ -46,6 +41,12 @@ fun HistoricMovementChart(
     vendas: List<Double>,
     modifier: Modifier = Modifier
 ) {
+    val fundoHistorico = colorResource(R.color.card_background)
+    val azulCompra = colorResource(R.color.primary_blue)
+    val vermelhoVenda = colorResource(R.color.negativo_destaque)
+    val textoHistorico = colorResource(R.color.text_secondary)
+    val gradeHistorico = colorResource(R.color.grafico_grade)
+
     val progress = remember { Animatable(0f) }
     val maior = remember(labels, compras, vendas) {
         (compras + vendas).filter { it.isFinite() && it > 0.0 }.maxOrNull() ?: 0.0
@@ -59,23 +60,23 @@ fun HistoricMovementChart(
         modifier = modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(14.dp))
-            .background(FundoHistorico)
+            .background(fundoHistorico)
             .padding(horizontal = 10.dp, vertical = 8.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(Modifier.size(7.dp).clip(CircleShape).background(AzulCompra))
-                Text("Compras", color = TextoHistorico, fontSize = 10.sp, modifier = Modifier.padding(start = 5.dp))
+                Spacer(Modifier.size(7.dp).clip(CircleShape).background(azulCompra))
+                Text("Compras", color = textoHistorico, fontSize = 10.sp, modifier = Modifier.padding(start = 5.dp))
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(Modifier.size(7.dp).clip(CircleShape).background(VermelhoVenda))
-                Text("Vendas", color = TextoHistorico, fontSize = 10.sp, modifier = Modifier.padding(start = 5.dp))
+                Spacer(Modifier.size(7.dp).clip(CircleShape).background(vermelhoVenda))
+                Text("Vendas", color = textoHistorico, fontSize = 10.sp, modifier = Modifier.padding(start = 5.dp))
             }
         }
 
         if (labels.isEmpty() || maior <= 0.0) {
             Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-                Text("Sem compras ou vendas neste período", color = TextoHistorico, fontSize = 11.sp)
+                Text("Sem compras ou vendas neste período", color = textoHistorico, fontSize = 11.sp)
             }
         } else {
             Canvas(
@@ -94,7 +95,7 @@ fun HistoricMovementChart(
 
                 for (i in 0..3) {
                     val y = top + usefulHeight * i / 3f
-                    drawLine(GradeHistorico, Offset(0f, y), Offset(size.width, y), 1.dp.toPx())
+                    drawLine(gradeHistorico, Offset(0f, y), Offset(size.width, y), 1.dp.toPx())
                 }
 
                 labels.indices.forEach { index ->
@@ -107,7 +108,7 @@ fun HistoricMovementChart(
 
                     if (buyHeight > 0f) {
                         drawRoundRect(
-                            color = AzulCompra,
+                            color = azulCompra,
                             topLeft = Offset(centerX - gap / 2f - barWidth, baseline - buyHeight),
                             size = Size(barWidth, buyHeight),
                             cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx())
@@ -115,7 +116,7 @@ fun HistoricMovementChart(
                     }
                     if (sellHeight > 0f) {
                         drawRoundRect(
-                            color = VermelhoVenda,
+                            color = vermelhoVenda,
                             topLeft = Offset(centerX + gap / 2f, baseline - sellHeight),
                             size = Size(barWidth, sellHeight),
                             cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx())
@@ -132,7 +133,7 @@ fun HistoricMovementChart(
             ) {
                 val indices = labels.indices.filter { it % intervalo == 0 || it == labels.lastIndex }
                 indices.forEach { index ->
-                    Text(labels[index], color = TextoHistorico, fontSize = 9.sp, maxLines = 1)
+                    Text(labels[index], color = textoHistorico, fontSize = 9.sp, maxLines = 1)
                 }
             }
         }

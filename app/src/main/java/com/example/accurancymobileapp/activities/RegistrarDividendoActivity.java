@@ -12,7 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.ColorRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -39,10 +41,10 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
 
     private static final String TAG = "DIVIDENDO";
     private static final BigDecimal VALOR_MAXIMO = new BigDecimal("10000000.00");
-    private static final int COR_CHIP_SELECIONADO = 0xFF60A5FA;
-    private static final int COR_CHIP_NORMAL = 0xFFB3C7D9;
-    private static final int COR_ERRO = 0xFFFF5265;
-    private static final int COR_AVISO = 0xFF829BB9;
+    @ColorRes private static final int COR_CHIP_SELECIONADO = R.color.link;
+    @ColorRes private static final int COR_CHIP_NORMAL = R.color.texto_suave;
+    @ColorRes private static final int COR_ERRO = R.color.negativo_destaque;
+    @ColorRes private static final int COR_AVISO = R.color.texto_fraco;
 
     private final NumberFormat formatoMoeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
@@ -151,7 +153,7 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
             boolean selecionado = nomes[i].equals(tipo);
             chips[i].setBackgroundResource(selecionado
                     ? R.drawable.bg_valor_rapido_selecionado : R.drawable.bg_valor_rapido);
-            chips[i].setTextColor(selecionado ? COR_CHIP_SELECIONADO : COR_CHIP_NORMAL);
+            chips[i].setTextColor(cor(selecionado ? COR_CHIP_SELECIONADO : COR_CHIP_NORMAL));
         }
     }
 
@@ -175,13 +177,13 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
         String problema = validar(valor);
         if (problema == null) {
             tvAviso.setText(" ");
-            tvAviso.setTextColor(COR_AVISO);
+            tvAviso.setTextColor(cor(COR_AVISO));
         } else if (valor.compareTo(BigDecimal.ZERO) > 0) {
             tvAviso.setText(problema);
-            tvAviso.setTextColor(COR_ERRO);
+            tvAviso.setTextColor(cor(COR_ERRO));
         } else {
             tvAviso.setText("Informe o valor líquido recebido");
-            tvAviso.setTextColor(COR_AVISO);
+            tvAviso.setTextColor(cor(COR_AVISO));
         }
         boolean habilitado = problema == null && !requisicaoEmAndamento;
         btnConfirmar.setEnabled(habilitado);
@@ -290,5 +292,9 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
         requisicaoEmAndamento = emAndamento;
         btnConfirmar.setText(emAndamento ? "Registrando…" : "Registrar dividendo");
         atualizarEstado();
+    }
+
+    private int cor(@ColorRes int id) {
+        return ContextCompat.getColor(this, id);
     }
 }

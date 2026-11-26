@@ -14,6 +14,14 @@ public class AcaoResponse {
     @SerializedName("paginacao")
     private Paginacao paginacao;
 
+    /** FIIs: false quando a API usou a lista padrão da brapi, sem tipo de fundo, DY, P/VP e investidores. */
+    @SerializedName("filtrosDetalhados")
+    private Boolean filtrosDetalhados;
+
+    public boolean temFiltrosDetalhados() {
+        return filtrosDetalhados == null || filtrosDetalhados;
+    }
+
     public boolean isSucesso() {
         return sucesso;
     }

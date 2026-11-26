@@ -382,7 +382,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
 
     private void selecionarFiltroVisual(TextView selecionado) {
         int corFundoSelecionado = ContextCompat.getColor(this, R.color.btn_primary);
-        int corTextoSelecionado = ContextCompat.getColor(this, R.color.blue_primary);
+        int corTextoSelecionado = ContextCompat.getColor(this, R.color.white);
         int corTextoInativo = ContextCompat.getColor(this, R.color.text_secondary);
 
         TextView[] filtros = {filtroHoje, filtro1S, filtro1M, filtro3M, filtro6M};
@@ -562,7 +562,7 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                             tvVariacaoPrecoAtivo.setText("0%");
                             tvVariacaoPrecoAtivo.setTextColor(ContextCompat.getColor(
                                     DetalhesAtivoActivity.this,
-                                    R.color.text_secondary
+                                    R.color.texto_sobre_destaque
                             ));
                         } else {
                             String seta = variacao > 0
@@ -578,10 +578,10 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                             tvVariacaoPrecoAtivo.setTextColor(ContextCompat.getColor(
                                     DetalhesAtivoActivity.this,
                                     variacao < 0
-                                            ? R.color.red_negative
+                                            ? R.color.negativo_sobre_destaque
                                             : variacao > 0
-                                            ? R.color.green_positive
-                                            : R.color.text_secondary
+                                            ? R.color.positivo_sobre_destaque
+                                            : R.color.texto_sobre_destaque
                             ));
                         }
 
@@ -636,8 +636,9 @@ public class DetalhesAtivoActivity extends AppCompatActivity {
                 window.getDecorView()
         );
 
-        controller.setAppearanceLightStatusBars(false);
-        controller.setAppearanceLightNavigationBars(false);
+        boolean barrasClaras = getResources().getBoolean(R.bool.barras_sistema_claras);
+        controller.setAppearanceLightStatusBars(barrasClaras);
+        controller.setAppearanceLightNavigationBars(barrasClaras);
 
         final int initialLeft = detalhesAtivoRoot.getPaddingLeft();
         final int initialTop = detalhesAtivoRoot.getPaddingTop();

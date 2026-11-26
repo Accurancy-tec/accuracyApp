@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,19 +31,27 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.accurancymobileapp.R
+import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.max
 
-private val FundoGrafico = Color(0xFF0B1A2D)
-private val VerdeGrafico = Color(0xFF34D399)
-private val TextoGrafico = Color(0xFF91A4BD)
-private val GradeGrafico = Color(0x1FFFFFFF)
-private val MoedaBR = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR"))
+private val LocalBRAtivo: Locale = Locale.forLanguageTag("pt-BR")
+private val MoedaBR = NumberFormat.getCurrencyInstance(LocalBRAtivo)
 
 @Composable
 fun StockPriceChart(
@@ -52,6 +62,14 @@ fun StockPriceChart(
     error: String? = null,
     modifier: Modifier = Modifier
 ) {
+    val corFundo = colorResource(R.color.card_background)
+    val corDestaque = colorResource(R.color.positivo_destaque)
+    val corQueda = colorResource(R.color.negativo_destaque)
+    val corTexto = colorResource(R.color.text_secondary)
+    val corTextoForte = colorResource(R.color.text_primary)
+    val corGrade = colorResource(R.color.grafico_grade)
+    val corBorda = colorResource(R.color.borda)
+
     val pontos = remember(labels, values) {
         labels.zip(values).filter { (_, value) -> value.isFinite() && value > 0.0 }
     }
@@ -62,11 +80,27 @@ fun StockPriceChart(
         if (pontos.size >= 2) progress.animateTo(1f, animationSpec = tween(durationMillis = 950))
     }
 
+    var selecionado by remember(pontos) { mutableStateOf<Int?>(null) }
+    var tocando by remember { mutableStateOf(false) }
+    LaunchedEffect(tocando) {
+        if (!tocando) {
+            delay(1200L)
+            selecionado = null
+        }
+    }
+
+    val view = LocalView.current
+    val vibracao = LocalHapticFeedback.current
+    val margemX = with(LocalDensity.current) { 4.dp.toPx() }
+    val textMeasurer = rememberTextMeasurer()
+    val estiloData = TextStyle(color = corTexto, fontSize = 11.sp)
+    val estiloValor = TextStyle(color = corTextoForte, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(FundoGrafico)
+            .background(corFundo)
             .padding(horizontal = 14.dp, vertical = 12.dp)
     ) {
         Row(
@@ -76,13 +110,13 @@ fun StockPriceChart(
         ) {
             Text(
                 text = "HISTÓRICO DE PREÇOS",
-                color = TextoGrafico,
+                color = corTexto,
                 fontSize = 10.sp,
                 letterSpacing = 1.2.sp
             )
             Text(
                 text = selectedRange,
-                color = VerdeGrafico,
+                color = corDestaque,
                 fontSize = 11.sp
             )
         }
@@ -95,28 +129,38 @@ fun StockPriceChart(
             contentAlignment = Alignment.Center
         ) {
             when {
-                loading -> CircularProgressIndicator(color = VerdeGrafico, strokeWidth = 2.dp)
-                !error.isNullOrBlank() -> Text(
-                    text = error,
-                    color = TextoGrafico,
-                    fontSize = 12.sp
-                )
+                loading -> CircularProgressIndicator(color = corDestaque, strokeWidth = 2.dp)
+                !error.isNullOrBlank() -> Text(text = error, color = corTexto, fontSize = 12.sp)
                 pontos.isEmpty() -> Text(
                     text = "Histórico indisponível para este período",
-                    color = TextoGrafico,
+                    color = corTexto,
                     fontSize = 12.sp
                 )
                 pontos.size == 1 -> Text(
                     text = "É necessário mais de um ponto para desenhar o gráfico.",
-                    color = TextoGrafico,
+                    color = corTexto,
                     fontSize = 12.sp
                 )
-                else -> Canvas(Modifier.fillMaxSize()) {
-                    val margemEsquerda = 4.dp.toPx()
-                    val margemDireita = 4.dp.toPx()
+                else -> Canvas(
+                    Modifier
+                        .fillMaxSize()
+                        .pointerInput(pontos) {
+                            acompanharToque(view, pontos.size, margemX) { indice ->
+                                if (indice == null) {
+                                    tocando = false
+                                } else {
+                                    if (indice != selecionado) {
+                                        vibracao.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    }
+                                    tocando = true
+                                    selecionado = indice
+                                }
+                            }
+                        }
+                ) {
                     val margemTopo = 8.dp.toPx()
                     val margemBase = 8.dp.toPx()
-                    val larguraUtil = max(1f, size.width - margemEsquerda - margemDireita)
+                    val larguraUtil = max(1f, size.width - 2 * margemX)
                     val alturaUtil = max(1f, size.height - margemTopo - margemBase)
 
                     val precos = pontos.map { it.second }
@@ -127,12 +171,12 @@ fun StockPriceChart(
                     val escalaMin = menor - folga
                     val escalaMax = maior + folga
                     val escalaIntervalo = max(0.000001, escalaMax - escalaMin)
-                    val passoX = if (pontos.size > 1) larguraUtil / (pontos.size - 1) else 0f
+                    val passoX = larguraUtil / (pontos.size - 1)
 
                     val coordenadas = pontos.mapIndexed { index, ponto ->
                         val frac = ((ponto.second - escalaMin) / escalaIntervalo).toFloat().coerceIn(0f, 1f)
                         Offset(
-                            x = margemEsquerda + index * passoX,
+                            x = margemX + index * passoX,
                             y = margemTopo + alturaUtil * (1f - frac)
                         )
                     }
@@ -141,9 +185,9 @@ fun StockPriceChart(
                     for (i in 0..3) {
                         val y = margemTopo + alturaUtil * i / 3f
                         drawLine(
-                            color = GradeGrafico,
-                            start = Offset(margemEsquerda, y),
-                            end = Offset(size.width - margemDireita, y),
+                            color = corGrade,
+                            start = Offset(margemX, y),
+                            end = Offset(size.width - margemX, y),
                             strokeWidth = 1.dp.toPx()
                         )
                     }
@@ -170,7 +214,7 @@ fun StockPriceChart(
                         close()
                     }
 
-                    val limiteDireito = margemEsquerda + larguraUtil * progress.value
+                    val limiteDireito = margemX + larguraUtil * progress.value
                     clipRect(
                         left = 0f,
                         top = 0f,
@@ -180,25 +224,42 @@ fun StockPriceChart(
                         drawPath(
                             path = area,
                             brush = Brush.verticalGradient(
-                                colors = listOf(VerdeGrafico.copy(alpha = 0.25f), VerdeGrafico.copy(alpha = 0.015f), Color.Transparent),
+                                colors = listOf(
+                                    corDestaque.copy(alpha = 0.25f),
+                                    corDestaque.copy(alpha = 0.015f),
+                                    Color.Transparent
+                                ),
                                 startY = margemTopo,
                                 endY = size.height - margemBase
                             )
                         )
                         drawPath(
                             path = linha,
-                            color = VerdeGrafico,
+                            color = corDestaque,
                             style = Stroke(width = 2.7.dp.toPx(), cap = StrokeCap.Round)
                         )
-                        drawCircle(
-                            color = VerdeGrafico,
-                            radius = 4.dp.toPx(),
-                            center = coordenadas.last()
-                        )
-                        drawCircle(
-                            color = VerdeGrafico.copy(alpha = 0.18f),
-                            radius = 8.dp.toPx(),
-                            center = coordenadas.last()
+                        if (selecionado == null) {
+                            drawCircle(color = corDestaque, radius = 4.dp.toPx(), center = coordenadas.last())
+                            drawCircle(
+                                color = corDestaque.copy(alpha = 0.18f),
+                                radius = 8.dp.toPx(),
+                                center = coordenadas.last()
+                            )
+                        }
+                    }
+
+                    val indice = selecionado
+                    if (indice != null && indice in pontos.indices) {
+                        desenharValorTocado(
+                            centro = coordenadas[indice],
+                            topoGuia = margemTopo,
+                            baseGuia = size.height - margemBase,
+                            data = textMeasurer.measure(formatarDataCompleta(pontos[indice].first), estiloData),
+                            valor = textMeasurer.measure(MoedaBR.format(pontos[indice].second), estiloValor),
+                            corLinha = corDestaque,
+                            corBalao = corFundo,
+                            corBorda = corBorda,
+                            corGuia = corTexto.copy(alpha = 0.55f)
                         )
                     }
                 }
@@ -217,17 +278,17 @@ fun StockPriceChart(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text(text = formatarDataCurta(primeiro.first), color = TextoGrafico, fontSize = 10.sp)
-                    Text(text = MoedaBR.format(primeiro.second), color = Color.White, fontSize = 11.sp)
+                    Text(text = formatarDataCurta(primeiro.first), color = corTexto, fontSize = 10.sp)
+                    Text(text = MoedaBR.format(primeiro.second), color = corTextoForte, fontSize = 11.sp)
                 }
                 Text(
-                    text = String.format(Locale.forLanguageTag("pt-BR"), "%+.2f%%", variacao),
-                    color = if (variacao >= 0.0) VerdeGrafico else Color(0xFFFF7278),
+                    text = String.format(LocalBRAtivo, "%+.2f%%", variacao),
+                    color = if (variacao >= 0.0) corDestaque else corQueda,
                     fontSize = 11.sp
                 )
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(text = formatarDataCurta(ultimo.first), color = TextoGrafico, fontSize = 10.sp)
-                    Text(text = MoedaBR.format(ultimo.second), color = Color.White, fontSize = 11.sp)
+                    Text(text = formatarDataCurta(ultimo.first), color = corTexto, fontSize = 10.sp)
+                    Text(text = MoedaBR.format(ultimo.second), color = corTextoForte, fontSize = 11.sp)
                 }
             }
         }
@@ -236,6 +297,13 @@ fun StockPriceChart(
 
 private fun formatarDataCurta(data: String): String {
     return runCatching {
-        LocalDate.parse(data).format(DateTimeFormatter.ofPattern("dd MMM", Locale.forLanguageTag("pt-BR")))
+        LocalDate.parse(data).format(DateTimeFormatter.ofPattern("dd MMM", LocalBRAtivo))
+    }.getOrDefault(data)
+}
+
+/** Datas completas viram dd/MM/aaaa; rótulos intradiários (HH:mm) e dd/MM ficam como vieram. */
+private fun formatarDataCompleta(data: String): String {
+    return runCatching {
+        LocalDate.parse(data).format(DateTimeFormatter.ofPattern("dd/MM/yyyy", LocalBRAtivo))
     }.getOrDefault(data)
 }

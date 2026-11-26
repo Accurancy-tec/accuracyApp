@@ -39,49 +39,28 @@ public final class TutorialTour {
         }
     }
 
+    /** Cinco passos curtos: o essencial para começar, sem repetir o que cada tela já explica. */
     private static final Passo[] PASSOS = new Passo[]{
-            new Passo("Bem-vindo ao Accurancy!",
-                    "Vamos fazer um tour rápido, em menos de um minuto, para você saber onde fica cada coisa. "
-                            + "Você pode pular quando quiser.",
-                    R.id.nav_home, 0),
             new Passo("Seu patrimônio",
-                    "Aqui você vê o saldo total, quanto já está investido e quanto ainda está livre para investir.",
+                    "Aqui fica o total das suas carteiras reais somado ao saldo livre. As carteiras simuladas "
+                            + "aparecem logo abaixo, separadas, para não misturar dinheiro de teste.",
                     R.id.nav_home, R.id.cardSaldoTotal),
-            new Passo("Adicione saldo primeiro",
-                    "Para comprar qualquer ativo você precisa ter saldo. Toque em \"Adicionar saldo\" para colocar "
-                            + "dinheiro na sua conta.",
-                    R.id.nav_home, R.id.cardSaldoDisponivel),
-            new Passo("Evolução da carteira",
-                    "O gráfico mostra como o seu patrimônio mudou. Troque entre 1M, 6M e 1A para ver períodos "
-                            + "diferentes.",
+            new Passo("Comece por uma carteira",
+                    "Uma carteira real usa o seu saldo. Uma simulada tem um valor só dela, que você escolhe, "
+                            + "para testar estratégias sem mexer no resto.",
+                    R.id.nav_home, R.id.cardCriarCarteira),
+            new Passo("Acompanhe a evolução",
+                    "Toque e arraste no gráfico para ver o valor exato de cada dia. "
+                            + "Os botões 1M, 6M e 1A mudam o período.",
                     R.id.nav_home, R.id.blocoGraficoEvolucao),
-            new Passo("Crie sua carteira",
-                    "Na aba Carteira você organiza seus investimentos. Toque em \"+ Criar carteira\" para criar a "
-                            + "primeira, por exemplo \"Aposentadoria\" ou \"Viagem\".",
-                    R.id.nav_wallet, R.id.btnCriarWallet),
-            new Passo("Não sabe o que comprar?",
-                    "Na aba Aportes, digite o nome de qualquer produto (ação, fundo, cripto, título...). "
-                            + "Os resultados aparecem enquanto você digita e, ao tocar, o app abre o ativo.",
+            new Passo("Escolha o que comprar",
+                    "Busque pelo código ou nome (PETR4, MXRF11, Bitcoin, Tesouro...) ou navegue pelas "
+                            + "categorias. Ao tocar no ativo, você vê os detalhes e compra.",
                     R.id.nav_aporte, R.id.containerBuscaGeral),
-            new Passo("Ou escolha por categoria",
-                    "Renda fixa, Tesouro Direto, Bolsa de Valores, Criptomoedas, Contratos Futuros e Moedas. "
-                            + "Toque em uma categoria para ver a lista.",
-                    R.id.nav_aporte, R.id.containerCardsProdutos),
-            new Passo("Seus favoritos",
-                    "Toque no coração de um ativo para guardá-lo. Esse botão abre todos os que você favoritou.",
-                    R.id.nav_aporte, R.id.btnFavoritosProdutos),
-            new Passo("Histórico",
-                    "Na aba Histórico ficam o gráfico de rendimento e todas as suas compras e vendas, "
-                            + "com filtros por período e por tipo.",
-                    R.id.nav_historic, R.id.cardGraficoHistorico),
-            new Passo("Seu perfil",
-                    "Na aba Perfil você muda nome, foto, telefone, e-mail e senha. "
-                            + "Para rever este tour, use o item \"Rever tutorial\" mais abaixo nesta tela.",
-                    R.id.nav_profile, R.id.btnEditarPerfil),
-            new Passo("Tudo pronto!",
-                    "Agora é com você: adicione saldo, crie uma carteira e faça o seu primeiro aporte. "
-                            + "Bons investimentos!",
-                    R.id.nav_home, 0),
+            new Passo("Ajuda e preferências",
+                    "No Perfil você troca o tema entre claro e escuro, tira dúvidas nas perguntas frequentes, "
+                            + "fala com a equipe e pode rever este tour quando quiser.",
+                    R.id.nav_profile, R.id.itemAparencia),
     };
 
     private static final long INTERVALO_ESPERA_MS = 120L;

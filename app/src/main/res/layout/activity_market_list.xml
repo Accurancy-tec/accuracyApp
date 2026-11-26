@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#081426">
+    android:background="@color/superficie_campo">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                 android:background="@drawable/bg_btn_icone"
                 android:contentDescription="Voltar"
                 android:src="@drawable/ic_arrow_back"
-                app:tint="#9BAAC0" />
+                app:tint="@color/text_secondary" />
 
             <TextView
                 android:id="@+id/tvTituloListaAtivos"
@@ -38,7 +38,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Ativos"
-                android:textColor="#F1F5FC"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -68,7 +68,7 @@
                 android:layout_height="17dp"
                 android:contentDescription="@null"
                 android:src="@drawable/ic_busca"
-                app:tint="#9BAAC0" />
+                app:tint="@color/text_secondary" />
 
             <EditText
                 android:id="@+id/edtBuscarTitulo"
@@ -82,8 +82,8 @@
                 android:imeOptions="actionSearch"
                 android:padding="0dp"
                 android:singleLine="true"
-                android:textColor="#F1F5FC"
-                android:textColorHint="#8291A8"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_placeholder"
                 android:textSize="12sp" />
 
             <ImageButton
@@ -95,7 +95,7 @@
                 android:contentDescription="Abrir filtros"
                 android:padding="7dp"
                 android:src="@drawable/ic_filter_list"
-                app:tint="#9BAAC0" />
+                app:tint="@color/text_secondary" />
         </LinearLayout>
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -151,16 +151,16 @@
                 android:text="Anterior"
                 android:textAllCaps="false"
                 android:textSize="11sp"
-                android:textColor="#C6D2E2"
-                app:backgroundTint="#12243A"
+                android:textColor="@color/texto_suave"
+                app:backgroundTint="@color/card_background"
                 app:cornerRadius="13dp"
-                app:strokeColor="#263B55"
+                app:strokeColor="@color/borda"
                 app:strokeWidth="1dp"
                 app:icon="@drawable/ic_chevron_left"
                 app:iconGravity="textStart"
                 app:iconPadding="3dp"
-                app:iconTint="#C6D2E2"
-                app:rippleColor="#334B6A" />
+                app:iconTint="@color/texto_suave"
+                app:rippleColor="@color/borda_forte" />
 
             <TextView
                 android:id="@+id/tvPaginaAnterior"
@@ -168,7 +168,7 @@
                 android:layout_height="36dp"
                 android:layout_marginHorizontal="2dp"
                 android:gravity="center"
-                android:textColor="#8193AA"
+                android:textColor="@color/texto_fraco"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif-medium"/>
 
@@ -190,7 +190,7 @@
                 android:layout_height="36dp"
                 android:layout_marginHorizontal="2dp"
                 android:gravity="center"
-                android:textColor="#8193AA"
+                android:textColor="@color/texto_fraco"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif-medium" />
 
@@ -208,14 +208,14 @@
                 android:text="Próxima"
                 android:textAllCaps="false"
                 android:textSize="11sp"
-                android:textColor="#FFFFFF"
-                app:backgroundTint="#2563EB"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/primary_blue"
                 app:cornerRadius="13dp"
                 app:icon="@drawable/ic_chevron_right"
                 app:iconGravity="textEnd"
                 app:iconPadding="3dp"
                 app:iconTint="#FFFFFF"
-                app:rippleColor="#5585F5" />
+                app:rippleColor="@color/primary_blue" />
 
         </LinearLayout>
 

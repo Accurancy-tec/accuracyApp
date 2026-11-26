@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema escuro (visual original do app): cores por papel, usadas nos layouts e no código -->
+    <!-- Preto fixo -->
+    <color name="black">#FF000000</color>
+    <!-- Branco fixo (texto sobre botões e cartões coloridos) -->
+    <color name="white">#FFFFFFFF</color>
+    <!-- Fundo das telas -->
+    <color name="bg_deep">#FF06101E</color>
+    <!-- Fundo de painéis grandes -->
+    <color name="bg_surface">#FF0A1628</color>
+    <!-- Cartões -->
+    <color name="card_background">#FF0D1D30</color>
+    <!-- Cartão dentro de cartão, abas e controles -->
+    <color name="card_background_2">#FF10243A</color>
+    <!-- Campos e áreas rebaixadas -->
+    <color name="superficie_campo">#FF081426</color>
+    <!-- Item ou chip selecionado -->
+    <color name="superficie_selecionada">#FF142B50</color>
+    <!-- Fundo dos ícones -->
+    <color name="fundo_icone">#FF102C50</color>
+    <!-- Trilho de barras de progresso -->
+    <color name="trilho">#FF26374D</color>
+    <!-- Bordas de cartões e campos -->
+    <color name="borda">#FF22334B</color>
+    <!-- Bordas de destaque e alça das janelas -->
+    <color name="borda_forte">#FF334155</color>
+    <!-- Linhas divisórias -->
+    <color name="divider">#12FFFFFF</color>
+    <!-- Borda dos campos de login -->
+    <color name="input_border">#1AFFFFFF</color>
+    <!-- Fundo dos campos de login -->
+    <color name="input_bg">#0DFFFFFF</color>
+    <!-- Botões sociais -->
+    <color name="social_bg">#0AFFFFFF</color>
+    <!-- Abas inativas -->
+    <color name="tab_bg">#0DFFFFFF</color>
+    <!-- Texto principal -->
+    <color name="text_primary">#FFF1F5F9</color>
+    <!-- Texto de apoio forte -->
+    <color name="texto_suave">#FFB8C9E5</color>
+    <!-- Texto secundário e rótulos -->
+    <color name="text_secondary">#FF9BAAC0</color>
+    <!-- Texto discreto -->
+    <color name="texto_fraco">#FF8D9DB3</color>
+    <!-- Texto de dica dos campos -->
+    <color name="text_placeholder">#FF7086A5</color>
+    <!-- Links e valores em destaque azul -->
+    <color name="link">#FF60A5FA</color>
+    <!-- Azul principal -->
+    <color name="primary_blue">#FF2563EB</color>
+    <!-- Botões principais -->
+    <color name="btn_primary">#FF2563EB</color>
+    <!-- Azul principal pressionado -->
+    <color name="primaria_forte">#FF1D4ED8</color>
+    <!-- Ícones e destaques do perfil -->
+    <color name="blue_primary">#FF1677FF</color>
+    <!-- Detalhes azuis -->
+    <color name="blue_light">#FF328BFF</color>
+    <!-- Ganhos -->
+    <color name="green_positive">#FF22C55E</color>
+    <!-- Ganhos em destaque -->
+    <color name="positivo_destaque">#FF31D9B5</color>
+    <!-- Perdas -->
+    <color name="red_negative">#FFF44336</color>
+    <!-- Perdas em destaque e erros -->
+    <color name="negativo_destaque">#FFFF626B</color>
+    <!-- Avisos -->
+    <color name="aviso">#FFFFC400</color>
+    <!-- Botão Sair da conta -->
+    <color name="red_primary">#FFFF5265</color>
+    <!-- Texto de apoio do Sair -->
+    <color name="red_secondary">#FFC65A68</color>
+    <!-- Fundo do cartão Sair -->
+    <color name="red_background">#FF241A29</color>
+    <!-- Fundo: ações e renda fixa -->
+    <color name="categoria_verde">#FF12383A</color>
+    <!-- Fundo: BDRs -->
+    <color name="categoria_azul">#FF202C50</color>
+    <!-- Fundo: cripto -->
+    <color name="categoria_neutra">#FF2A3140</color>
+    <!-- Fundo: FIIs -->
+    <color name="categoria_amarela">#FF35372F</color>
+    <!-- Fundo: futuros -->
+    <color name="categoria_laranja">#FF352F2A</color>
+    <!-- Fundo: moedas -->
+    <color name="categoria_moeda">#FF1F3350</color>
+    <!-- Carregamento: base -->
+    <color name="esqueleto_base">#FF162840</color>
+    <!-- Carregamento: brilho -->
+    <color name="esqueleto_brilho">#FF26406A</color>
+    <!-- Linhas de grade dos gráficos -->
+    <color name="grafico_grade">#1FFFFFFF</color>
+    <!-- Fundo escurecido do tutorial e das janelas -->
+    <color name="scrim">#B3050A16</color>
+
+    <!-- Textos sobre o cartão azul do patrimônio (o cartão é azul nos dois temas) -->
+    <color name="texto_sobre_destaque">#FFD6E4FF</color>
+    <color name="positivo_sobre_destaque">#FF9BF0C4</color>
+    <color name="negativo_sobre_destaque">#FFFFC2C7</color>
+    <color name="linha_sobre_destaque">#33FFFFFF</color>
+    <color name="fundo_sobre_destaque">#26FFFFFF</color>
+</resources>

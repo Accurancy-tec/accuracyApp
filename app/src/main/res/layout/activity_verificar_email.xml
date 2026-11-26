@@ -100,7 +100,7 @@
             android:stateListAnimator="@null"
             android:text="Confirmar e-mail"
             android:textAllCaps="false"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="bold" />
 

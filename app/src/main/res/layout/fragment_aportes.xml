@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#081426">
+    android:background="@color/superficie_campo">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -48,7 +48,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Produtos"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -56,7 +56,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Prateleira completa de investimentos"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
 
                     </LinearLayout>
@@ -69,7 +69,7 @@
                         android:contentDescription="Abrir meus favoritos"
                         android:padding="9dp"
                         android:src="@drawable/ic_favorito_cheio"
-                        app:tint="#FF4D6D" />
+                        app:tint="@color/negativo_destaque" />
 
                 </LinearLayout>
 
@@ -90,7 +90,7 @@
                         android:layout_height="18dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_busca"
-                        app:tint="#9BAAC0" />
+                        app:tint="@color/text_secondary" />
 
                     <EditText
                         android:id="@+id/edtBuscaGeral"
@@ -105,8 +105,8 @@
                         android:inputType="text"
                         android:padding="0dp"
                         android:singleLine="true"
-                        android:textColor="#F1F5FC"
-                        android:textColorHint="#8291A8"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_placeholder"
                         android:textSize="13sp" />
 
                     <ImageButton
@@ -118,7 +118,7 @@
                         android:padding="9dp"
                         android:src="@drawable/ic_limpar_busca"
                         android:visibility="gone"
-                        app:tint="#9BAAC0" />
+                        app:tint="@color/text_secondary" />
                 </LinearLayout>
 
                 <!-- Resultados da busca (aparecem no lugar dos cards) -->
@@ -144,7 +144,7 @@
                         android:layout_marginTop="24dp"
                         android:gravity="center"
                         android:lineSpacingMultiplier="1.15"
-                        android:textColor="#8D9DB3"
+                        android:textColor="@color/texto_fraco"
                         android:textSize="13sp"
                         android:visibility="gone" />
                 </LinearLayout>
@@ -182,7 +182,7 @@
                             android:background="@drawable/bg_icone_renda_fixa"
                             android:gravity="center"
                             android:text="CDB"
-                            android:textColor="#31D9C0"
+                            android:textColor="@color/positivo_destaque"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -191,7 +191,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
                             android:text="Renda Fixa"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -200,7 +200,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="CDB, LCI e LCA"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -224,7 +224,7 @@
                             android:background="@drawable/bg_icone_tesouro"
                             android:gravity="center"
                             android:text="TD"
-                            android:textColor="#57A6FF"
+                            android:textColor="@color/link"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -233,7 +233,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
                             android:text="Tesouro Direto"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -242,7 +242,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Títulos públicos nacionais"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -275,7 +275,7 @@
                             android:background="@drawable/bg_icone_renda_variavel"
                             android:gravity="center"
                             android:text="B3"
-                            android:textColor="#31D9A5"
+                            android:textColor="@color/positivo_destaque"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -284,7 +284,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
                             android:text="Bolsa de Valores"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -293,7 +293,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Ações, FIIs e BDRs"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -326,7 +326,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
                             android:text="Criptomoedas"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -335,7 +335,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Bitcoin, Ethereum e mais"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -368,7 +368,7 @@
                             android:background="@drawable/bg_categoria_futuros"
                             android:gravity="center"
                             android:text="FUT"
-                            android:textColor="#FF9F43"
+                            android:textColor="@color/aviso"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -377,7 +377,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
                             android:text="Contratos Futuros"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -386,7 +386,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Índice, dólar e juros"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>
@@ -410,7 +410,7 @@
                             android:background="@drawable/bg_categoria_moeda"
                             android:gravity="center"
                             android:text="$"
-                            android:textColor="#57A6FF"
+                            android:textColor="@color/link"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -419,7 +419,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="9dp"
                             android:text="Moedas Estrangeiras"
-                            android:textColor="#F1F5FC"
+                            android:textColor="@color/text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -428,7 +428,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Dólar, euro, libra e mais"
-                            android:textColor="#9BAAC0"
+                            android:textColor="@color/text_secondary"
                             android:textSize="11sp" />
 
                     </LinearLayout>

@@ -3,19 +3,19 @@ package com.example.accurancymobileapp.utils;
 import android.widget.ImageView;
 
 import com.example.accurancymobileapp.R;
+import androidx.core.content.ContextCompat;
 
 /** Draws the heart used on lists and details, and names categories for the user. */
 public final class FavoritoUi {
 
     private static final int COR_FAVORITO = 0xFFFF4D6D;
-    private static final int COR_NORMAL = 0xFF9BAAC0;
 
     private FavoritoUi() {
     }
 
     public static void aplicar(ImageView coracao, boolean favorito) {
         coracao.setImageResource(favorito ? R.drawable.ic_favorito_cheio : R.drawable.ic_favorito_vazio);
-        coracao.setColorFilter(favorito ? COR_FAVORITO : COR_NORMAL);
+        coracao.setColorFilter(favorito ? COR_FAVORITO : ContextCompat.getColor(coracao.getContext(), R.color.text_secondary));
         coracao.setContentDescription(favorito ? "Remover dos favoritos" : "Adicionar aos favoritos");
     }
 

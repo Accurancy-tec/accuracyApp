@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ícones escuros na barra de status/navegação quando o fundo do app é claro. -->
+    <bool name="barras_sistema_claras">true</bool>
+</resources>
