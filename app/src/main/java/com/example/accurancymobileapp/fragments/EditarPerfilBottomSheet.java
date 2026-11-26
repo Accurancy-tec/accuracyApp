@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.accurancymobileapp.response.PerfilResponse;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 
 import java.util.HashMap;
@@ -98,7 +99,7 @@ public class EditarPerfilBottomSheet extends PerfilSheetBase {
         api.perfilAtualizar(corpo).enqueue(new PerfilCallback(this) {
             @Override
             public void aoSucesso(PerfilResponse resposta) {
-                Toast.makeText(requireContext(), "Dados atualizados.", Toast.LENGTH_SHORT).show();
+                Aviso.makeText(requireContext(), "Dados atualizados.", Toast.LENGTH_SHORT).show();
                 concluir(ACAO_RECARREGAR);
             }
 

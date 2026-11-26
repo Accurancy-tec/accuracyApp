@@ -37,6 +37,7 @@ import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
 import com.example.accurancymobileapp.response.VicoResponse;
 import com.example.accurancymobileapp.ui.AnimationSpinner;
 import com.example.accurancymobileapp.ui.ChartHelper;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.CallbackDaTela;
 import com.example.accurancymobileapp.utils.ContadorNotificacoes;
 import com.example.accurancymobileapp.utils.Esqueleto;
@@ -205,7 +206,7 @@ public class DashboardFragment extends Fragment {
                         campo.setText("—");
                     }
                             }
-                Toast.makeText(requireContext(), mensagem, Toast.LENGTH_SHORT).show();
+                Aviso.makeText(requireContext(), mensagem, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -303,7 +304,7 @@ public class DashboardFragment extends Fragment {
             try {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
             } catch (ActivityNotFoundException e) {
-                Toast.makeText(requireContext(), "Nenhum navegador disponível para abrir a notícia.", Toast.LENGTH_SHORT).show();
+                Aviso.makeText(requireContext(), "Nenhum navegador disponível para abrir a notícia.", Toast.LENGTH_SHORT).show();
             }
             return;
         }

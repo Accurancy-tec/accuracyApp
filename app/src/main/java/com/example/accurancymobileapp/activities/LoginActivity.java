@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.accurancymobileapp.R;
+import com.example.accurancymobileapp.fragments.RecuperarSenhaBottomSheet;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.response.LoginResponse;
@@ -27,6 +28,8 @@ import com.example.accurancymobileapp.utils.TutorialPrefs;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 import com.example.accurancymobileapp.utils.ApiErros;
 import com.example.accurancymobileapp.model.User;
+import com.example.accurancymobileapp.utils.Aparelho;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.SessionManager;
 
 import com.google.gson.JsonElement;
@@ -43,6 +46,9 @@ import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
+    /** Message shown when the screen opens (session ended on this device, signed out everywhere...). */
+    public static final String EXTRA_AVISO = "aviso";
+
     EditText editEmail;
     EditText editSenha;
     EditText txtNome;
@@ -57,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
     TextView tabEntrar;
     TextView tabCadastrar;
     LinearLayout btnGoogle;
-    LinearLayout btnGitHub;
     TextView btnIrCadastro;
     View layoutLogin;
     View layoutRegister;
@@ -79,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (confirmado != null) editEmail.setText(confirmado);
                     editSenha.setText("");
                     editSenha.requestFocus();
-                    Toast.makeText(this, "E-mail confirmado. Agora é só entrar.", Toast.LENGTH_LONG).show();
+                    Aviso.makeText(this, "E-mail confirmado. Agora é só entrar.", Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -105,7 +110,6 @@ public class LoginActivity extends AppCompatActivity {
         tabEntrar = findViewById(R.id.tabEntrar);
         tabCadastrar = findViewById(R.id.tabCadastrar);
         btnGoogle = findViewById(R.id.btnGoogle);
-        btnGitHub = findViewById(R.id.btnGitHub);
         btnIrCadastro = findViewById(R.id.btnIrCadastro);
         layoutLogin = findViewById(R.id.layoutLogin);
         layoutRegister = findViewById(R.id.layoutRegister);
@@ -113,6 +117,20 @@ public class LoginActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         configurarListeners();
+
+        // "Esqueci a senha" answers with the e-mail used, so the user only types the new password.
+        getSupportFragmentManager().setFragmentResultListener(RecuperarSenhaBottomSheet.RESULTADO_CHAVE, this,
+                (chave, resultado) -> {
+                    mostrarAbaEntrar();
+                    editEmail.setText(resultado.getString(RecuperarSenhaBottomSheet.RESULTADO_EMAIL, ""));
+                    editSenha.setText("");
+                    editSenha.requestFocus();
+                });
+
+        String aviso = getIntent().getStringExtra(EXTRA_AVISO);
+        if (savedInstanceState == null && aviso != null && !aviso.isEmpty()) {
+            Aviso.makeText(this, aviso, Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -207,31 +225,14 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-        btnEsqueciSenha.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Toast.makeText(LoginActivity.this,
-                        "Tela de recuperação de senha (em breve)",
-                        Toast.LENGTH_SHORT).show();
-            }
+        btnEsqueciSenha.setOnClickListener(v -> {
+            if (getSupportFragmentManager().findFragmentByTag(RecuperarSenhaBottomSheet.TAG_FRAGMENT) != null) return;
+            RecuperarSenhaBottomSheet.nova(editEmail.getText().toString())
+                    .show(getSupportFragmentManager(), RecuperarSenhaBottomSheet.TAG_FRAGMENT);
         });
 
 
-        tabCadastrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                layoutLogin.setVisibility(View.GONE);
-                layoutRegister.setVisibility(View.VISIBLE);
-
-                tabCadastrar.setBackgroundResource(R.drawable.bg_tab_active);
-                tabEntrar.setBackgroundResource(0);
-
-                tabCadastrar.setTextColor(getColor(R.color.white));
-                tabEntrar.setTextColor(getColor(R.color.text_secondary));
-            }
-        });
+        tabCadastrar.setOnClickListener(v -> mostrarAbaCadastrar());
 
         tabEntrar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,28 +250,14 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-        btnGitHub.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Toast.makeText(LoginActivity.this,
-                        "Login com GitHub (em breve)", Toast.LENGTH_SHORT).show();
-            }
+        // "Não tem conta? Cadastre-se" e "Já tem conta? Entrar" trocam de aba nesta mesma tela.
+        btnIrCadastro.setOnClickListener(v -> {
+            mostrarAbaCadastrar();
+            txtNome.requestFocus();
         });
-
-
-
-
-        btnIrCadastro.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //  navegar para CadastroActivity
-                // Intent intent = new Intent(LoginActivity.this, CadastroActivity.class);
-                // startActivity(intent);
-                Toast.makeText(LoginActivity.this,
-                        "Indo para o cadastro...", Toast.LENGTH_SHORT).show();
-
-            }
+        findViewById(R.id.btnIrLogin).setOnClickListener(v -> {
+            mostrarAbaEntrar();
+            editEmail.requestFocus();
         });
     }
 
@@ -280,6 +267,7 @@ public class LoginActivity extends AppCompatActivity {
         User user = new User();
         user.setEmail_usuario(email);
         user.setSenha_usuario(senha);
+        user.setDispositivo(Aparelho.nome());
 
         ApiService api = RetrofitClient.getClient(this).create(ApiService.class);
         api.loginVerification(user).enqueue(new Callback<LoginResponse>() {
@@ -294,9 +282,10 @@ public class LoginActivity extends AppCompatActivity {
                             "Erro HTTP: " + response.code()
                     );
 
-                    Toast.makeText(
+                    Aviso.makeText(
                             LoginActivity.this,
-                            "Erro no servidor: HTTP " + response.code(),
+                            ApiErros.mensagem(response.errorBody(),
+                                    "Não foi possível entrar agora (erro " + response.code() + ")."),
                             Toast.LENGTH_LONG
                     ).show();
 
@@ -304,7 +293,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 if (response.body() == null) {
-                    Toast.makeText(
+                    Aviso.makeText(
                             LoginActivity.this,
                             "O servidor retornou uma resposta vazia.",
                             Toast.LENGTH_LONG
@@ -317,7 +306,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (login.isEmailNaoVerificado()) {
                     // Right password, but the e-mail was never confirmed: ask for the code (a new one is sent).
-                    Toast.makeText(LoginActivity.this,
+                    Aviso.makeText(LoginActivity.this,
                             login.getMessage() != null ? login.getMessage() : "Confirme seu e-mail para entrar.",
                             Toast.LENGTH_LONG).show();
                     abrirVerificacao(login.getEmailUsuario() != null ? login.getEmailUsuario() : email, true);
@@ -331,7 +320,7 @@ public class LoginActivity extends AppCompatActivity {
                             login.getToken(),
                             login.getRefreshToken());
 
-                    Toast.makeText(
+                    Aviso.makeText(
                             LoginActivity.this,
                             "Bem-vindo " + usuario.getNome_usuario(),
                             Toast.LENGTH_LONG
@@ -346,7 +335,7 @@ public class LoginActivity extends AppCompatActivity {
                     finish();
 
                 } else {
-                    Toast.makeText(
+                    Aviso.makeText(
                             LoginActivity.this,
                             login.getMessage(),
                             Toast.LENGTH_LONG
@@ -357,7 +346,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable throwable) {
                 Log.e("LoginActivity","Erro ao Logar",throwable);
-                Toast.makeText(LoginActivity.this, "Erro: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+                Aviso.makeText(LoginActivity.this, "Erro: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -376,12 +365,12 @@ public class LoginActivity extends AppCompatActivity {
                     String status = corpo != null && corpo.has("status") && !corpo.get("status").isJsonNull()
                             ? corpo.get("status").getAsString() : "";
                     if(!"sucesso".equals(status)){
-                        Toast.makeText(LoginActivity.this,
+                        Aviso.makeText(LoginActivity.this,
                                 mensagemDoCorpo(corpo, "Não foi possível concluir o cadastro."),
                                 Toast.LENGTH_LONG).show();
                         return;
                     }
-                    Toast.makeText(LoginActivity.this,
+                    Aviso.makeText(LoginActivity.this,
                             mensagemDoCorpo(corpo, "Usuario cadastrado"), Toast.LENGTH_LONG).show();
 
                     final String emailCadastrado = email;
@@ -391,14 +380,7 @@ public class LoginActivity extends AppCompatActivity {
                     txtSenhaCadastro.setText("");
                     txtConfirmarSenha.setText("");
 
-                    layoutLogin.setVisibility(View.VISIBLE);
-                    layoutRegister.setVisibility(View.GONE);
-
-                    tabEntrar.setBackgroundResource(R.drawable.bg_tab_active);
-                    tabCadastrar.setBackgroundResource(0);
-
-                    tabCadastrar.setTextColor(getColor(R.color.text_secondary));
-                    tabEntrar.setTextColor(getColor(R.color.white));
+                    mostrarAbaEntrar();
 
                     // The API already e-mailed the code: ask for it now.
                     abrirVerificacao(emailCadastrado, false);
@@ -410,7 +392,7 @@ public class LoginActivity extends AppCompatActivity {
                     } catch (Exception ignored) {
                         // Falls back to the generic message below.
                     }
-                    Toast.makeText(LoginActivity.this,
+                    Aviso.makeText(LoginActivity.this,
                             mensagemDoCorpo(corpo, "Não foi possível cadastrar agora (erro " + response.code() + ")."),
                             Toast.LENGTH_LONG).show();
                 }
@@ -418,7 +400,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable throwable) {
-                Toast.makeText(LoginActivity.this, "Erro" + throwable.toString(), Toast.LENGTH_LONG).show();
+                Aviso.makeText(LoginActivity.this, "Erro" + throwable.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -444,6 +426,17 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         return padrao;
+    }
+
+    private void mostrarAbaCadastrar() {
+        layoutLogin.setVisibility(View.GONE);
+        layoutRegister.setVisibility(View.VISIBLE);
+
+        tabCadastrar.setBackgroundResource(R.drawable.bg_tab_active);
+        tabEntrar.setBackgroundResource(0);
+
+        tabCadastrar.setTextColor(getColor(R.color.white));
+        tabEntrar.setTextColor(getColor(R.color.text_secondary));
     }
 
     private void mostrarAbaEntrar() {
@@ -508,6 +501,7 @@ public class LoginActivity extends AppCompatActivity {
     private void enviarTokenGoogle(ApiService api, String idToken) {
         Map<String, String> corpo = new HashMap<>();
         corpo.put("id_token", idToken);
+        corpo.put("dispositivo", Aparelho.nome());
         api.loginGoogle(corpo).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
@@ -524,7 +518,7 @@ public class LoginActivity extends AppCompatActivity {
                             && !TutorialPrefs.jaViu(LoginActivity.this, emailGoogle)) {
                         TutorialPrefs.marcarPendente(LoginActivity.this, emailGoogle);
                     }
-                    Toast.makeText(LoginActivity.this,
+                    Aviso.makeText(LoginActivity.this,
                             nome != null && !nome.isEmpty() ? "Bem-vindo " + nome : "Bem-vindo!",
                             Toast.LENGTH_LONG).show();
                     startActivity(new Intent(LoginActivity.this, MainPageActivity.class));
@@ -551,7 +545,7 @@ public class LoginActivity extends AppCompatActivity {
         btnGoogle.setEnabled(true);
         btnGoogle.setAlpha(1f);
         if (mensagemOuNulo != null) {
-            Toast.makeText(this, mensagemOuNulo, Toast.LENGTH_LONG).show();
+            Aviso.makeText(this, mensagemOuNulo, Toast.LENGTH_LONG).show();
         }
     }
 

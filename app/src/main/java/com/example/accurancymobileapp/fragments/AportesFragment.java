@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -56,6 +57,8 @@ import com.example.accurancymobileapp.utils.AnimacaoUtils;
 import com.example.accurancymobileapp.response.ApiResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -82,6 +85,12 @@ public class AportesFragment extends Fragment {
     private Runnable buscaPendente;
     private BuscaGeralRepository buscaRepository;
     private BuscaGeralAdapter buscaAdapter;
+    private ChipGroup grupoFiltrosBusca;
+    /** Título da seção escolhida no filtro da busca; null mostra todas. */
+    private String filtroSecao;
+    private List<BuscaGeralRepository.Secao> ultimasSecoes = new ArrayList<>();
+    private boolean ultimaBuscaCarregando;
+    private int ultimasFalhas;
     private EditText edtBusca;
     private ImageButton btnLimparBusca;
     private View containerCards, containerResultados;
@@ -192,6 +201,7 @@ public class AportesFragment extends Fragment {
         });
         rvBusca.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvBusca.setAdapter(buscaAdapter);
+        configurarFiltrosBusca(view);
 
         edtBusca.addTextChangedListener(new TextWatcher() {
             @Override
@@ -263,19 +273,92 @@ public class AportesFragment extends Fragment {
 
         buscaRepository.buscar(termo, (secoes, carregando, falhas) -> {
             if (!isAdded() || getView() == null) return;
-            buscaAdapter.atualizar(secoes, carregando);
-            if (carregando) {
-                tvBuscaMensagem.setVisibility(View.GONE);
-            } else if (secoes.isEmpty()) {
-                mostrarMensagem(falhas > 0
-                        ? "Não foi possível buscar agora. Verifique a conexão e tente de novo."
-                        : "Nada encontrado para “" + termo + "”.\nTente o código (ex.: PETR4, BTC) ou parte do nome.");
-            } else if (falhas > 0) {
-                mostrarMensagem("Algumas categorias não responderam. Os resultados podem estar incompletos.");
-            } else {
-                tvBuscaMensagem.setVisibility(View.GONE);
-            }
+            ultimasSecoes = new ArrayList<>(secoes);
+            ultimaBuscaCarregando = carregando;
+            ultimasFalhas = falhas;
+            mostrarResultadosFiltrados();
         });
+    }
+
+    // ------------------------------------------------------------ category filter
+
+    /** Rótulo do chip e título da seção da busca geral que ele mostra (null = todas). */
+    private static final String[][] FILTROS_BUSCA = {
+            {"Todos", null},
+            {"Renda fixa", "Renda fixa"},
+            {"Tesouro", "Tesouro Direto"},
+            {"Ações", "Ações"},
+            {"FIIs", "Fundos imobiliários"},
+            {"BDRs e ETFs", "BDRs e ETFs"},
+            {"Cripto", "Criptomoedas"},
+            {"Moedas", "Moedas estrangeiras"},
+            {"Futuros", "Contratos futuros"}
+    };
+
+    private void configurarFiltrosBusca(View view) {
+        grupoFiltrosBusca = view.findViewById(R.id.grupoFiltrosBusca);
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        for (String[] filtro : FILTROS_BUSCA) {
+            Chip chip = (Chip) inflater.inflate(R.layout.item_chip_filtro, grupoFiltrosBusca, false);
+            chip.setId(View.generateViewId());
+            chip.setText(filtro[0]);
+            chip.setTag(filtro[1]);
+            chip.setCheckable(true);
+            grupoFiltrosBusca.addView(chip);
+            if (filtro[1] == null) chip.setChecked(true);
+        }
+        grupoFiltrosBusca.setOnCheckedStateChangeListener((grupo, marcados) -> {
+            if (marcados.isEmpty()) return;
+            Chip escolhido = grupo.findViewById(marcados.get(0));
+            filtroSecao = escolhido == null ? null : (String) escolhido.getTag();
+            mostrarResultadosFiltrados();
+        });
+    }
+
+    /** Aplica o filtro de categoria aos últimos resultados e mostra a mensagem certa. */
+    private void mostrarResultadosFiltrados() {
+        List<BuscaGeralRepository.Secao> visiveis = new ArrayList<>();
+        for (BuscaGeralRepository.Secao secao : ultimasSecoes) {
+            if (filtroSecao == null || filtroSecao.equals(secao.titulo)) visiveis.add(secao);
+        }
+        atualizarChipsDeFiltro();
+        buscaAdapter.atualizar(visiveis, ultimaBuscaCarregando);
+
+        if (ultimaBuscaCarregando) {
+            tvBuscaMensagem.setVisibility(View.GONE);
+        } else if (ultimasSecoes.isEmpty()) {
+            mostrarMensagem(ultimasFalhas > 0
+                    ? "Não foi possível buscar agora. Verifique a conexão e tente de novo."
+                    : "Nada encontrado para “" + ultimaBusca + "”.\nTente o código (ex.: PETR4, BTC) ou parte do nome.");
+        } else if (visiveis.isEmpty()) {
+            mostrarMensagem("Nada nesta categoria para “" + ultimaBusca + "”. Toque em Todos para ver as outras.");
+        } else if (ultimasFalhas > 0) {
+            mostrarMensagem("Algumas categorias não responderam. Os resultados podem estar incompletos.");
+        } else {
+            tvBuscaMensagem.setVisibility(View.GONE);
+        }
+    }
+
+    /** Só aparecem as categorias com resultado (e a que está marcada). */
+    private void atualizarChipsDeFiltro() {
+        int comResultado = 0;
+        for (int i = 0; i < grupoFiltrosBusca.getChildCount(); i++) {
+            Chip chip = (Chip) grupoFiltrosBusca.getChildAt(i);
+            String titulo = (String) chip.getTag();
+            if (titulo == null) continue;
+            boolean temResultado = false;
+            for (BuscaGeralRepository.Secao secao : ultimasSecoes) {
+                if (titulo.equals(secao.titulo) && secao.quantidade() > 0) {
+                    temResultado = true;
+                    break;
+                }
+            }
+            if (temResultado) comResultado++;
+            chip.setVisibility(temResultado || chip.isChecked() ? View.VISIBLE : View.GONE);
+        }
+        // Com uma categoria só (ou nenhuma), o filtro não ajuda: a faixa some.
+        ((View) grupoFiltrosBusca.getParent()).setVisibility(
+                comResultado > 1 || filtroSecao != null ? View.VISIBLE : View.GONE);
     }
 
     private void mostrarMensagem(String texto) {

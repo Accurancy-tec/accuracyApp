@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
+import com.example.accurancymobileapp.utils.Aviso;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -237,7 +238,7 @@ public class FormAdicionarSaldoActivity extends AppCompatActivity {
 
             if (valor.compareTo(BigDecimal.ZERO) <= 0) {
 
-                Toast.makeText(
+                Aviso.makeText(
                         this,
                         "Informe um valor válido.",
                         Toast.LENGTH_SHORT
@@ -248,7 +249,7 @@ public class FormAdicionarSaldoActivity extends AppCompatActivity {
 
             if (valor.stripTrailingZeros().scale() > 2) {
 
-                Toast.makeText(
+                Aviso.makeText(
                         this,
                         "Informe no máximo duas casas decimais.",
                         Toast.LENGTH_SHORT
@@ -278,7 +279,7 @@ public class FormAdicionarSaldoActivity extends AppCompatActivity {
             public void onSuccess(String mensagem) {
                 requisicaoEmAndamento = false;
 
-                Toast.makeText(FormAdicionarSaldoActivity.this, "Saldo adicionado com sucesso.", Toast.LENGTH_SHORT).show();
+                Aviso.makeText(FormAdicionarSaldoActivity.this, "Saldo adicionado com sucesso.", Toast.LENGTH_SHORT).show();
 
                 Intent resultado = new Intent();
 
@@ -298,7 +299,7 @@ public class FormAdicionarSaldoActivity extends AppCompatActivity {
                 btnContinuarDeposito.setEnabled(true);
                 btnContinuarDeposito.setText("Continuar");
 
-                Toast.makeText(
+                Aviso.makeText(
                         FormAdicionarSaldoActivity.this,
                         message,
                         Toast.LENGTH_LONG

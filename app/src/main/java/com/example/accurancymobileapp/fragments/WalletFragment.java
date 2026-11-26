@@ -26,6 +26,7 @@ import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.CallbackDaTela;
 import com.example.accurancymobileapp.utils.CarteiraEmFoco;
 import com.example.accurancymobileapp.utils.Esqueleto;
@@ -116,7 +117,7 @@ public class WalletFragment extends Fragment {
         Esqueleto.iniciar(tvValor, tvInvestido, tvSaldoLivre, tvResultado);
 
         if (idCarteira <= 0) {
-            Toast.makeText(requireContext(), "Não foi possível identificar a carteira.", Toast.LENGTH_LONG).show();
+            Aviso.makeText(requireContext(), "Não foi possível identificar a carteira.", Toast.LENGTH_LONG).show();
             getParentFragmentManager().popBackStack();
             return;
         }
@@ -183,7 +184,7 @@ public class WalletFragment extends Fragment {
                                 campo.setText("—");
                             }
                                             }
-                        Toast.makeText(requireContext(), mensagem, Toast.LENGTH_SHORT).show();
+                        Aviso.makeText(requireContext(), mensagem, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -294,7 +295,7 @@ public class WalletFragment extends Fragment {
     /** Vai para Aportes com esta carteira já escolhida para a próxima compra. */
     private void irInvestir() {
         CarteiraEmFoco.definir(requireContext(), idCarteira);
-        Toast.makeText(requireContext(), simulada
+        Aviso.makeText(requireContext(), simulada
                 ? "Escolha um ativo. A compra vai para a simulação \"" + nomeCarteira + "\"."
                 : "Escolha um ativo para investir em \"" + nomeCarteira + "\".", Toast.LENGTH_LONG).show();
         BottomNavigationView navegacao = requireActivity().findViewById(R.id.bottomNavigation);
@@ -329,7 +330,7 @@ public class WalletFragment extends Fragment {
                         public void onSuccess(String saldo) {
                             if (!isAdded() || getView() == null) return;
                             dialogo.dismiss();
-                            Toast.makeText(requireContext(), reais(valor) + " depositados na simulação.",
+                            Aviso.makeText(requireContext(), reais(valor) + " depositados na simulação.",
                                     Toast.LENGTH_SHORT).show();
                             carregarResumo();
                         }
@@ -365,7 +366,7 @@ public class WalletFragment extends Fragment {
             public void onSuccess(String mensagem) {
                 if (!isAdded()) return;
                 if (CarteiraEmFoco.obter(requireContext()) == idCarteira) CarteiraEmFoco.limpar(requireContext());
-                Toast.makeText(requireContext(), "Carteira excluída.", Toast.LENGTH_SHORT).show();
+                Aviso.makeText(requireContext(), "Carteira excluída.", Toast.LENGTH_SHORT).show();
                 getParentFragmentManager().popBackStack();
             }
 

@@ -1,6 +1,7 @@
 package com.example.accurancymobileapp.utils;
 
 import android.app.Activity;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -17,11 +18,15 @@ import androidx.credentials.exceptions.NoCredentialException;
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 
+import java.util.Locale;
+
 /**
  * "Sign in with Google" through the Android Credential Manager. It only gets the Google id_token;
  * the API checks it and creates the session.
  */
 public final class GoogleEntrar {
+
+    private static final String TAG = "GoogleEntrar";
 
     public interface Resultado {
         void aoObterToken(String idToken);
@@ -33,6 +38,13 @@ public final class GoogleEntrar {
     }
 
     private GoogleEntrar() {}
+
+    /** Só "[16] Cancelled by user." é a pessoa fechando o cartão do Google. */
+    private static boolean canceladoPelaPessoa(GetCredentialException erro) {
+        if (!(erro instanceof GetCredentialCancellationException)) return false;
+        String texto = erro.getMessage() == null ? "" : erro.getMessage().toLowerCase(Locale.ROOT);
+        return texto.isEmpty() || texto.contains("cancelled by user") || texto.contains("cancelled by the user");
+    }
 
     /** @param clientIdWeb the WEB OAuth client id (the one the API checks the token against) */
     public static void iniciar(@NonNull Activity activity, @NonNull String clientIdWeb,
@@ -71,8 +83,14 @@ public final class GoogleEntrar {
 
                     @Override
                     public void onError(@NonNull GetCredentialException erro) {
-                        if (erro instanceof GetCredentialCancellationException) {
+                        Log.w(TAG, erro.getClass().getSimpleName() + ": " + erro.getMessage());
+                        if (canceladoPelaPessoa(erro)) {
                             resultado.aoCancelar();
+                        } else if (erro instanceof GetCredentialCancellationException) {
+                            // O Google também usa "cancelado" quando recusa o app, por exemplo com
+                            // "[16] Account reauth failed": app (pacote + SHA-1) sem cadastro no Google Cloud.
+                            resultado.aoFalhar("O Google recusou o login neste aparelho."
+                                    + " A configuração do app no Google Cloud precisa ser revisada.");
                         } else if (erro instanceof NoCredentialException) {
                             resultado.aoFalhar("Nenhuma conta Google disponível neste aparelho.");
                         } else {

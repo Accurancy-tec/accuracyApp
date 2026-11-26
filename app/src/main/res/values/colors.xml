@@ -65,6 +65,7 @@
     <color name="red_negative">#FFDC2626</color>
     <!-- Perdas em destaque e erros -->
     <color name="negativo_destaque">#FFD93545</color>
+    <color name="atencao_destaque">#FFB45309</color>
     <!-- Avisos -->
     <color name="aviso">#FFB26A00</color>
     <!-- Botão Sair da conta -->
@@ -100,4 +101,8 @@
     <color name="negativo_sobre_destaque">#FFFFC2C7</color>
     <color name="linha_sobre_destaque">#33FFFFFF</color>
     <color name="fundo_sobre_destaque">#26FFFFFF</color>
+
+    <!-- Aviso (substitui o Toast): escuro no tema claro, claro no tema escuro -->
+    <color name="aviso_fundo">#F01E293B</color>
+    <color name="aviso_texto">#FFF8FAFC</color>
 </resources>

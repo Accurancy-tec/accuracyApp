@@ -25,6 +25,7 @@ import com.example.accurancymobileapp.model.clsAportes;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
 import com.example.accurancymobileapp.network.repository.WalletRepository;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.MascaraMonetaria;
 
 import java.math.BigDecimal;
@@ -79,7 +80,7 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
 
         if (ticker == null || ticker.trim().isEmpty()) {
             Log.e(TAG, "Ativo nao informado na Intent.");
-            Toast.makeText(this, "Não foi informado de qual ativo é o dividendo.", Toast.LENGTH_LONG).show();
+            Aviso.makeText(this, "Não foi informado de qual ativo é o dividendo.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -197,7 +198,7 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
         BigDecimal valor = valorDigitado();
         String problema = validar(valor);
         if (problema != null) {
-            Toast.makeText(this, problema, Toast.LENGTH_SHORT).show();
+            Aviso.makeText(this, problema, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -216,7 +217,7 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
                 }
                 if (wallets == null || wallets.isEmpty()) {
                     definirEmAndamento(false);
-                    Toast.makeText(RegistrarDividendoActivity.this,
+                    Aviso.makeText(RegistrarDividendoActivity.this,
                             "Crie uma carteira antes de registrar o dividendo.", Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -250,7 +251,7 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
                 }
                 Log.e(TAG, "Falha ao listar carteiras: " + message);
                 definirEmAndamento(false);
-                Toast.makeText(RegistrarDividendoActivity.this, message, Toast.LENGTH_LONG).show();
+                Aviso.makeText(RegistrarDividendoActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -270,7 +271,7 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
                     return;
                 }
                 Log.d(TAG, "Dividendo registrado: ativo=" + ticker);
-                Toast.makeText(RegistrarDividendoActivity.this,
+                Aviso.makeText(RegistrarDividendoActivity.this,
                         "Dividendo registrado com sucesso (operação simulada).", Toast.LENGTH_LONG).show();
                 setResult(RESULT_OK);
                 finish();
@@ -283,7 +284,7 @@ public class RegistrarDividendoActivity extends AppCompatActivity {
                 }
                 Log.w(TAG, "Dividendo recusado: " + mensagem);
                 definirEmAndamento(false);
-                Toast.makeText(RegistrarDividendoActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                Aviso.makeText(RegistrarDividendoActivity.this, mensagem, Toast.LENGTH_LONG).show();
             }
         });
     }

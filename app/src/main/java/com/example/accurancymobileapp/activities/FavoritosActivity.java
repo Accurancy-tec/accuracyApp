@@ -25,6 +25,7 @@ import com.example.accurancymobileapp.adapter.FavoritosAdapter;
 import com.example.accurancymobileapp.model.FavoritoAtivo;
 import com.example.accurancymobileapp.network.repository.FavoritoRepository;
 import com.example.accurancymobileapp.utils.AnimacaoUtils;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.FavoritosCache;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -144,7 +145,7 @@ public class FavoritosActivity extends AppCompatActivity {
                 if (todos.isEmpty()) {
                     mostrarEstado("Não foi possível carregar", mensagem, true);
                 } else {
-                    Toast.makeText(FavoritosActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                    Aviso.makeText(FavoritosActivity.this, mensagem, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -239,7 +240,7 @@ public class FavoritosActivity extends AppCompatActivity {
                     @Override
                     public void onError(boolean estadoAnterior, String mensagem) {
                         if (isFinishing() || isDestroyed()) return;
-                        Toast.makeText(FavoritosActivity.this, mensagem, Toast.LENGTH_SHORT).show();
+                        Aviso.makeText(FavoritosActivity.this, mensagem, Toast.LENGTH_SHORT).show();
                         carregar();
                     }
                 });

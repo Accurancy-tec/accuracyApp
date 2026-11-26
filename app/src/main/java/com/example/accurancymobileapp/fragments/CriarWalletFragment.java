@@ -21,6 +21,7 @@ import com.example.accurancymobileapp.adapter.EspacamentoCarteiras;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
+import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.CallbackDaTela;
 import com.example.accurancymobileapp.utils.Esqueleto;
 import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
@@ -102,7 +103,7 @@ public class CriarWalletFragment extends Fragment {
                             tvTotal.setText("—");
                             tvRendimento.setText("");
                                             }
-                        Toast.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
+                        Aviso.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
                     }
                 });
     }
