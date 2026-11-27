@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.model.SessaoAparelho;
+import com.example.accurancymobileapp.model.DeviceSession;
 import com.example.accurancymobileapp.utils.TempoRelativo;
 import com.google.android.material.button.MaterialButton;
 
@@ -18,21 +18,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Aparelhos com a conta aberta; o deste celular vem marcado e o botão dele vira "Sair". */
-public class DispositivoAdapter extends RecyclerView.Adapter<DispositivoAdapter.Linha> {
+public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.Linha> {
 
     public interface AoDesconectar {
-        void aoDesconectar(@NonNull SessaoAparelho sessao);
+        void aoDesconectar(@NonNull DeviceSession sessao);
     }
 
-    private final List<SessaoAparelho> itens = new ArrayList<>();
+    private final List<DeviceSession> itens = new ArrayList<>();
     private final AoDesconectar aoDesconectar;
     private boolean habilitado = true;
 
-    public DispositivoAdapter(@NonNull AoDesconectar aoDesconectar) {
+    public DeviceAdapter(@NonNull AoDesconectar aoDesconectar) {
         this.aoDesconectar = aoDesconectar;
     }
 
-    public void definir(@NonNull List<SessaoAparelho> sessoes) {
+    public void definir(@NonNull List<DeviceSession> sessoes) {
         itens.clear();
         itens.addAll(sessoes);
         notifyDataSetChanged();
@@ -45,42 +45,42 @@ public class DispositivoAdapter extends RecyclerView.Adapter<DispositivoAdapter.
         notifyItemRangeChanged(0, itens.size());
     }
 
-    public List<SessaoAparelho> getItens() {
+    public List<DeviceSession> getItens() {
         return itens;
     }
 
     @NonNull
     @Override
     public Linha onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dispositivo, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_device, parent, false);
         return new Linha(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull Linha linha, int posicao) {
-        SessaoAparelho s = itens.get(posicao);
-        String nome = s.getDispositivo();
+        DeviceSession s = itens.get(posicao);
+        String nome = s.getDeviceName();
         boolean celular = !s.isSite() || nome.contains("Android") || nome.contains("iPhone");
 
-        linha.icone.setImageResource(celular ? R.drawable.ic_celular : R.drawable.ic_computador);
+        linha.icone.setImageResource(celular ? R.drawable.ic_phone : R.drawable.ic_computer);
         linha.nome.setText(nome);
-        linha.esteAparelho.setVisibility(s.isAtual() ? View.VISIBLE : View.GONE);
+        linha.esteAparelho.setVisibility(s.isCurrent() ? View.VISIBLE : View.GONE);
         linha.uso.setText(descreverUso(s));
 
-        String desde = TempoRelativo.dataCurta(s.getCriadoEm());
+        String desde = TempoRelativo.dataCurta(s.getCreatedAt());
         linha.desde.setText(desde.isEmpty() ? "" : "Entrou em " + desde);
         linha.desde.setVisibility(desde.isEmpty() ? View.GONE : View.VISIBLE);
 
-        linha.botao.setText(s.isAtual() ? "Sair" : "Desconectar");
+        linha.botao.setText(s.isCurrent() ? "Sair" : "Desconectar");
         linha.botao.setEnabled(habilitado);
-        linha.botao.setContentDescription((s.isAtual() ? "Sair deste aparelho: " : "Desconectar ") + nome);
+        linha.botao.setContentDescription((s.isCurrent() ? "Sair deste aparelho: " : "Desconectar ") + nome);
         linha.botao.setOnClickListener(v -> aoDesconectar.aoDesconectar(s));
     }
 
-    private static String descreverUso(SessaoAparelho s) {
-        String origem = s.isSite() ? "Site" : "Android".equals(s.getPlataforma()) ? "App Android" : "Login";
-        if (s.isAtual()) return origem + " · em uso agora";
-        String quando = TempoRelativo.descrever(s.getUltimoUsoEm());
+    private static String descreverUso(DeviceSession s) {
+        String origem = s.isSite() ? "Site" : "Android".equals(s.getPlatform()) ? "App Android" : "Login";
+        if (s.isCurrent()) return origem + " · em uso agora";
+        String quando = TempoRelativo.descrever(s.getLastUsedAt());
         if (quando.isEmpty()) return origem;
         return "agora".equals(quando) ? origem + " · usado agora" : origem + " · último uso " + quando;
     }

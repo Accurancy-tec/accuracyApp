@@ -93,7 +93,7 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activities.DispositivosActivity"
+            android:name=".activities.DevicesActivity"
             android:exported="false" />
         <activity
             android:name=".activities.ReportActivity"

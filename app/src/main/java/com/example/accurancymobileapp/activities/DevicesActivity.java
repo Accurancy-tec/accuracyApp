@@ -17,12 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.adapter.DispositivoAdapter;
+import com.example.accurancymobileapp.adapter.DeviceAdapter;
 import com.example.accurancymobileapp.adapter.EsqueletoAdapter;
-import com.example.accurancymobileapp.model.SessaoAparelho;
+import com.example.accurancymobileapp.model.DeviceSession;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.service.ApiService;
-import com.example.accurancymobileapp.response.SessoesResponse;
+import com.example.accurancymobileapp.response.SessionsResponse;
 import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.CallbackDaTela;
 import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
@@ -37,23 +37,23 @@ import java.util.Map;
 import retrofit2.Call;
 
 /** Onde a conta está aberta: desconecta um aparelho, todos os outros ou todos de uma vez. */
-public class DispositivosActivity extends AppCompatActivity {
+public class DevicesActivity extends AppCompatActivity {
 
     private ApiService api;
-    private DispositivoAdapter adapter;
+    private DeviceAdapter adapter;
     private RecyclerView lista;
     private PuxarParaAtualizar puxar;
     private View estado, acoes;
     private TextView tvTituloEstado, tvTextoEstado;
     private MaterialButton btnOutros, btnTodos;
-    private Call<SessoesResponse> chamada;
+    private Call<SessionsResponse> chamada;
     private boolean ocupado = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_dispositivos);
+        setContentView(R.layout.activity_devices);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.raizDispositivos), (v, insets) -> {
             Insets barras = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(barras.left, barras.top, barras.right, barras.bottom);
@@ -69,7 +69,7 @@ public class DispositivosActivity extends AppCompatActivity {
         btnOutros = findViewById(R.id.btnDesconectarOutros);
         btnTodos = findViewById(R.id.btnSairDeTodos);
 
-        adapter = new DispositivoAdapter(this::confirmarDesconexao);
+        adapter = new DeviceAdapter(this::confirmarDesconexao);
         lista.setLayoutManager(new LinearLayoutManager(this));
         SwipeRefreshLayout swipe = findViewById(R.id.swipeDispositivos);
         puxar = new PuxarParaAtualizar(swipe, this::carregar);
@@ -97,11 +97,11 @@ public class DispositivosActivity extends AppCompatActivity {
         if (chamada != null) chamada.cancel();
         puxar.iniciar();
         chamada = api.listarSessoes();
-        chamada.enqueue(new CallbackDaTela<SessoesResponse>(this) {
+        chamada.enqueue(new CallbackDaTela<SessionsResponse>(this) {
             @Override
-            public void aoSucesso(@NonNull SessoesResponse resposta) {
+            public void aoSucesso(@NonNull SessionsResponse resposta) {
                 puxar.concluir();
-                mostrar(resposta.getSessoes());
+                mostrar(resposta.getSessions());
             }
 
             @Override
@@ -114,19 +114,19 @@ public class DispositivosActivity extends AppCompatActivity {
                     tvTextoEstado.setText(mensagem);
                     estado.setVisibility(View.VISIBLE);
                 } else {
-                    Aviso.makeText(DispositivosActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                    Aviso.makeText(DevicesActivity.this, mensagem, Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
-    private void mostrar(List<SessaoAparelho> sessoes) {
+    private void mostrar(List<DeviceSession> sessoes) {
         adapter.definir(sessoes);
         EsqueletoAdapter.ocultar(lista, adapter);
         estado.setVisibility(View.GONE);
 
         int outros = 0;
-        for (SessaoAparelho s : sessoes) if (!s.isAtual()) outros++;
+        for (DeviceSession s : sessoes) if (!s.isCurrent()) outros++;
         btnOutros.setEnabled(outros > 0);
         btnOutros.setAlpha(outros > 0 ? 1f : 0.45f);
         btnOutros.setText(outros == 0 ? "Nenhum outro aparelho conectado"
@@ -134,15 +134,15 @@ public class DispositivosActivity extends AppCompatActivity {
         acoes.setVisibility(View.VISIBLE);
     }
 
-    private void confirmarDesconexao(@NonNull SessaoAparelho sessao) {
+    private void confirmarDesconexao(@NonNull DeviceSession sessao) {
         if (ocupado) return;
-        if (sessao.isAtual()) {
+        if (sessao.isCurrent()) {
             confirmar("Sair deste aparelho?",
                     "Os outros aparelhos continuam conectados. Para voltar aqui, entre com seu e-mail e senha.",
                     "Sair", () -> desconectar(sessao));
             return;
         }
-        confirmar("Desconectar " + sessao.getDispositivo() + "?",
+        confirmar("Desconectar " + sessao.getDeviceName() + "?",
                 "A conta fecha nesse aparelho na hora. Se você não reconhece esse acesso, troque a senha também.",
                 "Desconectar", () -> desconectar(sessao));
     }
@@ -170,19 +170,19 @@ public class DispositivosActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void desconectar(@NonNull SessaoAparelho sessao) {
+    private void desconectar(@NonNull DeviceSession sessao) {
         travar(true);
         Map<String, Object> corpo = new HashMap<>();
         corpo.put("id_sessao", sessao.getId());
-        api.encerrarSessao(corpo).enqueue(new CallbackDaTela<SessoesResponse>(this) {
+        api.encerrarSessao(corpo).enqueue(new CallbackDaTela<SessionsResponse>(this) {
             @Override
-            public void aoSucesso(@NonNull SessoesResponse resposta) {
+            public void aoSucesso(@NonNull SessionsResponse resposta) {
                 travar(false);
-                if (resposta.isEncerrouAtual()) {
+                if (resposta.isCurrentSessionEnded()) {
                     voltarParaLogin("Você saiu deste aparelho.");
                     return;
                 }
-                Aviso.makeText(DispositivosActivity.this, resposta.texto("Aparelho desconectado."),
+                Aviso.makeText(DevicesActivity.this, resposta.texto("Aparelho desconectado."),
                         Toast.LENGTH_SHORT).show();
                 carregar();
             }
@@ -190,7 +190,7 @@ public class DispositivosActivity extends AppCompatActivity {
             @Override
             public void aoErro(@NonNull String mensagem) {
                 travar(false);
-                Aviso.makeText(DispositivosActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                Aviso.makeText(DevicesActivity.this, mensagem, Toast.LENGTH_LONG).show();
                 carregar();
             }
         });
@@ -200,15 +200,15 @@ public class DispositivosActivity extends AppCompatActivity {
         travar(true);
         Map<String, Object> corpo = new HashMap<>();
         corpo.put("manter_atual", manterEste);
-        api.encerrarSessoes(corpo).enqueue(new CallbackDaTela<SessoesResponse>(this) {
+        api.encerrarSessoes(corpo).enqueue(new CallbackDaTela<SessionsResponse>(this) {
             @Override
-            public void aoSucesso(@NonNull SessoesResponse resposta) {
+            public void aoSucesso(@NonNull SessionsResponse resposta) {
                 travar(false);
-                if (resposta.isEncerrouAtual()) {
+                if (resposta.isCurrentSessionEnded()) {
                     voltarParaLogin("Você saiu de todos os aparelhos.");
                     return;
                 }
-                Aviso.makeText(DispositivosActivity.this,
+                Aviso.makeText(DevicesActivity.this,
                         resposta.texto("Os outros aparelhos foram desconectados."), Toast.LENGTH_SHORT).show();
                 carregar();
             }
@@ -216,7 +216,7 @@ public class DispositivosActivity extends AppCompatActivity {
             @Override
             public void aoErro(@NonNull String mensagem) {
                 travar(false);
-                Aviso.makeText(DispositivosActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                Aviso.makeText(DevicesActivity.this, mensagem, Toast.LENGTH_LONG).show();
                 carregar();
             }
         });

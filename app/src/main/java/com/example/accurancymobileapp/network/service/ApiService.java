@@ -23,7 +23,7 @@ import com.example.accurancymobileapp.response.ReportResponse;
 import com.example.accurancymobileapp.response.TermsStatusResponse;
 import com.example.accurancymobileapp.response.RespostaSimples;
 import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
-import com.example.accurancymobileapp.response.SessoesResponse;
+import com.example.accurancymobileapp.response.SessionsResponse;
 import com.example.accurancymobileapp.response.StockHistoryResponse;
 import com.example.accurancymobileapp.response.TitulosRendaFixaResponse;
 
@@ -78,15 +78,15 @@ public interface ApiService {
     // ---- Connected devices (token needed) ----
 
     @POST("auth/sessoes")
-    Call<SessoesResponse> listarSessoes();
+    Call<SessionsResponse> listarSessoes();
 
     /** Body: id_sessao. */
     @POST("auth/sessaoEncerrar")
-    Call<SessoesResponse> encerrarSessao(@Body Map<String, Object> corpo);
+    Call<SessionsResponse> encerrarSessao(@Body Map<String, Object> corpo);
 
     /** Body: manter_atual (true keeps this device signed in). */
     @POST("auth/sessoesEncerrar")
-    Call<SessoesResponse> encerrarSessoes(@Body Map<String, Object> corpo);
+    Call<SessionsResponse> encerrarSessoes(@Body Map<String, Object> corpo);
 
     /** Logout. Body: refresh_token. Works even after the access token expired. */
     @POST("auth/sair")

@@ -19,7 +19,7 @@
         android:background="@drawable/bg_item_icon"
         android:importantForAccessibility="no"
         android:padding="10dp"
-        android:src="@drawable/ic_celular"
+        android:src="@drawable/ic_phone"
         app:tint="@color/blue_primary" />
 
     <LinearLayout

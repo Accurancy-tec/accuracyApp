@@ -415,7 +415,7 @@
 
                     <ImageView
                         style="@style/LinhaOpcaoIcone"
-                        android:src="@drawable/ic_celular" />
+                        android:src="@drawable/ic_phone" />
 
                     <LinearLayout style="@style/LinhaOpcaoTextos">
 
