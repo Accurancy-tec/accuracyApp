@@ -96,7 +96,7 @@
             android:name=".activities.DispositivosActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.RelatorioActivity"
+            android:name=".activities.ReportActivity"
             android:exported="false" />
     </application>
 

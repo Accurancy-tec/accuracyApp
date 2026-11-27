@@ -288,12 +288,12 @@
             <LinearLayout style="@style/CartaoOpcoes">
 
                 <LinearLayout
-                    android:id="@+id/itemRelatorio"
+                    android:id="@+id/itemReport"
                     style="@style/LinhaOpcao">
 
                     <ImageView
                         style="@style/LinhaOpcaoIcone"
-                        android:src="@drawable/ic_relatorio" />
+                        android:src="@drawable/ic_report" />
 
                     <LinearLayout style="@style/LinhaOpcaoTextos">
 

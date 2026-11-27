@@ -15,7 +15,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvSimboloAtivoRelatorio"
+            android:id="@+id/tvReportAssetSymbol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
@@ -23,7 +23,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvCarteiraAtivoRelatorio"
+            android:id="@+id/tvReportAssetWallet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -32,7 +32,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/tvVariacaoAtivoRelatorio"
+        android:id="@+id/tvReportAssetChange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingStart="8dp"
