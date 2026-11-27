@@ -20,7 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.adapter.AporteAdapter;
 import com.example.accurancymobileapp.adapter.EsqueletoAdapter;
+import com.example.accurancymobileapp.adapter.PositionAdapter;
 import com.example.accurancymobileapp.model.Aporte;
+import com.example.accurancymobileapp.model.Position;
 import com.example.accurancymobileapp.model.Wallet;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.network.repository.AporteRepository;
@@ -35,8 +37,12 @@ import com.example.accurancymobileapp.utils.PuxarParaAtualizar;
 import com.example.accurancymobileapp.utils.TempoRelativo;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -46,8 +52,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Uma carteira: patrimônio e resultado calculados pela API, ações (investir, depositar na
- * simulação, excluir) e as movimentações registradas nela.
+ * A wallet: net worth and result calculated by the API, actions (invest, deposit in the
+ * simulation, rename, delete), the assets it holds now and the operations registered in it.
  */
 public class WalletFragment extends Fragment {
 
@@ -72,6 +78,9 @@ public class WalletFragment extends Fragment {
     private boolean carregouOperacoes = false;
     private String atualizadoEm;
     private int quantidadeOperacoes = -1;
+    @Nullable
+    private List<Aporte> operations;
+    private boolean showingPositions = true;
 
     public WalletFragment() {
         super(R.layout.fragment_wallet);
@@ -108,6 +117,8 @@ public class WalletFragment extends Fragment {
         puxar = new PuxarParaAtualizar(view.findViewById(R.id.swipeCarteira), this::carregarTudo);
         view.findViewById(R.id.btnVoltar).setOnClickListener(v -> getParentFragmentManager().popBackStack());
         view.findViewById(R.id.btnExcluirCarteira).setOnClickListener(v -> confirmarExclusao());
+        view.findViewById(R.id.btnRenameWallet).setOnClickListener(v -> askNewName());
+        setUpListTabs(view.findViewById(R.id.walletListTabs));
         view.findViewById(R.id.btnAtualizar).setOnClickListener(v -> puxar.disparar(this::carregarTudo));
         btnInvestir.setOnClickListener(v -> irInvestir());
         btnDepositar.setOnClickListener(v -> abrirDeposito());
@@ -243,7 +254,7 @@ public class WalletFragment extends Fragment {
         }
 
         Esqueleto.parar(tvValor, tvInvestido, tvSaldoLivre, tvResultado);
-        mostrarQuantidade();
+        if (showingPositions) showList();
     }
 
     // ------------------------------------------------------------ operações
@@ -260,34 +271,83 @@ public class WalletFragment extends Fragment {
             public void onSucesso(List<Aporte> aportes) {
                 puxar.concluir();
                 if (!isAdded() || getView() == null) return;
-                List<Aporte> lista = aportes != null ? aportes : new ArrayList<>();
+                operations = aportes != null ? aportes : new ArrayList<>();
                 carregouOperacoes = true;
-                quantidadeOperacoes = lista.size();
-                EsqueletoAdapter.ocultar(recyclerInvestimentos, new AporteAdapter(lista, idCarteira));
-                recyclerInvestimentos.setVisibility(lista.isEmpty() ? View.GONE : View.VISIBLE);
-                txtCarteiraVazia.setText(simulada
-                        ? "Nenhuma operação nesta simulação ainda. Toque em Simular investimento para começar."
-                        : "Nenhuma operação nesta carteira ainda. Toque em Investir para fazer a primeira.");
-                txtCarteiraVazia.setVisibility(lista.isEmpty() ? View.VISIBLE : View.GONE);
-                mostrarQuantidade();
+                quantidadeOperacoes = operations.size();
+                if (!showingPositions) showList();
             }
 
             @Override
             public void onErro(String mensagem) {
                 puxar.concluir();
                 if (!isAdded() || getView() == null) return;
+                if (showingPositions) return;
                 EsqueletoAdapter.ocultar(recyclerInvestimentos, new AporteAdapter(new ArrayList<>(), idCarteira));
-                txtCarteiraVazia.setText("Não foi possível carregar as operações agora.");
-                txtCarteiraVazia.setVisibility(View.VISIBLE);
+                showEmptyState(true, "Não foi possível carregar as operações agora.");
             }
         });
     }
 
+    private void setUpListTabs(ChipGroup tabs) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        String[] labels = {"Ativos", "Movimentações"};
+        for (int i = 0; i < labels.length; i++) {
+            Chip chip = (Chip) inflater.inflate(R.layout.item_chip_filtro, tabs, false);
+            chip.setId(View.generateViewId());
+            chip.setText(labels[i]);
+            chip.setCheckable(true);
+            chip.setChecked(i == 0);
+            final boolean positionsTab = i == 0;
+            chip.setOnClickListener(v -> {
+                if (showingPositions == positionsTab) return;
+                showingPositions = positionsTab;
+                showList();
+            });
+            tabs.addView(chip);
+        }
+    }
+
+    /** Assets held now (sold ones only show up in the operations) or every operation of the wallet. */
+    private void showList() {
+        if (showingPositions) {
+            if (carteira == null) return;
+            List<Position> positions = carteira.getPositions();
+            EsqueletoAdapter.ocultar(recyclerInvestimentos, new PositionAdapter(positions, idCarteira));
+            showEmptyState(positions.isEmpty(), simulada
+                    ? "Nenhum ativo nesta simulação agora. Toque em Simular investimento para começar; o que foi vendido aparece em Movimentações."
+                    : "Nenhum ativo nesta carteira agora. Toque em Investir para começar; o que foi vendido aparece em Movimentações.");
+        } else {
+            if (operations == null) {
+                EsqueletoAdapter.mostrar(recyclerInvestimentos, R.layout.item_esqueleto_linha, 4);
+                showEmptyState(false, "");
+                return;
+            }
+            EsqueletoAdapter.ocultar(recyclerInvestimentos, new AporteAdapter(operations, idCarteira));
+            showEmptyState(operations.isEmpty(), simulada
+                    ? "Nenhuma operação nesta simulação ainda. Toque em Simular investimento para começar."
+                    : "Nenhuma operação nesta carteira ainda. Toque em Investir para fazer a primeira.");
+        }
+        mostrarQuantidade();
+    }
+
+    private void showEmptyState(boolean empty, String text) {
+        recyclerInvestimentos.setVisibility(empty ? View.GONE : View.VISIBLE);
+        txtCarteiraVazia.setText(text);
+        txtCarteiraVazia.setVisibility(empty ? View.VISIBLE : View.GONE);
+    }
+
     private void mostrarQuantidade() {
-        if (quantidadeOperacoes < 0) return;
-        String quantidade = quantidadeOperacoes == 1 ? "1 operação" : quantidadeOperacoes + " operações";
+        String quantity;
+        if (showingPositions) {
+            if (carteira == null) return;
+            int count = carteira.getPositions().size();
+            quantity = count == 1 ? "1 ativo" : count + " ativos";
+        } else {
+            if (quantidadeOperacoes < 0) return;
+            quantity = quantidadeOperacoes == 1 ? "1 operação" : quantidadeOperacoes + " operações";
+        }
         String hora = TempoRelativo.hora(atualizadoEm);
-        tvQuantidade.setText(hora.isEmpty() ? quantidade : quantidade + " · atualizado às " + hora);
+        tvQuantidade.setText(hora.isEmpty() ? quantity : quantity + " · atualizado às " + hora);
     }
 
     // --------------------------------------------------------------- ações
@@ -347,11 +407,59 @@ public class WalletFragment extends Fragment {
         dialogo.show();
     }
 
+    private void askNewName() {
+        TextInputLayout layout = new TextInputLayout(requireContext());
+        int padding = Math.round(20 * getResources().getDisplayMetrics().density);
+        layout.setPadding(padding, padding / 2, padding, 0);
+        layout.setCounterEnabled(true);
+        layout.setCounterMaxLength(60);
+        TextInputEditText field = new TextInputEditText(layout.getContext());
+        field.setSingleLine(true);
+        field.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        field.setText(nomeCarteira);
+        field.selectAll();
+        layout.addView(field);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Renomear carteira")
+                .setView(layout)
+                .setNegativeButton("Cancelar", null)
+                .setPositiveButton("Salvar", null)
+                .create();
+        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String name = field.getText() == null ? "" : field.getText().toString().trim().replaceAll("\\s+", " ");
+            if (name.isEmpty() || name.length() > 60) {
+                layout.setError("Dê um nome de até 60 caracteres.");
+                return;
+            }
+            v.setEnabled(false);
+            walletRepository.renameWallet(idCarteira, name, new WalletRepository.WalletCallback() {
+                @Override
+                public void onSuccess(String message) {
+                    if (!isAdded() || getView() == null) return;
+                    dialog.dismiss();
+                    nomeCarteira = name;
+                    tvTitulo.setText(name);
+                    Aviso.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onError(String message) {
+                    if (!isAdded() || getView() == null) return;
+                    v.setEnabled(true);
+                    layout.setError(message);
+                }
+            });
+        }));
+        dialog.show();
+    }
+
     private void confirmarExclusao() {
         String mensagem = simulada
-                ? "A simulação \"" + nomeCarteira + "\" e todas as operações dela serão apagadas. Isso não pode ser desfeito."
-                : "A carteira \"" + nomeCarteira + "\" será excluída. Uma carteira real só pode ser excluída "
-                + "quando não tem mais ativos: venda os ativos antes, e o dinheiro volta para o saldo geral.";
+                ? "Os ativos da simulação \"" + nomeCarteira + "\" serão vendidos pelo preço atual, com dinheiro fictício, "
+                + "e ela sai da lista. As operações continuam no histórico."
+                : "Os ativos da carteira \"" + nomeCarteira + "\" serão vendidos pelo preço atual e o dinheiro volta "
+                + "para o seu saldo. As operações continuam no histórico. Carteiras com renda fixa não podem ser excluídas.";
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Excluir carteira?")
                 .setMessage(mensagem)
@@ -366,7 +474,7 @@ public class WalletFragment extends Fragment {
             public void onSuccess(String mensagem) {
                 if (!isAdded()) return;
                 if (CarteiraEmFoco.obter(requireContext()) == idCarteira) CarteiraEmFoco.limpar(requireContext());
-                Aviso.makeText(requireContext(), "Carteira excluída.", Toast.LENGTH_SHORT).show();
+                Aviso.makeText(requireContext(), mensagem, Toast.LENGTH_LONG).show();
                 getParentFragmentManager().popBackStack();
             }
 

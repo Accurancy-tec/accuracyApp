@@ -3,6 +3,8 @@ package com.example.accurancymobileapp.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Carteira como a API devolve em /carteiras/buscar-carteiras e /carteiras/resumo,
@@ -140,6 +142,13 @@ public class Wallet {
 
     public int getQuantidadeAtivos() {
         return quantidadeAtivos;
+    }
+
+    @SerializedName("ativos")
+    private List<Position> positions;
+
+    public List<Position> getPositions() {
+        return positions == null ? new ArrayList<>() : positions;
     }
 
     @Override
