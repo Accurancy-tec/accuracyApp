@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingMultiplier="1.2"
+        android:text="O Accuracy é um simulador educativo: nenhuma operação movimenta dinheiro de verdade e nada no app é recomendação de investimento. Seus dados (nome, e-mail, carteiras e aparelhos conectados) são usados só para a conta e o simulador funcionarem, sem venda nem publicidade."
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnTermsRead"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingStart="0dp"
+        android:text="Ler os Termos de Uso"
+        android:textAllCaps="false"
+        android:textColor="@color/link" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnPrivacyRead"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="0dp"
+        android:text="Ler a Política de Privacidade"
+        android:textAllCaps="false"
+        android:textColor="@color/link" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/checkTermsAccept"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Li e aceito os Termos de Uso e a Política de Privacidade."
+        android:textColor="@color/text_primary"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvTermsError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/negativo_destaque"
+        android:textSize="13sp"
+        android:visibility="gone" />
+</LinearLayout>

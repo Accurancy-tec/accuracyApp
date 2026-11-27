@@ -20,6 +20,7 @@ import com.example.accurancymobileapp.response.PerfilResponse;
 import com.example.accurancymobileapp.response.PerguntasResponse;
 import com.example.accurancymobileapp.response.QuoteResponse;
 import com.example.accurancymobileapp.response.ReportResponse;
+import com.example.accurancymobileapp.response.TermsStatusResponse;
 import com.example.accurancymobileapp.response.RespostaSimples;
 import com.example.accurancymobileapp.response.ResumoPatrimonioResponse;
 import com.example.accurancymobileapp.response.SessoesResponse;
@@ -90,6 +91,13 @@ public interface ApiService {
     /** Logout. Body: refresh_token. Works even after the access token expired. */
     @POST("auth/sair")
     Call<RespostaSimples> sair(@Body Map<String, String> corpo);
+
+    /** Whether the user still has to accept the current Terms of Use and Privacy Policy. */
+    @POST("auth/termos")
+    Call<TermsStatusResponse> termsStatus();
+
+    @POST("auth/aceitar-termos")
+    Call<RespostaSimples> acceptTerms();
 
     // ---- Profile (token needed) ----
 
