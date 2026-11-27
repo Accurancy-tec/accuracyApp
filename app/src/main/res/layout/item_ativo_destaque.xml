@@ -12,18 +12,15 @@
     android:orientation="horizontal"
     android:padding="14dp">
 
-    <!-- Ícone: a cor de fundo e do texto é aplicada no adapter por categoria -->
-    <TextView
-        android:id="@+id/txtIconAtivo"
+    <!-- Asset logo (brapi) over the symbol initials, set by EmphasisAdapter -->
+    <ImageView
+        android:id="@+id/imgHighlightLogo"
         android:layout_width="44dp"
         android:layout_height="44dp"
         android:layout_marginEnd="12dp"
         android:background="@drawable/bg_item_icon"
-        android:gravity="center"
-        android:textColor="@color/link"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        tools:text="P4" />
+        android:contentDescription="Logo do ativo"
+        android:scaleType="fitCenter" />
 
     <LinearLayout
         android:layout_width="0dp"
