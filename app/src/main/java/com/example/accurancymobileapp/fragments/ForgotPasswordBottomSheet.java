@@ -20,9 +20,9 @@ import java.util.Map;
  * "Esqueci a senha", na tela de login: a API manda um código de 6 números para o e-mail e,
  * com ele, a pessoa escolhe a senha nova. Todos os aparelhos são desconectados depois.
  */
-public class RecuperarSenhaBottomSheet extends PerfilSheetBase {
+public class ForgotPasswordBottomSheet extends PerfilSheetBase {
 
-    public static final String TAG_FRAGMENT = "RecuperarSenhaBottomSheet";
+    public static final String TAG_FRAGMENT = "ForgotPasswordBottomSheet";
     /** Fragment result com o e-mail usado, para a tela de login já preencher o campo. */
     public static final String RESULTADO_CHAVE = "recuperar_senha";
     public static final String RESULTADO_EMAIL = "email";
@@ -35,10 +35,10 @@ public class RecuperarSenhaBottomSheet extends PerfilSheetBase {
     private int etapa = 0;
     private String email = "";
 
-    public static RecuperarSenhaBottomSheet nova(@Nullable String emailDigitado) {
+    public static ForgotPasswordBottomSheet nova(@Nullable String emailDigitado) {
         Bundle args = new Bundle();
         args.putString(ARG_EMAIL, emailDigitado == null ? "" : emailDigitado.trim());
-        RecuperarSenhaBottomSheet cartao = new RecuperarSenhaBottomSheet();
+        ForgotPasswordBottomSheet cartao = new ForgotPasswordBottomSheet();
         cartao.setArguments(args);
         return cartao;
     }

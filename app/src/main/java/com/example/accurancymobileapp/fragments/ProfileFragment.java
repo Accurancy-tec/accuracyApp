@@ -27,7 +27,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.accurancymobileapp.R;
 import com.example.accurancymobileapp.activities.AjudaActivity;
-import com.example.accurancymobileapp.activities.DispositivosActivity;
+import com.example.accurancymobileapp.activities.DevicesActivity;
 import com.example.accurancymobileapp.activities.ReportActivity;
 import com.example.accurancymobileapp.activities.LoginActivity;
 import com.example.accurancymobileapp.activities.NotificacoesActivity;
@@ -120,7 +120,7 @@ public class ProfileFragment extends Fragment {
                 v -> TutorialTour.iniciar(requireActivity(), false));
         view.findViewById(R.id.itemAlterarSenha).setOnClickListener(v -> abrirTrocaSenha());
         view.findViewById(R.id.itemAparelhos).setOnClickListener(
-                v -> startActivity(new Intent(requireContext(), DispositivosActivity.class)));
+                v -> startActivity(new Intent(requireContext(), DevicesActivity.class)));
         view.findViewById(R.id.itemReport).setOnClickListener(
                 v -> startActivity(new Intent(requireContext(), ReportActivity.class)));
         view.findViewById(R.id.itemSair).setOnClickListener(v -> logoutSession());

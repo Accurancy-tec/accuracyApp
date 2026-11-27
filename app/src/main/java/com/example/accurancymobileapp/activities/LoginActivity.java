@@ -26,7 +26,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.accurancymobileapp.R;
-import com.example.accurancymobileapp.fragments.RecuperarSenhaBottomSheet;
+import com.example.accurancymobileapp.fragments.ForgotPasswordBottomSheet;
 import com.example.accurancymobileapp.network.service.ApiService;
 import com.example.accurancymobileapp.network.client.RetrofitClient;
 import com.example.accurancymobileapp.response.LoginResponse;
@@ -36,7 +36,7 @@ import com.example.accurancymobileapp.utils.TutorialPrefs;
 import com.example.accurancymobileapp.utils.PerfilCallback;
 import com.example.accurancymobileapp.utils.ApiErros;
 import com.example.accurancymobileapp.model.User;
-import com.example.accurancymobileapp.utils.Aparelho;
+import com.example.accurancymobileapp.utils.DeviceInfo;
 import com.example.accurancymobileapp.utils.Aviso;
 import com.example.accurancymobileapp.utils.SessionManager;
 import com.example.accurancymobileapp.utils.TermsGate;
@@ -131,10 +131,10 @@ public class LoginActivity extends AppCompatActivity {
         configurarListeners();
 
         // "Esqueci a senha" answers with the e-mail used, so the user only types the new password.
-        getSupportFragmentManager().setFragmentResultListener(RecuperarSenhaBottomSheet.RESULTADO_CHAVE, this,
+        getSupportFragmentManager().setFragmentResultListener(ForgotPasswordBottomSheet.RESULTADO_CHAVE, this,
                 (chave, resultado) -> {
                     mostrarAbaEntrar();
-                    editEmail.setText(resultado.getString(RecuperarSenhaBottomSheet.RESULTADO_EMAIL, ""));
+                    editEmail.setText(resultado.getString(ForgotPasswordBottomSheet.RESULTADO_EMAIL, ""));
                     editSenha.setText("");
                     editSenha.requestFocus();
                 });
@@ -245,9 +245,9 @@ public class LoginActivity extends AppCompatActivity {
 
 
         btnEsqueciSenha.setOnClickListener(v -> {
-            if (getSupportFragmentManager().findFragmentByTag(RecuperarSenhaBottomSheet.TAG_FRAGMENT) != null) return;
-            RecuperarSenhaBottomSheet.nova(editEmail.getText().toString())
-                    .show(getSupportFragmentManager(), RecuperarSenhaBottomSheet.TAG_FRAGMENT);
+            if (getSupportFragmentManager().findFragmentByTag(ForgotPasswordBottomSheet.TAG_FRAGMENT) != null) return;
+            ForgotPasswordBottomSheet.nova(editEmail.getText().toString())
+                    .show(getSupportFragmentManager(), ForgotPasswordBottomSheet.TAG_FRAGMENT);
         });
 
 
@@ -286,7 +286,7 @@ public class LoginActivity extends AppCompatActivity {
         User user = new User();
         user.setEmail_usuario(email);
         user.setSenha_usuario(senha);
-        user.setDispositivo(Aparelho.nome());
+        user.setDispositivo(DeviceInfo.name());
 
         ApiService api = RetrofitClient.getClient(this).create(ApiService.class);
         api.loginVerification(user).enqueue(new Callback<LoginResponse>() {
@@ -551,7 +551,7 @@ public class LoginActivity extends AppCompatActivity {
     private void enviarTokenGoogle(ApiService api, String idToken) {
         Map<String, String> corpo = new HashMap<>();
         corpo.put("id_token", idToken);
-        corpo.put("dispositivo", Aparelho.nome());
+        corpo.put("dispositivo", DeviceInfo.name());
         api.loginGoogle(corpo).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
